@@ -13,9 +13,10 @@ export class Rwr {
   constructor() {
     this.element.id = "rwr"; this.element.setAttribute("role", "alert"); this.element.hidden = true; document.body.append(this.element);
     // Browsers only allow sound after a gesture: create the tone generator on the first key or click.
-    const wake = () => { if (this.audio) return; try { this.audio = new AudioContext(); this.gain = this.audio.createGain(); this.gain.gain.value = 0; this.gain.connect(this.audio.destination); this.osc = this.audio.createOscillator(); this.osc.type = "square"; this.osc.connect(this.gain); this.osc.start(); } catch { /* no audio */ } };
+    const wake = () => { if (this.audio) return; try { this.audio = new AudioContext(); this.gain = this.audio.createGain(); this.gain.gain.value = 0; this.gain.connect(this.audio.destination); this.osc = this.audio.createOscillator(); this.osc.type = "triangle"; this.osc.connect(this.gain); this.osc.start(); } catch { /* no audio */ } };
     addEventListener("keydown", wake, { once: true }); addEventListener("pointerdown", wake, { once: true });
   }
+  private lastMode = "quiet"; private since = 0;
   /** Clock bearing (1-12) of a point relative to the nose, in the local horizontal plane. */
   static clock(rel: T.Vector3, up: T.Vector3, heading: number) {
     const east = new T.Vector3(0, 1, 0).cross(up).normalize(), north = up.clone().cross(east);
@@ -40,17 +41,18 @@ export class Rwr {
     this.element.dataset.urgency = String(level);
     this.mode = missiles.length ? "missile" : locks.length ? "lock" : "quiet";
     if (!this.audio || !this.gain || !this.osc) return;
-    // Tones, slowest and lowest when the threat is far, climbing in pitch and rate as it closes:
-    //   lock by an aircraft: two 1 kHz beeps a second; by a SAM radar: two 650 Hz beeps a second;
-    //   missile far (over 15 s): 3 Hz warble 700/900 Hz; 6-15 s: 6 Hz 1000/1300 Hz;
-    //   2.5-6 s: 12 Hz 1400/1900 Hz; last 2.5 s: a steady 2.2 kHz tone.
-    const t = time, beep = (rate: number) => (t * rate) % 1 < 0.45;
+    // Soft triangle tones, kept short so they inform without nagging:
+    //   being tracked: two low blips when the lock starts, then one quiet blip every 6 s;
+    //   missile far (over 15 s): one blip a second; 6-15 s: a slow two-note warble;
+    //   2.5-6 s: a faster warble; last 2.5 s: a steady tone. Nothing goes above 1.1 kHz.
+    if (this.mode !== this.lastMode) { this.lastMode = this.mode; this.since = time; }
+    const t = time, held = t - this.since, beep = (rate: number, duty = 0.45) => (t * rate) % 1 < duty;
     let freq = 0, vol = 0;
-    if (level === 1) { freq = beep(3) ? 700 : 900; vol = 0.022; }
-    else if (level === 2) { freq = beep(6) ? 1000 : 1300; vol = 0.03; }
-    else if (level === 3) { freq = beep(12) ? 1400 : 1900; vol = 0.04; }
-    else if (level === 4) { freq = 2200; vol = 0.045; }
-    else if (locks.length) { const ground = locks.every((l) => l.ground), phase = (t * 2) % 1; freq = ground ? 650 : 1000; vol = phase < 0.12 || (phase > 0.22 && phase < 0.34) ? 0.03 : 0; }
+    if (level === 1) { freq = 620; vol = beep(1, 0.12) ? 0.014 : 0; }
+    else if (level === 2) { freq = beep(3) ? 700 : 860; vol = 0.016; }
+    else if (level === 3) { freq = beep(7) ? 820 : 1040; vol = 0.022; }
+    else if (level === 4) { freq = 1100; vol = 0.026; }
+    else if (locks.length) { const ground = locks.every((l) => l.ground); freq = ground ? 440 : 560; vol = (held < 0.12 || (held > 0.22 && held < 0.34)) || (held > 1 && held % 6 < 0.1) ? 0.014 : 0; }
     if (freq) this.osc.frequency.setTargetAtTime(freq, this.audio.currentTime, 0.004);
     this.gain.gain.setTargetAtTime(muted ? 0 : vol, this.audio.currentTime, 0.008);
   }

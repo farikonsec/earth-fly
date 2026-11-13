@@ -158,6 +158,10 @@ uniform float day;varying vec3 vLook;void main(){
   const reticle=project(p.clone().addScaledVector(aim,5));
   // SAM batteries are external ground targets: boxed like aircraft out to 40 km, no edge arrows beyond that.
   for(const d of [...m.targets,...m.external.filter(t=>t.ground&&t.hp>0&&(!t.quietTarget||t.id===m.lock)&&t.p.distanceTo(p)<40)]){const z=project(d.p),distance=d.p.distanceTo(p),locked=d.id===m.lock,acquired=locked&&m.lockTime>=.85,colour=acquired?'#9dffb0':locked?'#ffd27a':'#ff7a5c';
+   // Only contacts that matter get a marker: one you locked or picked on radar, one tracking or shooting at you,
+   // anything in a sortie or mission, and whatever is close enough to be a threat. Distant patrols stay on the radar only.
+   const relevant=locked||(d.ground?distance<10:!m.persistent||!d.patrol||(d.lockOn??0)>.3||(d.hit??0)>0||distance<8);
+   if(!relevant&&(!z.visible||distance>14))continue;
    c.strokeStyle=c.fillStyle=colour;c.shadowColor=colour;c.shadowBlur=8;
    if(!z.visible){
     // Edge arrow toward targets outside the frame.

@@ -82,10 +82,10 @@ export class FlightSound {
   }
   terrainCue(){
     const c=this.context;
-    if(!c||!this.gain||!this.enabled||c.state!=='running'||c.currentTime-this.lastTerrainTime<3)return false;
+    if(!c||!this.gain||!this.enabled||c.state!=='running'||c.currentTime-this.lastTerrainTime<7)return false;
     const oscillator=c.createOscillator(),volume=c.createGain(),t=c.currentTime;
-    oscillator.type='sine';oscillator.frequency.value=880;volume.gain.value=0;
-    for(const offset of [0,.24]){volume.gain.setValueAtTime(0,t+offset);volume.gain.linearRampToValueAtTime(.18,t+offset+.015);volume.gain.setValueAtTime(.18,t+offset+.1);volume.gain.linearRampToValueAtTime(0,t+offset+.15);}
+    oscillator.type='sine';oscillator.frequency.value=590;volume.gain.value=0;
+    for(const offset of [0,.24]){volume.gain.setValueAtTime(0,t+offset);volume.gain.linearRampToValueAtTime(.07,t+offset+.03);volume.gain.setValueAtTime(.07,t+offset+.1);volume.gain.linearRampToValueAtTime(0,t+offset+.16);}
     oscillator.connect(volume).connect(this.gain);oscillator.onended=()=>{oscillator.disconnect();volume.disconnect();};oscillator.start(t);oscillator.stop(t+.42);
     this.lastTerrainTime=t;this.terrainCues++;return true;
   }
