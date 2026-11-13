@@ -155,9 +155,16 @@ window.addEventListener("error", (e) => errors.push(e.message));
 window.addEventListener("unhandledrejection", (e) =>
   errors.push(String(e.reason)),
 );
-// The scene renders into post.ts's own 4x MSAA target, so a multisampled canvas would only add a second resolve.
+// The scene renders into post.ts's own target and is edge-smoothed there, so the canvas needs no multisampling.
 /** Resolution ceiling and floor for adaptive rendering. Retina at 2x costs 4x the pixels of 1x for a small gain. */
-const MAX_PIXEL_RATIO = 1.5, MIN_PIXEL_RATIO = 0.8;
+const MAX_PIXEL_RATIO = 1.5, MIN_PIXEL_RATIO = 0.7;
+/**
+ * Quality tiers: each owns a band of render scale. The adaptive loop moves the scale inside the band and steps to the
+ * next tier at its edge. The tier reached is remembered, so the next session starts where this machine settled.
+ */
+const TIERS = [{ name: 'low', min: 0.7, max: 1.0, reflect: 0.3 }, { name: 'medium', min: 0.85, max: 1.25, reflect: 0.4 }, { name: 'high', min: 1.1, max: MAX_PIXEL_RATIO, reflect: 0.5 }];
+let tier = (() => { try { const t = Number(localStorage.getItem('earth-fly-tier')); return Number.isInteger(t) && t >= 0 && t <= 2 ? t : 2; } catch { return 2; } })();
+const saveTier = () => { try { localStorage.setItem('earth-fly-tier', String(tier)); } catch { /* storage blocked */ } };
 const renderer = new T.WebGLRenderer({
   antialias: false,
   logarithmicDepthBuffer: true,
@@ -172,16 +179,16 @@ renderer.debug.onShaderError = (gl, program, vertex, fragment) => {
       String(gl.getShaderInfoLog(fragment)),
   );
 };
-renderer.setPixelRatio(Math.min(devicePixelRatio, MAX_PIXEL_RATIO));
+renderer.setPixelRatio(Math.min(devicePixelRatio, TIERS[tier].max));
 renderer.setSize(innerWidth, innerHeight);
 renderer.toneMapping = T.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.25;
 renderer.autoClear = false;
 const weatherMap={value:null as T.Texture|null},elevationMap={value:null as T.Texture|null};
-const post=new PostFX(renderer,weatherMap,elevationMap);
+const post=new PostFX(renderer,weatherMap,elevationMap);post.setTier(tier);
 let pendingRatio=0,uiClock=1,radarContacts:RadarContact[]=[];
 renderer.info.autoReset=false;
-const perf=new Perf(renderer.getContext() as WebGL2RenderingContext,()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,ratio:renderer.getPixelRatio(),width:renderer.domElement.width,height:renderer.domElement.height}));
+const perf=new Perf(renderer.getContext() as WebGL2RenderingContext,()=>({tier:TIERS[tier].name,calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,ratio:renderer.getPixelRatio(),width:renderer.domElement.width,height:renderer.domElement.height}));
 const fx={settle:0,exposure:1.25,flash:0,shake:0,slow:0,lockClock:0,shellTop:6,shellClock:9,quality:1};
 $("world").append(renderer.domElement);renderer.domElement.tabIndex=0;renderer.domElement.setAttribute("aria-label","Flight view. W/S pitch, A/D bank, Shift boost, Y superspeed, Z gun, X missile, C target lock, N nuclear bomb.");
 const scene = new T.Scene(),
@@ -257,7 +264,7 @@ function feelNuke(worldDt:number,shipP:T.Vector3){
   el.hidden=!text||document.body.classList.contains('clean');if(el.textContent!==text)el.textContent=text;el.classList.toggle('danger',danger);
   $('drop-nuke').classList.toggle('spent',!nuke.armed);
 }
-(window as unknown as {earthNuke:unknown}).earthNuke={nuke,drop:dropNuke,get fleets(){return fleets;},get raid(){return raid;},get ops(){return ops;}};
+(window as unknown as {earthNuke:unknown}).earthNuke={nuke,drop:dropNuke,get fleets(){return fleets;},get raid(){return raid;},get ops(){return ops;},get perf(){return perf;},get post(){return post;},get scenes(){return {scene,terrainScene,shipScene,waterScene};}};
 /** Mach 1 crossing: vapour cone, shock disc, a double thump and a jolt. */
 function sonicBoom(){const air=new T.Vector3(...state.v).sub(new T.Vector3(...atmosphereVelocity(state.p)));if(air.lengthSq()<1e-10)return;boomFx.trigger(air.normalize());audio.sonicCue();setTimeout(()=>audio.sonicCue(),140);fx.shake=Math.max(fx.shake,1.1);fx.flash=Math.max(fx.flash,.12);}
 /** External camera variants; all of them keep cameraMode 'chase' so flight feedback behaves the same. */
@@ -1222,7 +1229,7 @@ function draw(dt: number) {
   terrainSun.position.copy(lightDir).multiplyScalar(10000);
   // Local terrain owns its depth, including mapped surfaces below the globe's sea-level shell.
   // The river surface draws after the whole local scene against its depth, so only what stands above the water hides it.
-  if (patch.visible){water.reflect(renderer,camera,[terrainScene,shipScene]);renderer.clearDepth();renderer.render(terrainScene, camera);if(water.active||wash.mesh.visible)renderer.render(waterScene,camera);}
+  if (patch.visible){water.reflect(renderer,camera,[terrainScene,shipScene],TIERS[tier].reflect);renderer.clearDepth();renderer.render(terrainScene, camera);if(water.active||wash.mesh.visible)renderer.render(waterScene,camera);}
   // The blast pass needs the terrain's depth to char the ground and hide the cloud behind hills, so keep it while a blast is in range.
   if(!postFrame.nuke)renderer.clearDepth();
   ship.quaternion.copy(rotation);
@@ -1301,12 +1308,14 @@ function draw(dt: number) {
     $("fps").textContent = `${Math.round(frames / frameTime)} FPS`;
     // Adaptive resolution aims for a steady 55-60 fps: shed pixels after two slow seconds, win them back after
     // four fast ones. The gap between the thresholds stops it hunting up and down.
-    {const rate=frames/frameTime,ratio=renderer.getPixelRatio(),live=!paused&&!document.hidden,ceiling=Math.min(devicePixelRatio,MAX_PIXEL_RATIO);
+    {const rate=frames/frameTime,ratio=renderer.getPixelRatio(),live=!paused&&!document.hidden,band=TIERS[tier],ceiling=Math.min(devicePixelRatio,band.max);
      // Resizing the canvas clears it, so the change waits for the start of the next frame; doing it here left a dark frame on screen.
      // The first 12 seconds of a flight are spent loading scenery, so the frame rate then says nothing about the hardware.
      const apply=(next:number)=>{pendingRatio=next;fx.slow=fx.quality=0;};fx.settle=live?fx.settle+1:fx.settle;if(fx.settle<12){fx.slow=fx.quality=0;}
-     fx.slow=rate<48&&live&&fx.settle>=12?fx.slow+1:0;if(fx.slow>=2&&ratio>MIN_PIXEL_RATIO)apply(Math.max(MIN_PIXEL_RATIO,ratio-.2));
-     fx.quality=rate>57&&live&&fx.settle>=12?fx.quality+1:0;if(fx.quality>=4&&ratio<ceiling)apply(Math.min(ceiling,ratio+.1));}
+     fx.slow=rate<48&&live&&fx.settle>=12?fx.slow+1:0;
+     if(fx.slow>=2){if(ratio>band.min+.01)apply(Math.max(band.min,ratio-.15));else if(tier>0){tier--;post.setTier(tier);saveTier();apply(Math.min(ratio,TIERS[tier].max));}}
+     fx.quality=rate>57&&live&&fx.settle>=12?fx.quality+1:0;
+     if(fx.quality>=4){if(ratio<ceiling-.01)apply(Math.min(ceiling,ratio+.1));else if(tier<2&&fx.quality>=8){tier++;post.setTier(tier);saveTier();apply(Math.max(ratio,TIERS[tier].min));}}}
     frames = 0;
     frameTime = 0;
   }

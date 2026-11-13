@@ -57,11 +57,15 @@ export class PostFX {
   private upPass: T.ShaderMaterial;
   private finalPass: T.ShaderMaterial;
   readonly levels = 6;
+  /** 0 low, 1 medium, 2 high: sets cloud resolution and bloom depth; the host sets pixel ratio and reflections. */
+  tier = 2;
+  private get bloom() { return this.tier === 0 ? 4 : this.tier === 1 ? 5 : 6; }
+  setTier(tier: number) { if (tier === this.tier) return; this.tier = tier; this.resize(); }
   constructor(private renderer: T.WebGLRenderer, weather: { value: T.Texture | null }, elevation: { value: T.Texture | null }) {
     this.quad.frustumCulled = false;
     this.quadScene.add(this.quad);
     const size = renderer.getDrawingBufferSize(new T.Vector2());
-    this.scene = new T.WebGLRenderTarget(size.x, size.y, { type: T.HalfFloatType, samples: 4, depthTexture: new T.DepthTexture(size.x, size.y) });
+    this.scene = new T.WebGLRenderTarget(size.x, size.y, { type: T.HalfFloatType, samples: 0, depthTexture: new T.DepthTexture(size.x, size.y) });
     this.scene.texture.generateMipmaps = false;
     this.cloudTarget = hdr(1, 1);
     this.merged = hdr(1, 1);
@@ -111,12 +115,23 @@ void main(){vec3 c=texture2D(tMap,vUv+texel*vec2(-1.,0.)).rgb+texture2D(tMap,vUv
   gl_FragColor=vec4(texture2D(tBase,vUv).rgb+c/12.*spread,1.);}`, { tMap: { value: null }, tBase: { value: null }, texel: { value: new T.Vector2() }, spread: { value: 0.8 } });
     this.finalPass = pass(/* glsl */ `precision highp float;varying vec2 vUv;
 uniform sampler2D tScene;uniform sampler2D tBloom;uniform float exposure;uniform float time;uniform float aspect;
-uniform float speedBlur;uniform float shock;uniform vec2 shockCentre;uniform vec3 sunScreen;uniform float flash;uniform float damage;uniform float warp;
+uniform vec2 texel;uniform float speedBlur;uniform float shock;uniform vec2 shockCentre;uniform vec3 sunScreen;uniform float flash;uniform float damage;uniform float warp;
 vec3 fit(vec3 v){vec3 a=v*(v+.0245786)-.000090537,b=v*(.983729*v+.432951)+.238081;return a/b;}
 vec3 aces(vec3 c){c*=exposure/.6;c=mat3(.59719,.076,.0284,.35458,.90834,.13383,.04823,.01566,.83777)*c;c=fit(c);return clamp(mat3(1.60475,-.10208,-.00327,-.53108,1.10813,-.07276,-.07367,-.00605,1.07602)*c,0.,1.);}
 vec3 encode(vec3 c){return mix(c*12.92,1.055*pow(c,vec3(1./2.4))-.055,step(.0031308,c));}
 float hash(vec2 p){vec3 q=fract(vec3(p.xyx)*.1031);q+=dot(q,q.yzx+33.33);return fract((q.x+q.y)*q.z);}
 vec3 sampleScene(vec2 uv){return texture2D(tScene,uv).rgb+texture2D(tBloom,uv).rgb*.085;}
+// Edge smoothing (FXAA-style) on the HDR scene, judged on a compressed luma so bright skies do not swamp it.
+float lum(vec3 c){c=c/(1.+c);return dot(c,vec3(.299,.587,.114));}
+vec3 smoothEdges(vec2 uv){
+  vec3 nw=texture2D(tScene,uv+vec2(-1.,-1.)*texel).rgb,ne=texture2D(tScene,uv+vec2(1.,-1.)*texel).rgb,sw=texture2D(tScene,uv+vec2(-1.,1.)*texel).rgb,se=texture2D(tScene,uv+vec2(1.,1.)*texel).rgb,m=texture2D(tScene,uv).rgb;
+  float a=lum(nw),b=lum(ne),c=lum(sw),d=lum(se),e=lum(m),lo=min(e,min(min(a,b),min(c,d))),hi=max(e,max(max(a,b),max(c,d)));
+  if(hi-lo<max(.0312,hi*.125))return m;
+  vec2 dir=vec2(-((a+b)-(c+d)),(a+c)-(b+d));float reduce=max((a+b+c+d)*.03125,1./128.),k=1./(min(abs(dir.x),abs(dir.y))+reduce);
+  dir=clamp(dir*k,-8.,8.)*texel;
+  vec3 p=.5*(texture2D(tScene,uv+dir*(1./3.-.5)).rgb+texture2D(tScene,uv+dir*(2./3.-.5)).rgb),q=p*.5+.25*(texture2D(tScene,uv-dir*.5).rgb+texture2D(tScene,uv+dir*.5).rgb);
+  float lq=lum(q);return lq<lo||lq>hi?p:q;
+}
 void main(){
   vec2 uv=vUv,centred=(uv-.5)*vec2(aspect,1.);
   // Expanding refraction ring for the transonic crossing.
@@ -128,7 +143,7 @@ void main(){
     vec2 dir=(uv-.5)*speedBlur*.11*smoothstep(.12,.75,radial);float j=hash(gl_FragCoord.xy+time)-.5;color=vec3(0.);
     // Six taps of the scene plus one bloom read: bloom is already soft, so streaking it adds cost and no detail.
     for(int i=0;i<6;i++)color+=texture2D(tScene,uv-dir*(float(i)+j)/6.).rgb;color=color/6.+texture2D(tBloom,uv).rgb*.085;
-  }else color=sampleScene(uv);
+  }else color=smoothEdges(uv)+texture2D(tBloom,uv).rgb*.085;
   // Slight lateral chromatic fringing toward the frame edge.
   // Only the warp drive bends the lens; normal flight stays crisp.
   float fringe=.0016*radial*radial*warp;
@@ -151,14 +166,16 @@ void main(){
   color=encode(clamp(color,0.,1.));
   color+=(hash(gl_FragCoord.xy+fract(time)*61.)-.5)*.016;
   gl_FragColor=vec4(color,1.);
-}`, { tScene: { value: this.merged.texture }, tBloom: { value: null }, exposure: { value: 1.25 }, time: { value: 0 }, aspect: { value: 1 }, speedBlur: { value: 0 }, shock: { value: 0 }, shockCentre: { value: new T.Vector2(0.5, 0.5) }, sunScreen: { value: new T.Vector3() }, flash: { value: 0 }, damage: { value: 0 }, warp: { value: 0 } });
+}`, { tScene: { value: this.merged.texture }, tBloom: { value: null }, texel: { value: new T.Vector2() }, exposure: { value: 1.25 }, time: { value: 0 }, aspect: { value: 1 }, speedBlur: { value: 0 }, shock: { value: 0 }, shockCentre: { value: new T.Vector2(0.5, 0.5) }, sunScreen: { value: new T.Vector3() }, flash: { value: 0 }, damage: { value: 0 }, warp: { value: 0 } });
     this.resize();
   }
   resize() {
     const size = this.renderer.getDrawingBufferSize(new T.Vector2()), w = Math.max(2, size.x), h = Math.max(2, size.y);
     this.scene.setSize(w, h);
     this.merged.setSize(w, h);
-    const cw = Math.max(1, Math.round(w / 2)), ch = Math.max(1, Math.round(h / 2));
+    this.finalPass?.uniforms.texel.value.set(1 / w, 1 / h);
+    // Clouds are soft, so they survive a coarse grid: half resolution on high, a third on medium, a quarter on low.
+    const cloud = this.tier === 2 ? 2 : this.tier === 1 ? 3 : 4, cw = Math.max(1, Math.round(w / cloud)), ch = Math.max(1, Math.round(h / cloud));
     this.cloudTarget.setSize(cw, ch);
     this.nukeTarget.setSize(cw, ch);
     this.mergePass.uniforms.cloudTexel.value.set(1 / cw, 1 / ch);
@@ -210,13 +227,14 @@ void main(){
     this.brightPass.uniforms.tMap.value = this.merged.texture;
     this.brightPass.uniforms.texel.value.copy(texel(this.merged, 0.5));
     this.draw(this.brightPass, this.down[0]);
-    for (let i = 1; i < this.levels; i++) {
+    const levels = this.bloom;
+    for (let i = 1; i < levels; i++) {
       this.downPass.uniforms.tMap.value = this.down[i - 1].texture;
       this.downPass.uniforms.texel.value.copy(texel(this.down[i - 1]));
       this.draw(this.downPass, this.down[i]);
     }
-    for (let i = this.levels - 2; i >= 0; i--) {
-      const source = i === this.levels - 2 ? this.down[i + 1] : this.up[i + 1];
+    for (let i = levels - 2; i >= 0; i--) {
+      const source = i === levels - 2 ? this.down[i + 1] : this.up[i + 1];
       this.upPass.uniforms.tMap.value = source.texture;
       this.upPass.uniforms.tBase.value = this.down[i].texture;
       this.upPass.uniforms.texel.value.copy(texel(source));
