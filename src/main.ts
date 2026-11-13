@@ -178,7 +178,8 @@ renderer.toneMappingExposure = 1.25;
 renderer.autoClear = false;
 const weatherMap={value:null as T.Texture|null},elevationMap={value:null as T.Texture|null};
 const post=new PostFX(renderer,weatherMap,elevationMap);
-const fx={exposure:1.25,flash:0,shake:0,slow:0,lockClock:0,shellTop:6,shellClock:9,quality:1};
+let pendingRatio=0;
+const fx={settle:0,exposure:1.25,flash:0,shake:0,slow:0,lockClock:0,shellTop:6,shellClock:9,quality:1};
 $("world").append(renderer.domElement);renderer.domElement.tabIndex=0;renderer.domElement.setAttribute("aria-label","Flight view. W/S pitch, A/D bank, Shift boost, Y superspeed, Z gun, X missile, C target lock, N nuclear bomb.");
 const scene = new T.Scene(),
   shipScene = new T.Scene(),
@@ -863,6 +864,12 @@ function stepPhysics(dt: number) {
     bank = Math.atan2(rightAxis.dot(localVertical), topAxis.dot(localVertical));
   const commands = pilotInput.update(raw, bank, state.tele?.airspeed ?? 0, state.tele?.dynamicPressure ?? 0, dt, controlStyle);
   const stick = assist || entry ? new T.Vector3() : new T.Vector3(commands.pitch, commands.yaw, commands.roll);
+  // Fly-by-wire angle-of-attack limit, as on a modern fighter: the stick asks for pitch, but the nose is not allowed to run
+  // ahead of the wing. Held back at about 15 degrees, the jet turns as hard as its lift allows and never stalls out of a loop.
+  if (controlStyle !== 'direct' && state.tele && state.tele.dynamicPressure > 100 && state.tele.airspeed > 45) {
+    const a = state.tele.alpha, room = (x: number) => T.MathUtils.clamp((.27 - x) / .09, 0, 1);
+    if (stick.x > 0 && a > 0) stick.x *= room(a); else if (stick.x < 0 && a < 0) stick.x *= room(-a);
+  }
   // Low-level hold during missions: with the stick centred the jet holds the height it was released at, so a river
   // run at 8 m is flyable. Any pitch input takes over at once; the hold re-captures when the stick is centred again.
   if (missions.active && missions.status !== 'failed' && controlStyle !== 'direct' && state.tele && state.tele.agl < 200 && !assist && !entry) {
@@ -875,7 +882,7 @@ function stepPhysics(dt: number) {
       stick.x += T.MathUtils.clamp(error * .1 - vs * .22 + holdI * .09 - holdAcc * .14, -.6, .6) / Math.max(.5, Math.cos(bank));
     }
   } else { holdAgl = null; holdI = 0; }
-  control.maxRate.set(controlStyle === 'direct' ? .35 : .65, controlStyle === 'direct' ? .24 : .4, controlStyle === 'direct' ? .7 : 1.3);
+  control.maxRate.set(controlStyle === 'direct' ? .35 : .65, controlStyle === 'direct' ? .24 : .55, controlStyle === 'direct' ? .7 : 1.9);
   const boosting = controlStyle !== 'direct' && (keys.has('shift') || (pad?.buttons[7]?.value ?? 0) > .2);
   boostActive = boosting;
   airbrake = controlStyle !== 'direct' && (keys.has('control') || (pad?.buttons[6]?.value ?? 0) > .2) ? 1 : 0;
@@ -936,6 +943,13 @@ function stepPhysics(dt: number) {
   );
   deliveredThrottle = state.fuel > 0 ? flight.throttle : 0;
   advanceFlight(state, dt, rotation, flight, { surface, gear });
+  // Game mode: a modern fighter has thrust to spare, so a jet that is pulling through a loop or flying on its side or
+  // back is not allowed to fall below manoeuvring speed. Push along the nose, up to about 3 g, until it has 150 m/s again.
+  if (controlStyle !== 'direct' && state.status === 'flying' && state.tele && !airbrake && state.tele.dynamicPressure > 100 && state.tele.agl > 30) {
+    const nose = new T.Vector3(0, 0, -1).applyQuaternion(rotation), steep = Math.abs(nose.dot(localVertical)) > .45 || topAxis.dot(localVertical) < .35 || Math.abs(raw.pitch) > .5;
+    const push = steep ? Math.min(32, Math.max(0, 165 - state.tele.airspeed) * .6) * Math.max(.6, enginePower) : 0;
+    if (push > 0) state.v = [state.v[0] + nose.x * push * dt / 1000, state.v[1] + nose.y * push * dt / 1000, state.v[2] + nose.z * push * dt / 1000];
+  }
   if (sonic.update(state.tele?.mach ?? 0, (len(state.p) - EARTH.radius) * 1000,
       atmosphereDensity((len(state.p) - EARTH.radius) * 1000), state.t, dt, state.status === 'flying')) sonicBoom();
   if (((state.status as string) === "landed" || state.tele?.surfaceContact) && isOcean() && !surface.deckAt(...latLon())) {
@@ -1186,6 +1200,7 @@ function draw(dt: number) {
     terrainMaterial.userData.shader.uniforms.groundHazeDensity.value = groundHazeDensity;
   cloudMat.opacity = .62*T.MathUtils.smoothstep(alt,28000,50000);
   clouds.visible = alt>28000;
+  if(pendingRatio){renderer.setPixelRatio(pendingRatio);renderer.setSize(innerWidth,innerHeight);post.resize();pendingRatio=0;}
   post.begin();
   const worldDt=paused?0:Math.max(0,state.t-lastTrafficTime);lastTrafficTime=state.t;
   surfaceTraffic.update(worldDt,state.t,shipP,alt);
@@ -1279,9 +1294,11 @@ function draw(dt: number) {
     // Adaptive resolution aims for a steady 55-60 fps: shed pixels after two slow seconds, win them back after
     // four fast ones. The gap between the thresholds stops it hunting up and down.
     {const rate=frames/frameTime,ratio=renderer.getPixelRatio(),live=!paused&&!document.hidden,ceiling=Math.min(devicePixelRatio,MAX_PIXEL_RATIO);
-     const apply=(next:number)=>{renderer.setPixelRatio(next);renderer.setSize(innerWidth,innerHeight);post.resize();fx.slow=fx.quality=0;};
-     fx.slow=rate<48&&live?fx.slow+1:0;if(fx.slow>=2&&ratio>MIN_PIXEL_RATIO)apply(Math.max(MIN_PIXEL_RATIO,ratio-.2));
-     fx.quality=rate>57&&live?fx.quality+1:0;if(fx.quality>=4&&ratio<ceiling)apply(Math.min(ceiling,ratio+.1));}
+     // Resizing the canvas clears it, so the change waits for the start of the next frame; doing it here left a dark frame on screen.
+     // The first 12 seconds of a flight are spent loading scenery, so the frame rate then says nothing about the hardware.
+     const apply=(next:number)=>{pendingRatio=next;fx.slow=fx.quality=0;};fx.settle=live?fx.settle+1:fx.settle;if(fx.settle<12){fx.slow=fx.quality=0;}
+     fx.slow=rate<48&&live&&fx.settle>=12?fx.slow+1:0;if(fx.slow>=2&&ratio>MIN_PIXEL_RATIO)apply(Math.max(MIN_PIXEL_RATIO,ratio-.2));
+     fx.quality=rate>57&&live&&fx.settle>=12?fx.quality+1:0;if(fx.quality>=4&&ratio<ceiling)apply(Math.min(ceiling,ratio+.1));}
     frames = 0;
     frameTime = 0;
   }

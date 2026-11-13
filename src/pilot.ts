@@ -1,7 +1,10 @@
 const clamp = (v: number, min = -1, max = 1) => Math.max(min, Math.min(max, v));
 export type ControlStyle = 'game' | 'mouse' | 'direct';
 export interface PilotAxes { pitch: number; yaw: number; roll: number }
-/** Rate-independent virtual stick; game bank commands spring back to wings level. */
+/**
+ * Rate-independent virtual stick. In game mode a held roll input rolls at full rate through any angle, so the jet
+ * can roll and loop freely; only a centred stick near upright eases back to wings level.
+ */
 export class PilotInput {
   value: PilotAxes = { pitch: 0, yaw: 0, roll: 0 };
   reset() { this.value = { pitch: 0, yaw: 0, roll: 0 }; }
@@ -9,12 +12,15 @@ export class PilotInput {
     if (style === 'direct') return { ...raw };
     const w = 1 - Math.exp(-Math.max(0, dt) / .12);
     for (const key of ['pitch', 'yaw', 'roll'] as const) this.value[key] += (clamp(raw[key]) - this.value[key]) * w;
-    const atmospheric = qbar > 100;
-    // Coordinated heading rate is g*tan(bank)/v; projection onto body yaw is g*sin(bank)/v.
+    const atmospheric = qbar > 100, rolling = Math.abs(raw.roll) > .05, pulling = Math.abs(raw.pitch) > .05, upright = Math.abs(bank) < 1.15;
+    // Wings level returns only when nothing is commanded and the jet is the right way up; mid-loop or inverted it holds what it has.
+    const level = atmospheric && !rolling && !pulling && upright ? clamp(-bank * 2 / 1.3) : 0;
+    // Coordinated heading rate is g*tan(bank)/v; projection onto body yaw is g*sin(bank)/v. Only meaningful in an ordinary banked turn.
+    const coordinate = atmospheric && upright && !pulling ? 9.80665 * Math.sin(bank) / Math.max(80, speed) / .4 : 0;
     return {
       pitch: this.value.pitch,
-      yaw: clamp(this.value.yaw + (atmospheric ? 9.80665 * Math.sin(bank) / Math.max(80, speed) / .4 : 0)),
-      roll: atmospheric ? clamp((this.value.roll * Math.PI * .31 - bank) * 2 / 1.3) : this.value.roll,
+      yaw: clamp(this.value.yaw + coordinate),
+      roll: rolling || !atmospheric ? this.value.roll : level,
     };
   }
 }

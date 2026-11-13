@@ -28,11 +28,10 @@ export class Rwr {
       const rel = m.p.clone().sub(p), range = rel.length(), closing = -m.v.clone().sub(v).dot(rel) / Math.max(range, 1e-6);
       return { m, rel, range, closing, eta: closing > 0.02 ? range / closing : Infinity };
     }).filter((x) => x.closing > 0 && x.range < 90).sort((a, b) => a.eta - b.eta);
-    for (const x of missiles.slice(0, 2)) lines.push(`<b class="missile">${x.m.name === "SAM" && x.m.age < 4 ? "SAM LAUNCH" : "MISSILE"}</b> ${Rwr.clock(x.rel, up, heading)} o'clock · ${x.range.toFixed(1)} km · ${Number.isFinite(x.eta) ? x.eta.toFixed(0) + " s" : "—"}`);
-    if (missiles.length > 2) lines.push(`+${missiles.length - 2} more inbound`);
+    for (const x of missiles.slice(0, 2)) lines.push(`<b class="missile">${x.m.name === "SAM" && x.m.age < 4 ? "SAM LAUNCH" : "MISSILE"}</b> ${Rwr.clock(x.rel, up, heading)} o'clock · ${x.range.toFixed(1)} km${Number.isFinite(x.eta) ? " · " + x.eta.toFixed(0) + " s" : ""}${missiles.length > 2 && x === missiles[1] ? ` <i>+${missiles.length - 2}</i>` : ""}`);
     const locks = threats.locks.slice().sort((a, b) => a.p.distanceTo(p) - b.p.distanceTo(p));
-    for (const l of locks.slice(0, 2)) lines.push(`<b class="lock">LOCKED</b> ${l.name} · ${Rwr.clock(l.p.clone().sub(p), up, heading)} o'clock · ${l.p.distanceTo(p).toFixed(1)} km`);
-    if (locks.length > 2) lines.push(`+${locks.length - 2} more tracking`);
+    // One line for whoever is tracking: the nearest, and a count of the rest. Inbound missiles push it out entirely.
+    if (locks.length && !missiles.length) { const l = locks[0]; lines.push(`<b class="lock">LOCK</b> ${l.name} · ${Rwr.clock(l.p.clone().sub(p), up, heading)} o'clock · ${l.p.distanceTo(p).toFixed(0)} km${locks.length > 1 ? ` <i>+${locks.length - 1}</i>` : ""}`); }
     this.element.hidden = !lines.length; this.element.innerHTML = lines.join("<br>");
     this.element.classList.toggle("inbound", missiles.length > 0);
     // Urgency from the nearest inbound missile's time to impact (and range when it is not closing yet).

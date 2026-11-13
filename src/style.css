@@ -1112,3 +1112,16 @@ body.crashed #nuke-status{display:none}
 #mission-panel{transition:opacity .6s,font-size .3s,padding .3s}
 #mission-panel.quiet{opacity:.45;font-size:10px;padding:3px 10px;background:transparent;border-color:transparent;box-shadow:none}
 @media(max-width:750px){#raid-status{bottom:auto;top:calc(17% + 30px)}}
+
+/* 0.34 warnings out of the middle: threat lines sit bottom-left as two short rows, the bomb timer joins the low toast row, traffic counts fade until hovered. */
+#hud .hud-col>#rwr{position:fixed!important;inset:auto auto 204px 18px!important;transform:none!important;max-width:min(330px,60vw);padding:4px 9px;border-radius:7px;background:#1b0d0699;border-width:1px;font:600 10px/1.6 ui-monospace,Menlo,monospace;letter-spacing:.03em;text-align:left;box-shadow:none;white-space:nowrap}
+#hud .hud-col>#rwr[hidden]{display:none!important}
+#rwr b{padding:0 5px;margin-right:5px;font-size:9px}#rwr i{font-style:normal;opacity:.7}
+#rwr.inbound{background:#2a0705b3;animation:rwr-pulse .45s ease-in-out infinite alternate}
+#nuke-status{top:auto;bottom:158px;padding:4px 12px;border-radius:8px;font:700 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;background:#120d0099;box-shadow:none}
+#nuke-status.danger{font-size:12px}
+#surface-traffic-status{opacity:.35;font-size:9px;padding:3px 8px;gap:8px;background:#09212b80;border-color:transparent;backdrop-filter:none;transition:opacity .2s}
+#surface-traffic-status:hover,#surface-traffic-status:focus-within{opacity:1}
+#surface-traffic-status button{font-size:9px;padding:2px 6px}
+@media(max-width:750px){#hud .hud-col>#rwr{inset:auto auto 250px 8px!important;font-size:9px;max-width:70vw}#nuke-status{bottom:auto;top:calc(17% + 2px)}}
+@media(max-width:1000px) and (max-height:500px){#hud .hud-col>#rwr{inset:auto auto 120px 8px!important}#nuke-status{bottom:112px}}
