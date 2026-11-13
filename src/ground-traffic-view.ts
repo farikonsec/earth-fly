@@ -39,8 +39,10 @@ export class GroundTrafficView{
   }
   this.smoke=new T.InstancedMesh(new T.IcosahedronGeometry(.001,1),new T.MeshStandardMaterial({color:0x383b3c,transparent:true,opacity:.38,depthWrite:false,roughness:1}),480);this.smoke.count=0;this.smoke.frustumCulled=false;this.group.add(this.smoke);
  }
+ /** Radar text for 750 vehicles is rebuilt only on frames where the host is about to redraw the scope. */
+ labels=true;
  draw(origin:T.Vector3,time:number,enabled=true){
-  this.group.visible=enabled;this.targets=[];this.contacts=[];this.positions.clear();for(const b of [...this.batches.values(),...this.ghosts.values()])b.count=0;let smoke=0;
+  const labels=this.labels;this.group.visible=enabled;this.targets=[];if(labels)this.contacts=[];this.positions.clear();for(const b of [...this.batches.values(),...this.ghosts.values()])b.count=0;let smoke=0;
   if(!enabled)return;const spin=new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),time/EARTH.rotation*Math.PI*2);
   for(const v of this.model.vehicles){const spec=VEHICLES[v.kind];for(let carriage=0;carriage<spec.carriages;carriage++){
    const pose=this.model.pose(v,carriage*(spec.length+1));if(!pose)continue;
@@ -56,10 +58,10 @@ export class GroundTrafficView{
    if(v.dead){if(carriage===0&&v.wreckAge<75){for(let k=0;k<6&&smoke<480;k++){const age=(v.wreckAge+k*1.6)%9,pt=at.clone().addScaledVector(up,(spec.height+age*1.4)/1000).addScaledVector(right,Math.sin(age*.7+k)*age*.0003);this.matrix.compose(pt,this.q,this.unit.clone().multiplyScalar(1+age*.4));this.smoke.setMatrixAt(smoke++,this.matrix);}}continue;}
    const target=this.targetPool.get(id)??{id,p:p.clone(),v:new T.Vector3(),hp:spec.hp,maxHp:spec.hp,phase:0,external:true,ground:true,score:0,quietTarget:true,name:v.kind.toUpperCase(),radius:spec.length*.0005+.0006,destroy:()=>this.destroyVehicle(v.id)};
    target.collisionBox??={right:new T.Vector3(),up:new T.Vector3(),forward:new T.Vector3(),half:new T.Vector3(spec.width*.0005,spec.height*.0005,spec.length*.0005)};target.collisionBox.right.copy(right);target.collisionBox.up.copy(up);target.collisionBox.forward.copy(forward);
-   target.p.copy(p).addScaledVector(up,spec.height*.0005);target.v.copy(airVelocity(p)).addScaledVector(forward,v.speed/1000);target.name=(v.line?v.line+' · ':'')+v.kind.toUpperCase()+(spec.carriages>1?` ${carriage+1}/${spec.carriages}`:'');this.targetPool.set(id,target);
+   target.p.copy(p).addScaledVector(up,spec.height*.0005);target.v.copy(airVelocity(p)).addScaledVector(forward,v.speed/1000);if(labels)target.name=(v.line?v.line+' · ':'')+v.kind.toUpperCase()+(spec.carriages>1?` ${carriage+1}/${spec.carriages}`:'');this.targetPool.set(id,target);
    // Underground targets are protected by the terrain, but a nearby surface blast can damage them.
    if(!underground&&distance<5)this.targets.push(target);
-   if(carriage===0)this.contacts.push({id:'traffic-'+v.id,name:v.line||v.kind.toUpperCase(),kind:spec.carriages>1?'rail':'road',p:target.p,v:target.v,detail:`${Math.round(v.speed*3.6)} km/h · ${v.dwell>0?'Stopping at '+(v.station||'stop'):v.lane===1?'Overtaking':pose.edge.tunnel?'Underground':pose.edge.class} · ${v.kind}`,targetId:underground?undefined:id});
+   if(labels&&carriage===0)this.contacts.push({id:'traffic-'+v.id,name:v.line||v.kind.toUpperCase(),kind:spec.carriages>1?'rail':'road',p:target.p,v:target.v,detail:`${Math.round(v.speed*3.6)} km/h · ${v.dwell>0?'Stopping at '+(v.station||'stop'):v.lane===1?'Overtaking':pose.edge.tunnel?'Underground':pose.edge.class} · ${v.kind}`,targetId:underground?undefined:id});
   }}
   for(const [id]of this.targetPool)if(!this.positions.has(id))this.targetPool.delete(id);
   for(const b of [...this.batches.values(),...this.ghosts.values()])for(const m of b.meshes){m.count=b.count;m.instanceMatrix.needsUpdate=true;if(m.instanceColor)m.instanceColor.needsUpdate=true;}

@@ -17,7 +17,7 @@ export interface Threats {locks:{p:T.Vector3;name:string;ground:boolean}[];missi
 export interface Burst {scale?:number;p:T.Vector3;life:number;big?:boolean;v?:T.Vector3;dust?:boolean}
 export interface Popup {p:T.Vector3;text:string;life:number}
 export type CombatEvent='gun'|'missile'|'hit'|'lock'|'kill'|'wave'|'enemyGun'|'damage'|'down';
-const ORIGIN=new T.Vector3();
+const ORIGIN=new T.Vector3(),NO_TARGETS=new Map<number,T.Vector3>();
 export function closestSegment(a:T.Vector3,b:T.Vector3,p:T.Vector3){const d=b.clone().sub(a);const t=T.MathUtils.clamp(p.clone().sub(a).dot(d)/Math.max(1e-12,d.lengthSq()),0,1);return a.clone().addScaledVector(d,t).distanceTo(p);}
 const KINDS:Record<DroneKind,{hp:number;score:number;radius:number;agility:number}>={scout:{hp:2,score:150,radius:.07,agility:1.5},fighter:{hp:3,score:100,radius:.075,agility:1},heavy:{hp:9,score:500,radius:.14,agility:.45}};
 /** Fictional, deliberately forgiving game loadouts; no real weapon performance model. */
@@ -87,13 +87,15 @@ export class Combat {
  }
  advance(dt:number,p:T.Vector3,q:T.Quaternion,v:T.Vector3,aim:T.Vector3,gun=false,missile=false){
   if(!this.active||dt<=0||this.completed)return;
-  let left=Math.min(dt,this.persistent?60:1);const endpoints=this.external.map(t=>({target:t,p:t.p.clone()}));
+  let left=Math.min(dt,this.persistent?60:1);this.sweep=this.shots.length>0||gun||missile;const endpoints=this.sweep?this.external.map(t=>({target:t,p:t.p.clone()})):[];
   // Orbital positions supplied by the host are at the end of this frame. Sweep them
   // through the same substeps as projectiles, then restore the authoritative positions.
   for(const {target}of endpoints)target.p.addScaledVector(target.v,-left);
   while(left>1e-7){const h=Math.min(this.persistent?.05:.02,left);left-=h;this.tick(h,p,q,v,aim,gun,missile);}
   for(const {target,p:end}of endpoints)target.p.copy(end);
  }
+ /** True while the player has rounds in the air; only then do the hundreds of external targets need sweeping and testing. */
+ private sweep=false;
  /** The player flew into the ground: the sortie ends the same way as being shot down. */
  threats():Threats{const locks=this.targets.filter(t=>(t.lockOn??0)>.3).map(t=>({p:t.p,name:t.model?AIRCRAFT[t.model].name:'HOSTILE',ground:false}));
   return {locks,missiles:this.incoming.filter(s=>s.weapon==='missile'&&s.life>0)};}
@@ -123,11 +125,11 @@ export class Combat {
   this.comboClock=Math.max(0,this.comboClock-dt);if(!this.comboClock)this.combo=0;
   if(!this.persistent)this.remaining=Math.max(0,this.remaining-dt);if(!this.remaining&&!this.persistent){this.completed=true;this.best=Math.max(this.best,this.score);this.shots=[];this.lock=null;return;}
   this.gunCooldown=Math.max(0,this.gunCooldown-dt);this.missileCooldown=Math.max(0,this.missileCooldown-dt);
-  const target=this.allTargets.find(t=>t.id===this.lock);
+  const target=this.lock===null?undefined:this.targets.find(t=>t.id===this.lock)??this.external.find(t=>t.id===this.lock&&t.hp>0);
   if(target&&target.p.distanceTo(p)<25&&target.p.clone().sub(p).normalize().dot(aim)>.8){this.lockTime=Math.min(1,this.lockTime+dt);if(this.lockTime>=.85&&!this.lockAnnounced){this.lockAnnounced=true;this.event?.('lock');}}
   else{this.lockTime=0;this.lockAnnounced=false;if(!target)this.lock=null;}
   if(gun)this.fire(p,v,aim);if(missile)this.fire(p,v,aim,true);
-  const collisionTargets=this.allTargets,oldTargets=new Map(collisionTargets.map(t=>[t.id,t.p.clone()]));
+  const collisionTargets=this.sweep?this.allTargets:this.targets,oldTargets=this.shots.length?new Map(collisionTargets.map(t=>[t.id,t.p.clone()])):NO_TARGETS;
   for(const t of this.targets){
    t.hit=Math.max(0,(t.hit??0)-dt*5);
    if(t.ai){
@@ -144,7 +146,7 @@ export class Combat {
    if(t.ai)this.enemyFire(t,dt,p,v);
    if(t.ai){const floor=this.ground(t.p)+.03;if(t.p.length()<floor)t.p.setLength(floor);}
   }
-  for(const t of this.external)t.p.addScaledVector(t.v,dt);
+  if(this.sweep)for(const t of this.external)t.p.addScaledVector(t.v,dt);
   for(const s of this.shots){const old=s.p.clone();s.age+=dt;s.life-=dt;
    const goal=s.missile?collisionTargets.find(t=>t.id===s.target&&t.hp>0):undefined;
    if(s.missile&&s.dir&&s.extra){

@@ -21,6 +21,7 @@ import { PilotInput, SonicFeedback, gameThrottle, torchThrottleLimit, flightCues
 import { FlightEffects } from "./flight-effects";
 import { CrashFx } from "./crash";
 import { Nuke, NUKE } from "./nuke";
+import { Perf } from "./perf";
 import { Fleets, FLEET } from "./fleet";
 import { Raid, RAID } from "./raid";
 import { City } from "./city";
@@ -178,7 +179,9 @@ renderer.toneMappingExposure = 1.25;
 renderer.autoClear = false;
 const weatherMap={value:null as T.Texture|null},elevationMap={value:null as T.Texture|null};
 const post=new PostFX(renderer,weatherMap,elevationMap);
-let pendingRatio=0;
+let pendingRatio=0,uiClock=1,radarContacts:RadarContact[]=[];
+renderer.info.autoReset=false;
+const perf=new Perf(renderer.getContext() as WebGL2RenderingContext,()=>({calls:renderer.info.render.calls,triangles:renderer.info.render.triangles,ratio:renderer.getPixelRatio(),width:renderer.domElement.width,height:renderer.domElement.height}));
 const fx={settle:0,exposure:1.25,flash:0,shake:0,slow:0,lockClock:0,shellTop:6,shellClock:9,quality:1};
 $("world").append(renderer.domElement);renderer.domElement.tabIndex=0;renderer.domElement.setAttribute("aria-label","Flight view. W/S pitch, A/D bank, Shift boost, Y superspeed, Z gun, X missile, C target lock, N nuclear bomb.");
 const scene = new T.Scene(),
@@ -1200,9 +1203,11 @@ function draw(dt: number) {
     terrainMaterial.userData.shader.uniforms.groundHazeDensity.value = groundHazeDensity;
   cloudMat.opacity = .62*T.MathUtils.smoothstep(alt,28000,50000);
   clouds.visible = alt>28000;
+  perf.mark('world');renderer.info.reset();
   if(pendingRatio){renderer.setPixelRatio(pendingRatio);renderer.setSize(innerWidth,innerHeight);post.resize();pendingRatio=0;}
   post.begin();
   const worldDt=paused?0:Math.max(0,state.t-lastTrafficTime);lastTrafficTime=state.t;
+  uiClock+=dt;const slowUi=uiClock>=.1||paused;if(slowUi)uiClock=0;surfaceTraffic.view.labels=slowUi;
   surfaceTraffic.update(worldDt,state.t,shipP,alt);
   renderer.render(scene, camera);
   const u = atmospherePass.material.uniforms;
@@ -1252,9 +1257,11 @@ function draw(dt: number) {
   combat.allowEngage=state.status==='flying'&&alt<50000;
   feelNuke(worldDt,shipP);
   if(!paused&&state.status!=='impact')combat.advance(worldDt,shipP,rotation,new T.Vector3(...state.v),weaponAim,state.status==='flying'&&(gunHeld||keys.has('z')),state.status==='flying'&&(missileHeld||keys.has('x')));
-  const contacts:RadarContact[]=[...surfaceTraffic.contacts,...fleets.contacts,...raid.contacts,...combat.targets.map(d=>({id:'enemy-'+d.id,name:d.model?AIRCRAFT[d.model].name:'HOSTILE',kind:'hostile' as const,p:d.p,v:d.v,detail:(d.model?LOADOUTS[d.model]?.name:'Patrol')+' · '+(d.ai?.mode??'patrol'),targetId:d.id})),...sams.targets.map(d=>({id:'sam-'+d.id,name:'SAM BATTERY',kind:'ground' as const,p:d.p,v:d.v,detail:`Surface-to-air · ${SAM.detect} km radar · ${SAM.ceiling} km ceiling`,targetId:d.id})),...airTraffic.flights.map(f=>({id:f.id,name:f.id+' · '+AIRLINERS[f.type].name,kind:'civil' as const,p:f.p,v:f.v,detail:f.route+' · '+f.phase+' · '+Math.round(f.speed*3600)+' km/h'})),...orbitTraffic.contacts];
+  if(slowUi)radarContacts=[...surfaceTraffic.contacts,...fleets.contacts,...raid.contacts,...combat.targets.map(d=>({id:'enemy-'+d.id,name:d.model?AIRCRAFT[d.model].name:'HOSTILE',kind:'hostile' as const,p:d.p,v:d.v,detail:(d.model?LOADOUTS[d.model]?.name:'Patrol')+' · '+(d.ai?.mode??'patrol'),targetId:d.id})),...sams.targets.map(d=>({id:'sam-'+d.id,name:'SAM BATTERY',kind:'ground' as const,p:d.p,v:d.v,detail:`Surface-to-air · ${SAM.detect} km radar · ${SAM.ceiling} km ceiling`,targetId:d.id})),...airTraffic.flights.map(f=>({id:f.id,name:f.id+' · '+AIRLINERS[f.type].name,kind:'civil' as const,p:f.p,v:f.v,detail:f.route+' · '+f.phase+' · '+Math.round(f.speed*3600)+' km/h'})),...orbitTraffic.contacts];
+  const contacts=radarContacts;
   const threats=combat.threats();threats.locks.push(...sams.locks(),...fleets.locks());
-  radar.draw(contacts,shipP,trueHeading(rotation,up),state.t,trafficUTC,threats);
+  // The radar scope, moving map and numeric readouts repaint ten times a second; redrawing them every frame cost more than it showed.
+  if(slowUi)radar.draw(contacts,shipP,trueHeading(rotation,up),state.t,trafficUTC,threats);
   rwr.update(threats,shipP,new T.Vector3(...state.v),trueHeading(rotation,up),performance.now()/1000,paused||state.status!=='flying'||!audio.enabled);
   const tracked=contacts.find(c=>c.id===radar.selected);orbitalLabel.hidden=true;
   if(tracked&&lineOfSight(shipP,tracked.p)){const relative=tracked.p.clone().sub(shipP),view=relative.clone().applyMatrix4(camera.matrixWorldInverse),pos=relative.project(camera);if(view.z<0&&Math.abs(pos.x)<.88&&Math.abs(pos.y)<.8){orbitalLabel.hidden=false;orbitalLabel.style.left=((pos.x*.5+.5)*innerWidth)+'px';orbitalLabel.style.top=((-pos.y*.5+.5)*innerHeight-18)+'px';orbitalLabel.textContent=tracked.name+'\n'+tracked.p.distanceTo(shipP).toFixed(2)+' km · '+tracked.detail;}}
@@ -1266,6 +1273,7 @@ function draw(dt: number) {
   {const flying=state.status==='flying'&&cameraMode!=='planet',air=Math.min(1,atmosphereDensity(alt)/.45),day=T.MathUtils.smoothstep(up.dot(lightDir),-.1,.15);
    trails.update(state.t,shipP,rotation,camera.position,{tips:flying?Math.min(1,Math.max(0,((state.tele?.gLoad??1)-2.4)/3)*air+cues.transonic*.7):0,contrail:flying&&alt>7500&&alt<15500&&deliveredThrottle>.12&&!supercruise.active?.8:0,energy:flying&&supercruise.active?Math.min(1,.35+supercruise.speed/8000):flying&&torch&&deliveredThrottle>.3?.55:0},new T.Color(1,1,1).multiplyScalar(.12+.95*day),new T.Color(.45,1.3,3.2).multiplyScalar(supercruise.active?1.6:1));}
   renderer.render(shipScene, camera);
+  perf.mark('scene');
   finishFrame(dt,alt,up,cues);
   instruments.draw(camera, rotation, state.tele, cameraMode, alt >= KARMAN_LINE ? len(state.v) : undefined,altimetry);
   audio.update(
@@ -1286,7 +1294,7 @@ function draw(dt: number) {
       ? "Alpine lakes & forests · mapped boundaries"
       : "Detailed regional scenery unavailable here";
   $("sound").classList.toggle("on", audio.enabled);$("sound").querySelector(".sound-icon")!.textContent=audio.enabled?"🔊":"🔇";$("sound").setAttribute("aria-label",audio.enabled?"Sound on":"Sound off");
-  updateUI(alt);
+  if(slowUi)updateUI(alt);
   frames++;
   frameTime += dt;
   if (frameTime > 1) {
@@ -1328,7 +1336,9 @@ function finishFrame(dt:number,alt:number,up:T.Vector3,cues:{flow:number;transon
   postFrame.sunScreen.set(sunView.x*.5+.5,sunView.y*.5+.5,behind||blocked?0:(1-T.MathUtils.smoothstep(edge,.85,1.25))*T.MathUtils.smoothstep(elevation,-.05,.12));
   city.night.value=1-T.MathUtils.smoothstep(up.dot(lightDir),-.12,.1);city.hazeColor.value.copy(postFrame.hazeColor);city.hazeK.value=postFrame.hazeK;city.sky.value.copy(postFrame.skyLight);
   fx.flash*=Math.exp(-dt*5);postFrame.flash=fx.flash+nukeFlash;postFrame.nuke=nuke.frame(state.t,cameraAbs);postFrame.damage=Math.min(1,(state.structuralDamage??0)*1.2+Math.max(0,(state.heat??0)-60)/80+(combat.active?combat.hurt*.55+Math.max(0,.6-combat.health/100)*.5:0));
+  perf.mark('interface');
   post.finish(postFrame);
+  perf.mark('post');
 }
 function updateUI(alt: number) {
   const t = state.tele,
@@ -1537,6 +1547,7 @@ window.addEventListener("keydown", (e) => {
   if (e.repeat) return;
   if(k==='c'&&combat.active)combat.select(new T.Vector3(...state.p),weaponAim);
   if(k==='n')dropNuke();
+  if(k==='`'||k==='f3'){perf.toggle();e.preventDefault();}
   if(ops.id&&(ops.status!=='flying'||state.status==='impact')&&(k==='enter'||k==='r')){ops.restart?.();return;}
   if(missions.active&&(missions.status!=='flying'||state.status==='impact')&&(k==='enter'||k==='r')){void startMission(missions.active);return;}
   if(state.status==='impact'&&(k==='enter'||k==='r')){respawn();return;}
@@ -1697,8 +1708,11 @@ function frame(now: number) {
   const dt = Math.max(0.001, Math.min(tour&&!tour.completed?.25:.05, (now - last) / 1000));
   last = now;
   if (ready) {
+    perf.begin();
     step(dt);
+    perf.mark('physics');
     draw(dt);
+    perf.end(dt);
   }
   requestAnimationFrame(frame);
 }

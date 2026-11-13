@@ -36,6 +36,7 @@ export class SurfaceTraffic{
   for(const e of this.model.network.rail){if(!e.tunnel||e.a.p.distanceTo(origin)>6||e.id>e.reverse)continue;for(const n of[e.a,e.b])positions.push(...n.p.clone().normalize().multiplyScalar(EARTH.radius+this.height(n.p,e)/1000).sub(this.overlayAnchor).toArray());}
   const geo=new T.BufferGeometry().setAttribute('position',new T.Float32BufferAttribute(positions,3));this.railOverlay=new T.LineSegments(geo,new T.LineBasicMaterial({color:0x59d4e6,transparent:true,opacity:.38,depthTest:false,depthWrite:false}));this.railOverlay.renderOrder=99;this.overlayGroup.add(this.railOverlay);
  }
+ private simDt=0;
  update(dt:number,time:number,origin:T.Vector3,altitude:number){
   const body=new T.Vector3(...inertialToBody(origin.toArray() as V,time,EARTH.rotation)),loc=dirToLatLon(body.toArray() as V),uk=loc.lat>49.8&&loc.lat<61&&loc.lon>-8.4&&loc.lon<2.1,enabled=uk&&altitude<10000,now=performance.now();
   if(this.heightRevision!==this.terrain.revision){this.heightRevision=this.terrain.revision;this.cached.clear();}
@@ -49,7 +50,8 @@ export class SurfaceTraffic{
   }
   // The next network is built a few milliseconds per frame and swapped in when complete; traffic keeps driving the old one.
   if(this.pending){this.slice.until=now+4;if(this.pending.steps.next().done){const {network,count}=this.pending;this.pending=null;this.model.setNetwork(network,body);this.overlayFor=body.clone();this.status=`${count} mapped tiles`;}}
-  if(enabled)this.model.advance(dt,body);this.view.draw(origin,time,enabled);
+  // Traffic drives at 30 steps a second; the view still places every vehicle each frame.
+  this.simDt+=dt;if(enabled&&this.simDt>=1/31){this.model.advance(this.simDt,body);this.simDt=0;}else if(!enabled)this.simDt=0;this.view.draw(origin,time,enabled);
   // The tunnel overlay is only seen in cutaway view, so it is built when first needed rather than on every network swap.
   if(this.overlayFor&&this.view.cutaway){this.rebuildOverlay(this.overlayFor);this.overlayFor=null;}
   this.overlayGroup.visible=enabled&&this.view.cutaway;this.overlayGroup.quaternion.setFromAxisAngle(new T.Vector3(0,1,0),time/EARTH.rotation*Math.PI*2);this.overlayGroup.position.copy(this.overlayAnchor).applyQuaternion(this.overlayGroup.quaternion).sub(origin);
