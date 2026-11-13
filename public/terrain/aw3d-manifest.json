@@ -1,0 +1,329 @@
+{
+  "source": "JAXA ALOS World 3D-30m, JAXA Earth v3.2 global collection (2021-02 catalog)",
+  "datum": "EGM96 orthometric",
+  "sourcePixelMetres": "nominal 30 m; integer metre pixel averages",
+  "credit": "Original data supplied by JAXA AW3D30. Optical PRISM DSM with supplementary fill sources described by the source MSK.",
+  "terms": "https://earth.jaxa.jp/en/data/policy/",
+  "product": "https://www.eorc.jaxa.jp/ALOS/en/aw3d30/aw3d30v3.2_product_e_e1.2.pdf",
+  "changes": "Bilinear resampling to zoom 11/12 Terrarium. Zoom-11 outer 1 km feathers to original Mapzen. Void/invalid snow pixels retain parent terrain. No surveyed height correction or coordinate relocation.",
+  "regions": [
+    {
+      "id": "dombay",
+      "reference": {
+        "lat": 43.243572,
+        "lon": 41.727285,
+        "elevation": 4046
+      },
+      "sourceAtReference": 3805.186083199783,
+      "sourceCrestWithin1000m": {
+        "lat": 43.240972222222226,
+        "lon": 41.72097222222222,
+        "elevation": 3981,
+        "mask": 0
+      },
+      "crestOffsetMetres": 587.3929557860215,
+      "validSamples": 4521,
+      "nonzeroMaskSamples": 2554,
+      "sourceAssets": [
+        {
+          "url": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E041.00-E042.00/E041.00-N43.00-E042.00-N44.00-DSM.tiff",
+          "maskURL": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E041.00-E042.00/E041.00-N43.00-E042.00-N44.00-MSK.tiff",
+          "itemURL": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E041.00-E042.00/N43.00-N44.00.json",
+          "origin": [
+            41,
+            44,
+            0
+          ],
+          "resolution": [
+            0.0002777777777777778,
+            -0.0002777777777777778,
+            0
+          ],
+          "pixelOffset": 0.5
+        },
+        {
+          "url": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E042.00-E043.00/E042.00-N43.00-E043.00-N44.00-DSM.tiff",
+          "maskURL": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E042.00-E043.00/E042.00-N43.00-E043.00-N44.00-MSK.tiff",
+          "itemURL": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E042.00-E043.00/N43.00-N44.00.json",
+          "origin": [
+            42,
+            44,
+            0
+          ],
+          "resolution": [
+            0.0002777777777777778,
+            -0.0002777777777777778,
+            0
+          ],
+          "pixelOffset": 0.5
+        }
+      ],
+      "bounds": {
+        "west": 41.484375,
+        "east": 42.01171875,
+        "south": 43.06888777416962,
+        "north": 43.45291889355465
+      }
+    },
+    {
+      "id": "elbrus",
+      "reference": {
+        "lat": 43.353811,
+        "lon": 42.436098,
+        "elevation": 5642
+      },
+      "sourceAtReference": 5522.400660480031,
+      "sourceCrestWithin1000m": {
+        "lat": 43.35263888888889,
+        "lon": 42.43819444444444,
+        "elevation": 5639,
+        "mask": 0
+      },
+      "crestOffsetMetres": 213.8182267407459,
+      "validSamples": 4528,
+      "nonzeroMaskSamples": 711,
+      "sourceAssets": [
+        {
+          "url": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E042.00-E043.00/E042.00-N43.00-E043.00-N44.00-DSM.tiff",
+          "maskURL": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E042.00-E043.00/E042.00-N43.00-E043.00-N44.00-MSK.tiff",
+          "itemURL": "https://s3.ap-northeast-1.wasabisys.com/je-pds/cog/v1/JAXA.EORC_ALOS.PRISM_AW3D30.v3.2_global/2021-02/3/E042.00-E043.00/N43.00-N44.00.json",
+          "origin": [
+            42,
+            44,
+            0
+          ],
+          "resolution": [
+            0.0002777777777777778,
+            -0.0002777777777777778,
+            0
+          ],
+          "pixelOffset": 0.5
+        }
+      ],
+      "bounds": {
+        "west": 42.1875,
+        "east": 42.71484375,
+        "south": 43.19716728250127,
+        "north": 43.58039085560785
+      }
+    }
+  ],
+  "files": [
+    {
+      "key": "11/1260/749",
+      "sha256": "b13cdc0abf24747ce7765aaf47f51528a01109b2a21c75d6eff97f5531b4e73d",
+      "bytes": 163087,
+      "missing": 0
+    },
+    {
+      "key": "11/1261/749",
+      "sha256": "f515504e5ff331417dee580051c47d1ee2d16048a1e6d20759a8d022ca58dc47",
+      "bytes": 163161,
+      "missing": 0
+    },
+    {
+      "key": "11/1262/749",
+      "sha256": "02ae48f8f8c5f1bf2d98bd2ea50221aef9a57eeb57a76591c06805cfa6cd9534",
+      "bytes": 163556,
+      "missing": 0
+    },
+    {
+      "key": "11/1260/750",
+      "sha256": "d48e2737656e34c2b87b368ca83796f706becd6ae9a4ac8001474c16fedf1429",
+      "bytes": 164586,
+      "missing": 0
+    },
+    {
+      "key": "11/1261/750",
+      "sha256": "08a5136d2088a4e821c107b041618599e757a168f835e7317fd1f0d7820de629",
+      "bytes": 163970,
+      "missing": 0
+    },
+    {
+      "key": "11/1262/750",
+      "sha256": "ca9ec30514e7fb9c34fc5b88e02e4d331403c6af0664a3689d38304f136c36cf",
+      "bytes": 164429,
+      "missing": 0
+    },
+    {
+      "key": "11/1260/751",
+      "sha256": "77e6dfd0548ff588ff6def604374e9edd20d9150a82a289764b6f7e08f1ed945",
+      "bytes": 162409,
+      "missing": 0
+    },
+    {
+      "key": "11/1261/751",
+      "sha256": "ad2dc4d16442a428a0eaf2cfe3299334efc04321e964f103c0594a66ecb62cdd",
+      "bytes": 163538,
+      "missing": 0
+    },
+    {
+      "key": "11/1262/751",
+      "sha256": "0c5c62169d5a2ed68f9e2633552ec863411d10d11390e3ca9c70c78f274a64fb",
+      "bytes": 163346,
+      "missing": 0
+    },
+    {
+      "key": "12/2521/1500",
+      "sha256": "0e391af646ceef46175ab83b5993cd1dfd20f6e11b4da10bac8f87e39c94b7e9",
+      "bytes": 154937,
+      "missing": 0
+    },
+    {
+      "key": "12/2522/1500",
+      "sha256": "96e1654f07cae1e19dae7b65d81f8a721356965751fab5fced8c8901670a6dae",
+      "bytes": 151581,
+      "missing": 0
+    },
+    {
+      "key": "12/2523/1500",
+      "sha256": "068f260c0bd205fa85304eacd8c2c46d658cb88603c5e5c6724a765b7aea2fd7",
+      "bytes": 151784,
+      "missing": 0
+    },
+    {
+      "key": "12/2521/1501",
+      "sha256": "285174badeb9fb0910652e878fb90256b283ee2f08607ccf1fe02f2895d938fd",
+      "bytes": 157978,
+      "missing": 0
+    },
+    {
+      "key": "12/2522/1501",
+      "sha256": "179087aba48a5a93c56ae0d524cb6df82113a2f28a0f40c96485c4cc0cf1588e",
+      "bytes": 157701,
+      "missing": 0
+    },
+    {
+      "key": "12/2523/1501",
+      "sha256": "cc5e29f1415d63a30ae030a29afb04c4f6d3b05a02deae64048f3cde71b437a1",
+      "bytes": 158142,
+      "missing": 0
+    },
+    {
+      "key": "12/2521/1502",
+      "sha256": "9a2d5421ce04c224b0dee2abb9ca233bd566ee49445abd2a251248127832dba0",
+      "bytes": 154144,
+      "missing": 0
+    },
+    {
+      "key": "12/2522/1502",
+      "sha256": "5d4470f19be622f311c77fbae47b9286910d9d52aa59553c0dde896dcedc08b9",
+      "bytes": 157138,
+      "missing": 0
+    },
+    {
+      "key": "12/2523/1502",
+      "sha256": "dc6cbc2e5bfdaab1689052b8d7064552689626e7989ce86894bfc0605929a1fe",
+      "bytes": 157008,
+      "missing": 0
+    },
+    {
+      "key": "11/1264/748",
+      "sha256": "f2b03548b9df46776941835911528a5df819fd5dc258c73a332cd4ee3cf0b17b",
+      "bytes": 159760,
+      "missing": 0
+    },
+    {
+      "key": "11/1265/748",
+      "sha256": "804455df411d492db1b7565cfa512df30622dfa767d20de1ea91bab35aa9df5f",
+      "bytes": 153777,
+      "missing": 0
+    },
+    {
+      "key": "11/1266/748",
+      "sha256": "63971e35f48bc5c3947153bdd434eca1fec713330b1ae330513bb1675718f3cd",
+      "bytes": 156672,
+      "missing": 0
+    },
+    {
+      "key": "11/1264/749",
+      "sha256": "ceac404baf202e151d3b88e5009419689a293bfdf9739a270bebfb27405a0d8f",
+      "bytes": 161922,
+      "missing": 0
+    },
+    {
+      "key": "11/1265/749",
+      "sha256": "cac49ea162e4583213cc5fa41ace7878f654bca679d562dd81f2b356e80b70e9",
+      "bytes": 158800,
+      "missing": 0
+    },
+    {
+      "key": "11/1266/749",
+      "sha256": "d0793c47d821392cfbcddf7fd55339f6fc71d5eea71f023ca325e45f5d887a0a",
+      "bytes": 159595,
+      "missing": 0
+    },
+    {
+      "key": "11/1264/750",
+      "sha256": "73ebe7000151374908d79843c1cc414f1aeac953b7a78699d4d0178a2f192795",
+      "bytes": 163350,
+      "missing": 0
+    },
+    {
+      "key": "11/1265/750",
+      "sha256": "d1b0bad25b191f07fbad4ff5f998cce2c53fd881d936b0b5462b230b8e553b87",
+      "bytes": 160676,
+      "missing": 0
+    },
+    {
+      "key": "11/1266/750",
+      "sha256": "47f662d6d5e3f882a55a380f1b34f64462ec9586422dce8033493dce45cdd009",
+      "bytes": 162556,
+      "missing": 0
+    },
+    {
+      "key": "12/2529/1498",
+      "sha256": "6094b10ce3e77257905d7a4a1b8dcffa4889c3c66820ff0f1458707d27df690e",
+      "bytes": 150340,
+      "missing": 0
+    },
+    {
+      "key": "12/2530/1498",
+      "sha256": "95e082c89f4801fbd6b12487d1caea142930d8df3b9ac2b29032e2d650e463ba",
+      "bytes": 151270,
+      "missing": 0
+    },
+    {
+      "key": "12/2531/1498",
+      "sha256": "57d08f76dd78424d1e0bd8184f3507cd7d197b0833b04e25a7d5171cb6c6eefc",
+      "bytes": 147460,
+      "missing": 0
+    },
+    {
+      "key": "12/2529/1499",
+      "sha256": "0ab1314ef483f666dd8e362fada6d1c86ce1dddecc2ea39a58a39719bf387de1",
+      "bytes": 153374,
+      "missing": 0
+    },
+    {
+      "key": "12/2530/1499",
+      "sha256": "6346e9898c9d5792d5865b10a0d9475f853e5236fd3f9a26ad2de1db0b51cacf",
+      "bytes": 152593,
+      "missing": 0
+    },
+    {
+      "key": "12/2531/1499",
+      "sha256": "464138cf9041ea2cb6df14171b3326da7c6bb17803070c4d40bf76f164186e1d",
+      "bytes": 144839,
+      "missing": 0
+    },
+    {
+      "key": "12/2529/1500",
+      "sha256": "c074feded302fd2d2da47a11d4fe68c3e87dba1931626420e2bfb6378c6fd3d2",
+      "bytes": 153779,
+      "missing": 0
+    },
+    {
+      "key": "12/2530/1500",
+      "sha256": "79c12ee4d99b293dc7a4d4b527cb1aabebf6655309125dd1990eb6ca4fb3c892",
+      "bytes": 149358,
+      "missing": 0
+    },
+    {
+      "key": "12/2531/1500",
+      "sha256": "f6790c2118f70e16e6795c5ead89ef61ad6a7d885cc51a6255725b03081dab85",
+      "bytes": 149262,
+      "missing": 0
+    }
+  ]
+}

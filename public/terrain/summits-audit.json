@@ -1,0 +1,258 @@
+{
+  "checked": "2026-10-18",
+  "note": "Reference points are approximate WGS84. Tile sampling density is not source accuracy. Height discrepancies are not corrected by artificial peaks. Imagery is historic/regional, not close-range photogrammetry; Vinson imagery remains coarse.",
+  "summits": [
+    {
+      "id": "everest",
+      "name": "Everest",
+      "continent": "Asia",
+      "lat": 27.988257,
+      "lon": 86.925145,
+      "elevation": 8848.86,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=10640",
+      "heightSource": "https://www.tourismdepartment.gov.np/files/statistics/46.pdf",
+      "terrainAtReferenceMetres": 8729.254190139658,
+      "terrainMinusReferenceMetres": -119.60580986034256,
+      "modeledCrest": {
+        "lat": 27.98863921143037,
+        "lon": 86.92552691240557,
+        "elevation": 8740.865605303617,
+        "offsetMetres": 56.67892024377317,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -107.9943946963831,
+      "tilePixelSpacingMetres": 67.49724348992385,
+      "terrainSource": "Mapzen / Tilezen, source resolution varies",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "aconcagua",
+      "name": "Aconcagua",
+      "continent": "South America",
+      "lat": -32.653099,
+      "lon": -70.012088,
+      "elevation": 6960.8,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=8594",
+      "heightSource": "https://www.ign.gob.ar/Novedades/NuevaAlturaAconcagua",
+      "terrainAtReferenceMetres": 6906.404637844396,
+      "terrainMinusReferenceMetres": -54.395362155603834,
+      "modeledCrest": {
+        "lat": -32.65354866050632,
+        "lon": -70.01142041426262,
+        "elevation": 6934.384982641272,
+        "offsetMetres": 80.0390529679106,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -26.41501735872862,
+      "tilePixelSpacingMetres": 64.35636450035375,
+      "terrainSource": "Mapzen / Tilezen, source resolution varies",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "denali",
+      "name": "Denali",
+      "continent": "North America",
+      "lat": 63.069042,
+      "lon": -151.006347,
+      "elevation": 6190.488,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=271",
+      "heightSource": "https://www.nps.gov/articles/denali-crp-summit-survey.htm",
+      "terrainAtReferenceMetres": 6145.701599450302,
+      "terrainMinusReferenceMetres": -44.786400549698556,
+      "modeledCrest": {
+        "lat": 63.06942421143037,
+        "lon": -151.00674412442174,
+        "elevation": 6152.440931529317,
+        "offsetMetres": 46.97073557013984,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -38.04706847068337,
+      "tilePixelSpacingMetres": 34.61959120102324,
+      "terrainSource": "Mapzen / Tilezen, source resolution varies",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "kilimanjaro",
+      "name": "Kilimanjaro · Uhuru Peak",
+      "continent": "Africa",
+      "lat": -3.076448,
+      "lon": 37.354034,
+      "elevation": 5895,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=11202",
+      "heightSource": "https://www.peakbagger.com/peak.aspx?pid=11202",
+      "terrainAtReferenceMetres": 5857.154903108894,
+      "terrainMinusReferenceMetres": -37.84509689110564,
+      "modeledCrest": {
+        "lat": -3.076403033949368,
+        "lon": 37.352480432275634,
+        "elevation": 5882.833380787952,
+        "offsetMetres": 172.57244855422317,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -12.166619212048317,
+      "tilePixelSpacingMetres": 76.32686843307859,
+      "terrainSource": "Mapzen / Tilezen, source resolution varies",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "elbrus",
+      "name": "Elbrus · west summit",
+      "continent": "Europe",
+      "lat": 43.353811,
+      "lon": 42.436098,
+      "elevation": 5642,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=10381",
+      "heightSource": "https://volcano.si.edu/volcano.cfm?vn=214010",
+      "terrainAtReferenceMetres": 5521.866203060785,
+      "terrainMinusReferenceMetres": -120.13379693921524,
+      "modeledCrest": {
+        "lat": 43.352529467557,
+        "lon": 42.43795321793384,
+        "elevation": 5636.909487926886,
+        "offsetMetres": 206.8967133620058,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -5.090512073114041,
+      "tilePixelSpacingMetres": 27.789764383115237,
+      "terrainSource": "JAXA AW3D30 / EGM96 orthometric, resampled",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "vinson",
+      "name": "Mount Vinson",
+      "continent": "Antarctica",
+      "lat": -78.525483,
+      "lon": -85.617147,
+      "elevation": 4892,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=12108",
+      "heightSource": "https://www.peakbagger.com/peak.aspx?pid=12108",
+      "terrainAtReferenceMetres": 4879.122916644733,
+      "terrainMinusReferenceMetres": -12.877083355267132,
+      "modeledCrest": {
+        "lat": -78.52550548302531,
+        "lon": -85.61748605580007,
+        "elevation": 4880.954073118092,
+        "offsetMetres": 7.905694150420948,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -11.04592688190769,
+      "tilePixelSpacingMetres": 15.205777117142711,
+      "terrainSource": "REMA v2.0 32m → EGM96 orthometric, resampled",
+      "imagery": {
+        "source": "NASA Blue Marble",
+        "detail": "coarse regional imagery"
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "carstensz",
+      "name": "Carstensz Pyramid · Puncak Jaya",
+      "continent": "Oceania",
+      "lat": -4.078531,
+      "lon": 137.158077,
+      "elevation": 4884,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=11360",
+      "heightSource": "https://www.peakbagger.com/peak.aspx?pid=11360",
+      "terrainAtReferenceMetres": 4776.444033499024,
+      "terrainMinusReferenceMetres": -107.55596650097596,
+      "modeledCrest": {
+        "lat": -4.079003143531634,
+        "lon": 137.15848272194515,
+        "elevation": 4800.721946247791,
+        "offsetMetres": 69.14658342969665,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -83.27805375220942,
+      "tilePixelSpacingMetres": 76.24345176708773,
+      "terrainSource": "Mapzen / Tilezen, source resolution varies",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "kosciuszko",
+      "name": "Mount Kosciuszko",
+      "continent": "Australia · alternate list",
+      "lat": -36.456076,
+      "lon": 148.263399,
+      "elevation": 2228,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=11624",
+      "heightSource": "https://www.ga.gov.au/scientific-topics/national-location-information/landforms/highest-mountains",
+      "alternate": true,
+      "terrainAtReferenceMetres": 2218.3175588502127,
+      "terrainMinusReferenceMetres": -9.682441149787337,
+      "modeledCrest": {
+        "lat": -36.45634579630379,
+        "lon": 148.2635946716481,
+        "elevation": 2221.9446501467164,
+        "offsetMetres": 34.73110997362451,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -6.055349853283587,
+      "tilePixelSpacingMetres": 61.47926697972642,
+      "terrainSource": "Mapzen / Tilezen, source resolution varies",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    },
+    {
+      "id": "dombay",
+      "name": "Dombay-Ulgen · Caucasus",
+      "continent": "Caucasus · regional destination",
+      "lat": 43.243572,
+      "lon": 41.727285,
+      "elevation": 4046,
+      "coordinateSource": "https://www.peakbagger.com/peak.aspx?pid=10378",
+      "heightSource": "https://www.peakbagger.com/peak.aspx?pid=10378",
+      "terrainAtReferenceMetres": 3804.7283406872248,
+      "terrainMinusReferenceMetres": -241.27165931277523,
+      "modeledCrest": {
+        "lat": 43.24107638418994,
+        "lon": 41.72145164917408,
+        "elevation": 3973.6235695170226,
+        "offsetMetres": 547.9621337282349,
+        "searchRadiusMetres": 1000
+      },
+      "crestMinusPublishedHeightMetres": -72.37643048297741,
+      "tilePixelSpacingMetres": 27.84019391558735,
+      "terrainSource": "JAXA AW3D30 / EGM96 orthometric, resampled",
+      "imagery": {
+        "source": "NASA Landsat WELD v3.1",
+        "epoch": "2000-12-01",
+        "nominalSourceResolutionMetres": 30
+      },
+      "photorealistic": false
+    }
+  ]
+}

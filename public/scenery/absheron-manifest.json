@@ -1,0 +1,14 @@
+{
+  "source": "https://www.openstreetmap.org/copyright",
+  "sourceSnapshot": "absheron-osm-source.json",
+  "sourceHash": "2085f5a9cb3ffa9707a07a9bfb3c600939e4d991c9cb3bc10c9ffcfe0534e602",
+  "derivedHash": "497db3ac611e3845ec3aceb6d737779e67cf183202feec1dfa98f7082a218ced",
+  "coastVertices": 4102,
+  "mergedVertices": 4430,
+  "islands": 30,
+  "joinErrorKm": [
+    3.0217526498452583,
+    3.7361708672052965
+  ],
+  "license": "ODbL 1.0 / Natural Earth public domain"
+}

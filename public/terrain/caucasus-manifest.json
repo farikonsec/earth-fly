@@ -1,0 +1,118 @@
+{
+  "source": "Copernicus DEM GLO-30 Public",
+  "datum": "EGM2008 orthometric",
+  "nativeSampling": "1 arc second / nominal 30 m DSM",
+  "attribution": "Produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved.",
+  "licenseURL": "https://documentation.dataspace.copernicus.eu/APIs/SentinelHub/Data/DEM/resources/license/License-COPDEM-30.pdf",
+  "sourceAssets": [
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N43_00_E041_00_DEM/Copernicus_DSM_COG_10_N43_00_E041_00_DEM.tif",
+    "https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N43_00_E042_00_DEM/Copernicus_DSM_COG_10_N43_00_E042_00_DEM.tif"
+  ],
+  "changes": "Bilinearly resampled to zoom-11 Terrarium; missing samples retain original Mapzen; runtime parent-edge feather applies. No summit heights are artificially pinned.",
+  "replaced": 1179648,
+  "missing": 0,
+  "summits": [
+    {
+      "id": "dombay",
+      "reference": 4046,
+      "sourceAtReference": 3750.2944448833914
+    },
+    {
+      "id": "elbrus",
+      "reference": 5642,
+      "sourceAtReference": 5513.547818892241
+    }
+  ],
+  "files": [
+    {
+      "key": "11/1260/749",
+      "sha256": "e5df560cb90fa6bfed796648e7a69ed1e4f561434bff3ce59e9409b218d3fafa",
+      "bytes": 162733
+    },
+    {
+      "key": "11/1261/749",
+      "sha256": "260f5b4617015a3fd2a01f5789b583bc7e9e93c9e9c755eca2f59a4bf5bb5504",
+      "bytes": 162605
+    },
+    {
+      "key": "11/1262/749",
+      "sha256": "4cbdcfddd09f11e6b6ba0033f960dc078d5db951314debc610d158810b67f80f",
+      "bytes": 163280
+    },
+    {
+      "key": "11/1260/750",
+      "sha256": "d5dd4d53c42866ca968663f2e75182c1498ed3ad763b79f41e6606cd7400a7ad",
+      "bytes": 163781
+    },
+    {
+      "key": "11/1261/750",
+      "sha256": "cdc61af17c5e2480b30e9c7a9eaa8c3e50d3420d7ed45040efa22585b601507b",
+      "bytes": 163081
+    },
+    {
+      "key": "11/1262/750",
+      "sha256": "4f02aefaef95f5bd9d9a53d35a00df24b692212d5b57807374290c824ff38a83",
+      "bytes": 163459
+    },
+    {
+      "key": "11/1260/751",
+      "sha256": "6166d265ecba07ffd23ec1d800189931c876b390a25cb522a64c387f9f0bda68",
+      "bytes": 161660
+    },
+    {
+      "key": "11/1261/751",
+      "sha256": "8aa7d98023ceb1ada41c710853ab3b9f9ebd219df25182a87d240109f79c27d2",
+      "bytes": 162764
+    },
+    {
+      "key": "11/1262/751",
+      "sha256": "d8b3692a9ec6167408a8e94d84ca229d6f0c3682d1c6b2b91950e441cee69d2e",
+      "bytes": 162585
+    },
+    {
+      "key": "11/1264/748",
+      "sha256": "62d0ab2cba1f66332c08830766aa1af3b789f49a2f34bb0cb4ab70de07b6e223",
+      "bytes": 159623
+    },
+    {
+      "key": "11/1265/748",
+      "sha256": "5125fba4173d15289a739e084b7a337442a4c5f3e58608dff526a6805aba5664",
+      "bytes": 153729
+    },
+    {
+      "key": "11/1266/748",
+      "sha256": "a58461e511925e8c19e102225a3ef8aec1295e7ba590579d6595250ec6437329",
+      "bytes": 156654
+    },
+    {
+      "key": "11/1264/749",
+      "sha256": "756cfc2cc667d79c2177ece68b6b8ac8bcfa4e74c0f3bc439d4f0b11cb80b146",
+      "bytes": 161650
+    },
+    {
+      "key": "11/1265/749",
+      "sha256": "1fe01473e52058691029afc36e2683fe31fca6322b36618a9360631d8a9d9ae9",
+      "bytes": 158530
+    },
+    {
+      "key": "11/1266/749",
+      "sha256": "64548a878e743a363dc43f440da7037bf5f05c32a726c63fccf876536fa225f2",
+      "bytes": 159661
+    },
+    {
+      "key": "11/1264/750",
+      "sha256": "a2c13842b0e97eda6d8906b7f7df08e0c2cf85c41e428b05621665d36577fe07",
+      "bytes": 162974
+    },
+    {
+      "key": "11/1265/750",
+      "sha256": "c6e38df09d9fdeddcbbe5e46960212d06ac976770573b091f68534f3ba0aea8c",
+      "bytes": 160413
+    },
+    {
+      "key": "11/1266/750",
+      "sha256": "1f8edf52e826398cdf939d5023293816aff7c90d7526780402bda2d7580e2591",
+      "bytes": 162082
+    }
+  ]
+}

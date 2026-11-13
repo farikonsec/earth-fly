@@ -1,0 +1,37 @@
+{
+  "name": "earth-fly",
+  "private": true,
+  "version": "0.27.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5178",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 5178",
+    "test": "bun test",
+    "check": "bun test && bun run build",
+    "prepare:detail": "bun scripts/prepare-detail.ts",
+    "prepare:summits": "bun scripts/prepare-summits.ts",
+    "prepare:vinson": "bun scripts/prepare-vinson.ts",
+    "audit:summits": "bun scripts/audit-summits.ts",
+    "prepare:summit-imagery": "bun scripts/prepare-summit-imagery.ts",
+    "prepare:regions": "bun scripts/prepare-regions.ts",
+    "prepare:caucasus": "bun scripts/prepare-caucasus.ts",
+    "prepare:aw3d": "bun scripts/prepare-aw3d.ts",
+    "prepare:absheron": "bun scripts/prepare-absheron.ts && bun scripts/prepare-absheron-imagery.ts",
+    "orbits:refresh": "bun scripts/refresh-orbits.ts",
+    "traffic:refresh": "bun scripts/prepare-traffic-map.ts && bun scripts/prepare-transit.ts"
+  },
+  "dependencies": {
+    "satellite.js": "^7.1.0",
+    "three": "0.185.1"
+  },
+  "devDependencies": {
+    "@types/pngjs": "^6.0.5",
+    "@types/three": "0.185.4",
+    "geotiff": "^3.0.5",
+    "pngjs": "^7.0.0",
+    "proj4": "^2.22.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.0"
+  }
+}

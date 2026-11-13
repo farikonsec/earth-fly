@@ -1,0 +1,122 @@
+{
+  "source": "REMA mosaic v2.0 32m, Polar Geospatial Center",
+  "license": "CC-BY-4.0",
+  "citation": "https://doi.org/10.7910/DVN/EBW8UC",
+  "catalogURL": "https://stac.pgc.umn.edu/api/v1/collections/rema-mosaics-v2.0-32m/items?bbox=-86.484375,-78.76779175784321,-84.375,-78.34941069014629&limit=20",
+  "sourceAssets": [
+    "https://pgc-opendata-dems.s3.us-west-2.amazonaws.com/rema/mosaics/v2.0/32m/32_18/32_18_32m_v2.0_dem.tif",
+    "https://pgc-opendata-dems.s3.us-west-2.amazonaws.com/rema/mosaics/v2.0/32m/31_18/31_18_32m_v2.0_dem.tif"
+  ],
+  "geoid": {
+    "source": "https://download.osgeo.org/proj/vdatum/egm96_15/egm96_15.gtx",
+    "sha256": "c02a6eb70a7a78efebe5adf3ade626eb75390e170bb8b3f36136a2c28f5326a0",
+    "model": "EGM96 15 arc-minute",
+    "conversion": "orthometric H = ellipsoidal h − geoid undulation N"
+  },
+  "bounds": {
+    "west": -86.484375,
+    "south": -78.76779175784321,
+    "east": -84.375,
+    "north": -78.34941069014629
+  },
+  "feather": "Outer 15% blends into original Mapzen terrain; DEM voids retain original data.",
+  "valid": 1179614,
+  "missing": 34,
+  "summit": {
+    "ellipsoidal": 4864.124060951044,
+    "geoidUndulation": -14.986894304987846,
+    "orthometric": 4879.110955256032
+  },
+  "files": [
+    {
+      "key": "9/133/442",
+      "bytes": 145687,
+      "sha256": "6f75d03cffd493cbf82a9f19af27fadc100fccde62a2089cabd30d880d3baa9c"
+    },
+    {
+      "key": "9/134/442",
+      "bytes": 151907,
+      "sha256": "7d14b81664c4e285c64e7f4fad409c10489ad4ffa9c8b77e0d783c66e391dc03"
+    },
+    {
+      "key": "9/135/442",
+      "bytes": 151874,
+      "sha256": "4f80c7a69d1bc77b0707171b2ec5dd69eb07f1f3952f96d8ff7ce1d3262a8a1e"
+    },
+    {
+      "key": "9/133/443",
+      "bytes": 143666,
+      "sha256": "e7dad8e2591316ba0c4be333b26d21f0faa45250ca4c7aada5c5367dbc9364c8"
+    },
+    {
+      "key": "9/134/443",
+      "bytes": 157926,
+      "sha256": "cc63c13bf7b3046e49e9eecfcc4d4fbbee34082527b3c8f01f962d862255b36e"
+    },
+    {
+      "key": "9/135/443",
+      "bytes": 154320,
+      "sha256": "724e0652fb8f148a18c622bf74dfa7ec9bba3a48691217ff190736796e322697"
+    },
+    {
+      "key": "9/133/444",
+      "bytes": 128813,
+      "sha256": "6988c579d565bbe08e67feb2ece15a77b07f09dce6e4f6c40382d43ffcd086c4"
+    },
+    {
+      "key": "9/134/444",
+      "bytes": 145594,
+      "sha256": "18f75a0272db6342afddd893de6c83e37637eebe117f7c09f7b3cee546b96b80"
+    },
+    {
+      "key": "9/135/444",
+      "bytes": 147523,
+      "sha256": "c1417894d5e41739367cb3423466f2d31dd6044e5ac6d4a036ae01507a64e447"
+    },
+    {
+      "key": "11/535/1771",
+      "bytes": 138814,
+      "sha256": "09805d50c178807357fc339e5e135b3ff1d068efbc04d4bf52a828d592d9e372"
+    },
+    {
+      "key": "11/536/1771",
+      "bytes": 135084,
+      "sha256": "220b30ee7ab9502c68217fee0c668a16d36b628417cffa039e5ca1b0cdb32377"
+    },
+    {
+      "key": "11/537/1771",
+      "bytes": 134943,
+      "sha256": "50dc440a420d9a6b6ffa2448e7aefa0be94e774c86d4c84d4c2f052ad4275556"
+    },
+    {
+      "key": "11/535/1772",
+      "bytes": 125297,
+      "sha256": "f6402906ec3e360f62b94abf7b44244b9d195f59800bff5614815cc756f075a4"
+    },
+    {
+      "key": "11/536/1772",
+      "bytes": 138351,
+      "sha256": "ae28e9d36af3788cca539779dc0fe12377a0fb0d6ddaf3dee5a32cf44bb0762d"
+    },
+    {
+      "key": "11/537/1772",
+      "bytes": 137708,
+      "sha256": "f700202e2414936ed66a7aa79f8cd7846e3257ccfc85f853ab1c63909f44cc42"
+    },
+    {
+      "key": "11/535/1773",
+      "bytes": 131703,
+      "sha256": "788794979a21a6c7c218c74e65b988a785824b6139d0443bf930099feeffc075"
+    },
+    {
+      "key": "11/536/1773",
+      "bytes": 140497,
+      "sha256": "29041f4638f2ece9ad4b6f4f1fb84fe64b321221f9d1310233608435128db63b"
+    },
+    {
+      "key": "11/537/1773",
+      "bytes": 128455,
+      "sha256": "87ba3961fd01c6b267f7a8b32056e360a853c6e3663aafc83c8975419e5ef053"
+    }
+  ]
+}

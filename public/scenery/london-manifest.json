@@ -1,0 +1,28 @@
+{
+ "source": "https://www.openstreetmap.org/copyright",
+ "license": "OpenStreetMap contributors, ODbL 1.0",
+ "osmTimestamp": "2026-11-10T10:10:00Z",
+ "bounds": {
+  "south": 51.485,
+  "west": -0.155,
+  "north": 51.525,
+  "east": -0.005
+ },
+ "sourceHash": "91543b7f2cf569c5f93981962348582fde1355427ad8ae9bac882529414ad8a2",
+ "derivedHash": "ef88c498f1d2c380455a52334989061693068e07677fb5c7ae85b016029f1dc8",
+ "buildings": 47125,
+ "parts": 5675,
+ "outlinesReplacedByParts": 997,
+ "taggedHeightShare": 0.515,
+ "bytes": 2020160,
+ "tallest": [
+  "w666124826 310 m",
+  "w666124828 310 m",
+  "w666124832 310 m",
+  "w666124829 290 m",
+  "w717373630 278 m",
+  "w666124831 260 m",
+  "w717374379 260 m",
+  "w717374380 260 m"
+ ]
+}

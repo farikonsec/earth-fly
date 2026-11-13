@@ -1,0 +1,19 @@
+{
+ "source": "Environment Agency LIDAR Composite DTM 1m (WCS, resampled ~5 m)",
+ "license": "Open Government Licence v3.0. © Environment Agency copyright and/or database right. All rights reserved.",
+ "bounds": {
+  "west": -0.52,
+  "east": 0.06,
+  "south": 51.44,
+  "north": 51.56
+ },
+ "cols": 8040,
+ "rows": 2680,
+ "encoding": "int16 decimetres, each row delta-coded west to east, gzip",
+ "order": "row 0 = north edge, pixel centres",
+ "minM": -42.5,
+ "maxM": 136.8,
+ "filledNoData": 1063710,
+ "bytes": 10688683,
+ "sha256": "3b13d1892aa270f360cfb2d68a3b54d2470fa57b89a3a628e4a5cd8edfb94643"
+}

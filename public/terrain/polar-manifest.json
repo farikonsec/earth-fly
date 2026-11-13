@@ -1,0 +1,25 @@
+{
+  "source": "NOAA ETOPO 2022 v1 60 arc-second surface",
+  "url": "https://www.ngdc.noaa.gov/mgg/global/relief/ETOPO2022/data/60s/60s_surface_elev_gtif/ETOPO_2022_v1_60s_N90W180_surface.tif",
+  "datum": "EGM2008",
+  "license": "US Government public domain",
+  "sampling": "0.25 degree geographic grid, bilinear source resampling; north of 70 N and south of 70 S",
+  "files": [
+    {
+      "path": "public/terrain/polar-north.f32",
+      "bytes": 466560,
+      "sha256": "14e5a5a9d383dd621a5887fa1cfb3ed9c92d359a281e43a62c78759660769806",
+      "pole": 0,
+      "min": 0,
+      "max": 3223.7919921875
+    },
+    {
+      "path": "public/terrain/polar-south.f32",
+      "bytes": 466560,
+      "sha256": "ccc413e9e217bc78b325bc4fca123b9e5be8ae0a806a41a95c92d7e111a064be",
+      "pole": 2827.1305619981495,
+      "min": 0,
+      "max": 4226.6123046875
+    }
+  ]
+}

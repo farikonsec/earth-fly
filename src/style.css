@@ -1,0 +1,1114 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #edf5f3;
+  background: #03080d;
+  font-synthesis: none;
+  --mint: #a5ebc8;
+  --dim: #a2b2b9;
+  --line: #ffffff20;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  overflow: hidden;
+}
+button,
+select,
+input {
+  font: inherit;
+}
+button,
+select {
+  color: inherit;
+  cursor: pointer;
+}
+button {
+  background: #ffffff08;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 11px 12px;
+  font-size: 12px;
+  transition: background 0.15s;
+}
+button:hover {
+  background: #ffffff19;
+}
+button.on {
+  border-color: #a5ebc875;
+  background: #a5ebc81b;
+  color: var(--mint);
+}
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 3px;
+}
+.quiet {
+  background: none;
+  border-color: transparent;
+}
+#world {
+  position: fixed;
+  inset: 0;
+}
+canvas {
+  display: block;
+  touch-action: none;
+}
+header {
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  top: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+header > * {
+  pointer-events: auto;
+}
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  letter-spacing: 5px;
+  font-size: 19px;
+}
+.brand b {
+  font-weight: 400;
+  color: var(--mint);
+}
+.brand small {
+  display: block;
+  font: 8px monospace;
+  letter-spacing: 2px;
+  color: #a4b5ba;
+  margin-top: 7px;
+}
+.brand-icon {
+  font-size: 48px;
+  line-height: 0.9;
+  color: var(--mint);
+}
+.topstatus {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font: 10px monospace;
+  letter-spacing: 1.5px;
+}
+.dot {
+  display: inline-block;
+  background: var(--mint);
+  height: 5px;
+  width: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #a5ebc84a;
+}
+.divider {
+  color: #ffffff45;
+}
+header .quiet {
+  font-size: 11px;
+}
+header .quiet span {
+  padding: 4px 6px;
+  margin-left: 7px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.location {
+  position: absolute;
+  top: 145px;
+  left: 40px;
+  pointer-events: none;
+  text-shadow: 0 2px 30px #0008;
+}
+.eyebrow {
+  font: 9px monospace;
+  letter-spacing: 2px;
+  color: var(--mint);
+}
+.location h1 {
+  font-size: clamp(27px, 3.2vw, 49px);
+  font-weight: 400;
+  letter-spacing: -2px;
+  margin: 14px 0;
+}
+.location p {
+  font: 11px monospace;
+  letter-spacing: 1px;
+  color: #bac9cc;
+}
+#desk {
+  position: absolute;
+  right: 34px;
+  top: 116px;
+  width: 284px;
+  background: linear-gradient(130deg, #101e25e6, #081017dc);
+  border: 1px solid #ffffff24;
+  border-radius: 8px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 12px 60px #0003;
+}
+.desk-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 17px;
+  border-bottom: 1px solid var(--line);
+}
+.desk-head button {
+  font-size: 20px;
+  padding: 1px 5px;
+}
+.desk-body {
+  padding: 18px;
+}
+.field {
+  display: block;
+  font: 9px monospace;
+  letter-spacing: 1.2px;
+  color: var(--dim);
+  flex: 1;
+  min-width: 0;
+}
+.field select {
+  display: block;
+  background: #16242b;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  width: 100%;
+  padding: 10px 7px;
+  margin-top: 9px;
+  font: 11px Arial;
+  letter-spacing: 0;
+}
+.row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+.row > button {
+  flex: 1;
+}
+.row button span {
+  float: right;
+  color: var(--mint);
+}
+.map {
+  position: relative;
+  height: 123px;
+  margin: 20px -1px 18px;
+  border: 1px solid var(--line);
+  overflow: hidden;
+  border-radius: 4px;
+  background: #000;
+}
+.map img {
+  width: 100%;
+  height: 100%;
+  opacity: 0.62;
+  object-fit: fill;
+  filter: saturate(0.5);
+}
+.map-label {
+  position: absolute;
+  bottom: 7px;
+  left: 8px;
+  font: 7px monospace;
+  letter-spacing: 1px;
+  color: #cce1df;
+}
+#map-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #b5ffda;
+  box-shadow:
+    0 0 0 4px #b5ffda30,
+    0 0 14px #b5ffda;
+  transform: translate(-50%, -50%);
+}
+.throttle-label b {
+  float: right;
+  color: #edf5f3;
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--mint);
+  margin: 15px 0 6px;
+  height: 3px;
+  cursor: pointer;
+}
+.toggles button {
+  font-size: 10px;
+  padding: 10px 3px;
+}
+.toggles small {
+  color: #8fadb4;
+  font: 9px monospace;
+  margin-left: 2px;
+}
+.deck-footer {
+  display: flex;
+  justify-content: space-between;
+  font: 8px monospace;
+  color: #78919b;
+  letter-spacing: 1px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  margin-top: 18px;
+}
+.telemetry {
+  position: absolute;
+  left: 40px;
+  bottom: 100px;
+  display: flex;
+  gap: 34px;
+  align-items: end;
+  pointer-events: none;
+  text-shadow: 0 2px 12px #000;
+}
+.metric span {
+  font: 8px monospace;
+  color: #b1c4ca;
+  letter-spacing: 1.2px;
+  display: block;
+  margin-bottom: 10px;
+}
+.metric strong {
+  font: 28px monospace;
+  letter-spacing: -1px;
+}
+.metric.primary strong {
+  font-size: 46px;
+}
+.metric small {
+  font: 11px monospace;
+  color: #b1c4ca;
+  margin-left: 7px;
+  letter-spacing: 0;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  left: 34px;
+  right: 34px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  gap: 20px;
+}
+footer div {
+  font: 8px monospace;
+  letter-spacing: 1px;
+}
+footer .dot {
+  margin-right: 6px;
+}
+.muted {
+  color: #76919d;
+}
+footer p {
+  font-size: 9px;
+  color: #a3b8bf;
+}
+kbd {
+  font: 9px monospace;
+  border: 1px solid #ffffff26;
+  border-radius: 3px;
+  padding: 3px 4px;
+  color: #d9e7e8;
+  margin-left: 9px;
+}
+footer button {
+  font-size: 10px;
+}
+#crosshair {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 60px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  opacity: 0.6;
+  pointer-events: none;
+}
+#crosshair i {
+  width: 18px;
+  height: 1px;
+  background: #b4fbd5;
+}
+#crosshair span {
+  width: 4px;
+  height: 4px;
+  border: 1px solid #b4fbd5;
+  border-radius: 50%;
+}
+#notice {
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%);
+  font: 10px monospace;
+  letter-spacing: 1px;
+  color: var(--mint);
+  text-align: center;
+  max-width: 45%;
+  line-height: 1.7;
+}
+dialog {
+  background: #101d26f5;
+  color: inherit;
+  border: 1px solid #ffffff30;
+  border-radius: 12px;
+  padding: 36px;
+  max-width: 680px;
+  max-height: 85vh;
+  box-shadow: 0 20px 120px #0009;
+}
+dialog::backdrop {
+  background: #02080dbb;
+  backdrop-filter: blur(7px);
+}
+dialog h2 {
+  font-size: 39px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  margin: 17px 0 25px;
+}
+dialog p {
+  font-size: 12px;
+  color: #b9cbd1;
+  line-height: 1.8;
+}
+dialog b {
+  color: #e6efec;
+  font-weight: 500;
+}
+.guide-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 30px;
+}
+.guide-grid p {
+  line-height: 2.1;
+}
+.close {
+  position: absolute;
+  right: 14px;
+  top: 10px;
+  font-size: 23px;
+}
+.credit {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+  font-size: 10px !important;
+}
+.collapsed .desk-body {
+  display: none;
+}
+.collapsed .desk-head {
+  border: 0;
+}
+.clean header,
+.clean .location,
+.clean #desk,
+.clean .telemetry,
+.clean footer,
+.clean #crosshair,
+.clean #notice {
+  display: none;
+}
+#loading {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #050c13;
+  z-index: 10;
+}
+#loading h1 {
+  font-size: 21px;
+  font-weight: 400;
+  letter-spacing: 8px;
+}
+#loading p {
+  font: 11px monospace;
+  color: #9db6c1;
+}
+.loader {
+  width: 45px;
+  height: 45px;
+  border: 1px solid #ffffff20;
+  border-top-color: var(--mint);
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 1000px) {
+  .topstatus {
+    display: none;
+  }
+  .telemetry {
+    gap: 20px;
+  }
+  .metric strong {
+    font-size: 22px;
+  }
+  .metric.primary strong {
+    font-size: 35px;
+  }
+  footer p {
+    display: none;
+  }
+  #desk {
+    width: 250px;
+    right: 20px;
+  }
+  .location {
+    left: 25px;
+    top: 115px;
+  }
+  .location .eyebrow {
+    display: none;
+  }
+}
+@media (max-width: 650px) {
+  header {
+    left: 18px;
+    right: 18px;
+    top: 19px;
+  }
+  .location {
+    top: 95px;
+  }
+  .location h1 {
+    font-size: 28px;
+    letter-spacing: -1px;
+  }
+  #desk {
+    top: auto;
+    bottom: 145px;
+    width: 220px;
+    right: 16px;
+  }
+  .map {
+    display: none;
+  }
+  .desk-body {
+    padding: 12px;
+  }
+  .telemetry {
+    bottom: 82px;
+    left: 20px;
+    gap: 20px;
+  }
+  .metric.primary strong {
+    font-size: 26px;
+  }
+  .metric strong {
+    font-size: 19px;
+  }
+  .metric span {
+    font-size: 7px;
+  }
+  .metric:nth-child(3),
+  .metric:nth-child(4) {
+    display: none;
+  }
+  footer {
+    left: 20px;
+    right: 20px;
+  }
+  footer .muted {
+    display: none;
+  }
+  dialog {
+    padding: 23px;
+    margin: 12px;
+  }
+  .guide-grid {
+    gap: 0 14px;
+  }
+  #notice {
+    top: 75px;
+    max-width: 90%;
+    width: 90%;
+  }
+}
+#world::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    #0005,
+    transparent 28%,
+    transparent 65%,
+    #02080db3
+  );
+}
+#instruments {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.clean #instruments {
+  display: none;
+}
+header,
+.location,
+#desk,
+.telemetry,
+footer,
+#notice {
+  z-index: 2;
+}
+#crosshair {
+  display: none;
+}
+.location {
+  top: 110px;
+}
+.location h1 {
+  font-size: 32px;
+}
+#desk {
+  width: 280px;
+  max-height: calc(100vh - 190px);
+  overflow: auto;
+}
+#desk::-webkit-scrollbar {
+  width: 3px;
+}
+.map {
+  height: 100px;
+  margin-top: 14px;
+  margin-bottom: 14px;
+  cursor: crosshair;
+}
+.desk-body {
+  padding: 14px;
+}
+.field input[type="number"] {
+  display: block;
+  background: #16242b;
+  color: #e9f5ef;
+  border: 1px solid #ffffff26;
+  border-radius: 4px;
+  padding: 11px;
+  width: 100%;
+  margin: 9px 0 16px;
+  font: 13px monospace;
+}
+.terrain-status {
+  font: 8px monospace;
+  color: #96b6c1;
+  margin: 9px 0 0;
+  letter-spacing: 0.5px;
+}
+.row button {
+  font-size: 10px;
+}
+#planner-error {
+  color: #ffb78b;
+  min-height: 20px;
+}
+.location .eyebrow {
+  font-size: 8px;
+}
+.telemetry {
+  bottom: 85px;
+}
+.metric.primary strong {
+  font-size: 35px;
+}
+.metric strong {
+  font-size: 24px;
+}
+@media (max-height: 850px) {
+  .map {
+    height: 75px;
+  }
+  .desk-body {
+    padding: 10px;
+  }
+  .desk-footer {
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .field select {
+    padding: 7px;
+  }
+  .row {
+    margin-top: 9px;
+  }
+  #desk {
+    top: 94px;
+    max-height: calc(100vh - 160px);
+  }
+  .location {
+    top: 100px;
+  }
+}
+#scenery-credit{position:fixed;bottom:67px;right:35px;z-index:2;font:8px monospace;color:#9bbac0;text-decoration:none;letter-spacing:.4px}.clean #scenery-credit{display:none}
+
+.air-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 18px;
+  padding-left: 12px;
+  border-left: 2px solid #a5ebc880;
+  font: 10px monospace;
+  letter-spacing: .6px;
+  color: #c4d4df;
+}
+.air-readout strong { color: #e8faf4; font-size: 12px; text-transform: uppercase; }
+.air-readout span:last-child { color: #a5ebc8; font-size: 9px; }
+.speed-reference { padding: 16px; border: 1px solid var(--line); border-radius: 6px; }
+.speed-reference h3 { margin: 0; font-size: 14px; }
+.speed-reference dl { display: grid; grid-template-columns: 1fr auto; gap: 10px 16px; font: 11px monospace; }
+.speed-reference dt { color: var(--dim); }
+.speed-reference dd { margin: 0; text-align: right; }
+#guide a { color: var(--mint); }
+@media (max-width: 700px) { .air-readout { margin-top: 10px; gap: 4px; font-size: 9px; } }
+.air-readout #landing-site { color: #c4d4df; font-size: 9px; }
+.air-readout #landing-site.unsafe { color: #ffc38c; }
+.air-readout [hidden] { display: none; }
+
+/* HERO: one readable Mach crossing, supported by a quiet, continuous speed instrument. */
+.mach-meter { width: 235px; margin-top: 20px; font-family: 'SFMono-Regular', Menlo, Consolas, monospace; }
+.mach-meter strong { font-size: 13px; letter-spacing: 1.4px; color: #dce7e9; }
+.mach-meter strong.supersonic { color: var(--mint); }
+.mach-track { position: relative; height: 4px; margin: 10px 0; background: #cadcd733; }
+.mach-track i { display: block; height: 100%; width: 0; background: var(--mint); }
+.mach-track b { position: absolute; left: 66.6667%; top: -4px; height: 12px; width: 2px; background: #ffc38c; }
+.mach-meter > span { display: block; font-size: 8px; line-height: 1.6; letter-spacing: .5px; color: #d5e4e5; }
+#mach-flash { position: fixed; top: 108px; left: 50%; transform: translateX(-50%); pointer-events: none; opacity: 0; text-align: center; color: var(--mint); text-shadow: 0 2px 12px #000; font-family: Menlo, Consolas, monospace; }
+#mach-flash small, #mach-flash span { display: block; letter-spacing: 5px; font-size: 10px; }
+#mach-flash strong { display: block; font-size: 42px; line-height: 1.2; letter-spacing: 2px; }
+.game-actions button { border-color: #a5ebc85c; color: var(--mint); font-weight: bold; touch-action: none; }
+.game-actions small { display: block; margin-top: 5px; font-size: 8px; letter-spacing: .8px; }
+.game-actions button:active { background: #a5ebc832; }
+#motion-effects { align-self: end; height: 34px; white-space: nowrap; font-size: 10px; }
+.clean #mach-flash { display: none; }
+@media (max-width: 650px) { .mach-meter { width: 190px; margin-top: 12px; } #mach-flash { top: 70px; } #mach-flash strong { font-size: 26px; } }
+#mouse-stick { position: fixed; z-index: 3; width: 90px; height: 90px; transform: translate(-50%,-50%); border: 1px solid #dfffee80; border-radius: 50%; background: #07131c28; pointer-events: none; }
+#mouse-stick i { position: absolute; left: 40px; top: 40px; width: 10px; height: 10px; background: var(--mint); border-radius: 50%; }
+#mouse-stick[hidden] { display: none; }
+.summit-readout{font:11px/1.55 Menlo,Consolas,monospace;color:#b8d5d4;margin:10px 0}
+.summit-readout a{color:#a9e9d7;text-underline-offset:3px}
+.metric .clearance-readout{font:12px/1.4 Menlo,Consolas,monospace;letter-spacing:0;color:#baf2da;margin:7px 0 2px}
+.metric .altimetry-reference{font:9px/1.5 Menlo,Consolas,monospace;letter-spacing:0;max-width:290px;margin:0;color:#b1c4ca}
+.metric .clearance-readout.caution,#notice.terrain-caution{color:#ffd099}
+.metric .clearance-readout.critical,#notice.terrain-danger{color:#ff9c87}
+#notice.terrain-danger{background:#2c1116eb;border:1px solid #ff9c8790;padding:8px 12px;border-radius:4px;z-index:3;pointer-events:none}
+.clean #notice.terrain-danger{display:block}
+@media(max-width:620px){.metric.primary{max-width:225px}.metric .altimetry-reference{max-width:225px}}
+@media(max-width:650px){#desk.collapsed{bottom:220px}}
+#summits-button{width:100%;margin:7px 0 2px;color:#a9e9d7}
+#summit-beacon{position:fixed;z-index:2;transform:translate(-50%,-100%);width:max-content;max-width:min(260px,calc(100vw - 32px));padding:7px 10px;border-bottom:1px solid #a9e9d7;background:#0b1b23c9;color:#c9fff0;font:10px/1.5 Menlo,Consolas,monospace;pointer-events:none;text-align:center}
+#summit-beacon[hidden],.clean #summit-beacon{display:none}
+#flight-map{position:fixed;right:22px;bottom:45px;width:285px;z-index:12;border:1px solid #a4d9d64a;border-radius:8px;background:#0a1a24ed;overflow:hidden;box-shadow:0 6px 28px #0005;}
+#flight-map canvas{display:block;width:100%;height:175px;touch-action:none;cursor:grab;}
+#flight-map.expanded{width:min(620px,calc(100vw - 28px));}#flight-map.expanded canvas{height:min(410px,50vh);}
+.map-controls{display:flex;gap:5px;position:absolute;right:7px;top:7px;}.map-controls button{padding:6px 9px;min-width:29px;background:#0a202ee8;font:11px monospace;}.map-controls .active{color:#a9ffdb;border-color:#a9ffdb;}
+.flight-map-label{font:9px monospace;padding:8px;color:#c0d9d7;min-height:28px;}.solar-readout{font:9px/1.5 monospace;color:#b2ccc9;margin:12px 0;}
+@media(max-width:700px){#flight-map{right:10px;bottom:51px;width:170px;}#flight-map canvas{height:105px;}.flight-map-label{font-size:8px;padding:5px;}.map-controls{gap:2px;right:3px;top:3px;}.map-controls button{padding:5px;min-width:24px;}#flight-map.expanded{width:calc(100vw - 20px);}}
+.clean #flight-map{display:none;}
+@media(max-width:650px){.metric.primary{max-width:calc(100vw - 205px);}.metric.primary strong{font-size:29px;}.clearance-readout{font-size:10px;line-height:1.5;}.altimetry-reference{font-size:8px;}#flight-map{bottom:55px;}}
+@media(min-width:651px){#desk{max-height:max(170px,calc(100vh - 430px));}#flight-map{right:35px;}}
+@media(max-width:650px){body:has(#desk:not(.collapsed)) #flight-map{visibility:hidden;}}
+#tour-planner{width:min(540px,calc(100vw - 24px));max-height:90vh;overflow:auto;background:#0a202b;color:#e7f6f0;border:1px solid #7fb6b180;border-radius:12px;padding:24px;}#tour-planner::backdrop{background:#001018ad;}#tour-planner h2{font-weight:500;letter-spacing:-1px;font-size:30px;margin:0 0 15px;}#tour-planner p{font-size:12px;line-height:1.6;color:#b6ceca;}#tour-plan{padding:12px;background:#ffffff08;font-family:monospace;}#tour-error{color:#ffc395!important;}.row>.field{min-width:0;flex:1;}#tour-planner input,#tour-planner select{width:100%;font-size:13px;padding:10px;margin-top:6px;background:#142e38;color:#e8f6f1;border:1px solid #608f9255;border-radius:5px;}
+#tour-status{position:fixed;left:50%;transform:translateX(-50%);top:82px;width:min(380px,calc(100vw - 32px));z-index:13;padding:12px 15px;border:1px solid #9ad8c855;border-radius:8px;background:#09202de8;display:grid;gap:6px;font:11px monospace;color:#c4ece0;}#tour-status[hidden]{display:none;}#tour-status strong{font-size:12px;}#tour-meter{width:100%;height:5px;accent-color:#a8ffcc;}#tour-status button{font:10px monospace;padding:6px;}#tour-status span{font-size:10px;line-height:1.4;}#time-readout{line-height:1.5;}.clean #tour-status{display:none;}@media(max-width:650px){#tour-status{top:92px;width:calc(100vw - 32px);}body:has(#tour-status:not([hidden])) .location{display:none;}}
+body:has(#tour-status:not([hidden])) #notice:not(.terrain-danger){display:none;}
+
+/* World playground: the view stays primary, controls are grouped by intent. */
+#play-toolbar{position:fixed;top:90px;left:50%;transform:translateX(-50%);display:flex;gap:5px;z-index:15;background:#071923d9;border:1px solid #b1dacc35;padding:5px;border-radius:12px;backdrop-filter:blur(18px)}
+#play-toolbar button{border:0;background:transparent;font-size:11px;white-space:nowrap;padding:10px 13px}#play-toolbar button:first-child{background:#a5ebc8;color:#082529;border-radius:7px;font-weight:700}#play-toolbar span{margin-left:9px}
+#travel-panel{position:fixed;left:50%;transform:translateX(-50%);top:146px;z-index:14;text-align:center;color:#c8e4df}.travel-row{display:flex;gap:5px;justify-content:center}.travel-row select,.travel-row button{font-size:10px;padding:7px 9px;background:#071923dc;border:1px solid #b1dacc35;border-radius:6px;color:#d9f7ec}#super-readout{display:block;font:9px monospace;padding:8px;text-shadow:0 1px 4px #000}
+#combat-panel{position:fixed;left:24px;top:126px;z-index:18;width:270px;padding:15px;border:1px solid #ffbd6b65;background:#0b1926e6;border-radius:10px;backdrop-filter:blur(15px)}#combat-panel[hidden]{display:none}#combat-panel strong{display:block;font:13px monospace;color:#ffcf95}#combat-help{display:block;font:10px/1.6 monospace;margin:9px 0;color:#d1dedc}#combat-panel div{display:flex;gap:4px;flex-wrap:wrap}#combat-panel button{padding:8px;font-size:10px}.combat-active .location{visibility:hidden}#combat-hud{position:fixed;inset:0;pointer-events:none;z-index:9}.combat-active #crosshair{display:none}
+#imagery-credit{position:fixed;right:35px;bottom:28px;color:#a5c4c7;z-index:20;font-size:8px;text-shadow:0 1px 4px #000}#imagery-credit a{color:inherit;text-decoration:none}
+#world-explorer{width:min(860px,calc(100vw - 28px));max-height:86vh;background:linear-gradient(145deg,#132c38,#07141e);border:1px solid #8dc9c34a;border-radius:18px;padding:28px;color:#e3f3ef;box-shadow:0 30px 160px #000a}#world-explorer::backdrop{background:#020a12b0;backdrop-filter:blur(12px)}.dialog-head{display:flex;align-items:center;justify-content:space-between}.dialog-head h2{font-size:34px;font-weight:400;letter-spacing:-1px;margin:10px 0}#world-explorer>p{color:#aac3c7;font-size:13px;line-height:1.6}#destination-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-top:20px}.destination-card{text-align:left;display:grid;gap:10px;min-height:106px;padding:16px;background:linear-gradient(135deg,#20494c7a,#0b1d2e);border:1px solid #add2cd27;border-radius:10px}.destination-card:hover{background:#244d50;border-color:#a5ebc8}.destination-card small{color:#b5d9cf;font:9px monospace;text-transform:uppercase;letter-spacing:1.2px}.destination-card strong{font-weight:400;font-size:17px}.destination-card span{font:10px monospace;color:#8fafa9}
+#desk.collapsed{width:190px;box-shadow:none}.collapsed .desk-head{padding:13px 16px}.location h1{font-size:32px}.location{max-width:300px}.location .eyebrow{font-size:9px}.air-readout{font-size:11px}.mach-meter{margin-top:20px}
+.clean #play-toolbar,.clean #travel-panel,.clean #combat-panel{display:none}body:has(#tour-status:not([hidden])) #travel-panel{display:none}body:has(#tour-status:not([hidden])) #tour-status{top:145px}
+@media(max-width:750px){#play-toolbar{top:80px;width:calc(100vw - 24px);justify-content:center}#play-toolbar button{font-size:10px;padding:9px 7px}#play-toolbar span{margin-left:3px}#travel-panel{top:134px;width:100%}.travel-row select,.travel-row button{font-size:9px;padding:7px}.location{top:192px!important;left:18px!important;max-width:210px}.location h1{font-size:25px}.location .eyebrow,.air-readout span,.mach-track{display:none}.air-readout{padding:0 0 0 9px;margin-top:10px}.mach-meter{margin-top:12px}.mach-meter strong{font-size:12px}#combat-panel{left:12px;top:195px;width:245px;padding:12px}#world-explorer{padding:18px}#destination-grid{grid-template-columns:repeat(2,1fr)}.destination-card{padding:12px;min-height:100px}.destination-card strong{font-size:14px}.dialog-head h2{font-size:26px}#imagery-credit{right:12px;bottom:37px;font-size:6px;max-width:80vw;text-align:right}#desk.collapsed{width:160px}#super-readout{font-size:8px}.clean #combat-hud{display:none}}
+
+#touch-flight{display:none}#world canvas:focus{outline:none}.field[hidden]{display:none}#scenery-credit{bottom:19px;right:35px;font-size:7px}#imagery-credit{bottom:30px}.combat-active #travel-panel{visibility:hidden}body:has(#desk.collapsed) #collapse{font-size:0}body:has(#desk.collapsed) #collapse:after{content:'+';font-size:16px}
+@media(max-width:750px){#touch-flight{position:fixed;display:grid;grid-template-columns:repeat(4,38px);gap:4px;left:15px;bottom:187px;z-index:17}#touch-flight button{padding:9px 0;font:16px monospace;background:#09202cc9;touch-action:none}#touch-flight button:first-child{grid-column:2}#touch-flight button:nth-child(2){grid-column:1}#touch-flight button:nth-child(5),#touch-flight button:nth-child(6){grid-column:span 2;font-size:9px}#scenery-credit{font-size:6px;right:12px;bottom:27px}.clean #touch-flight{display:none}#imagery-credit{bottom:37px}.combat-active #touch-flight{bottom:185px}}
+
+/* 0.17 presentation pass */
+#combat-hud{position:fixed;inset:0;pointer-events:none;z-index:7}
+.combat-active .location,.combat-active #crosshair{opacity:0;pointer-events:none;transition:opacity .3s}
+.combat-active #world canvas{cursor:crosshair}
+#combat-panel{border-color:#ff7a5c70;box-shadow:0 12px 40px #0008,inset 0 0 0 1px #ffffff08}
+#combat-panel strong{font-size:14px;letter-spacing:.08em;color:#ffd9b0}
+@media(max-height:700px){#travel-panel #super-readout{display:none}}
+
+/* 0.18 HUD declutter */
+.location .eyebrow,#air-range,#space-boundary{display:none}
+.location h1{font-size:26px;line-height:1.1;margin-bottom:4px}
+.air-readout{margin-top:10px;padding-top:0;padding-bottom:0}
+.mach-meter{margin-top:12px;width:200px}
+#altimetry-reference{display:none}
+.summit-active #altimetry-reference{display:block}
+footer p{opacity:.55;transition:opacity .2s}footer:hover p{opacity:1}
+#travel-panel{top:128px;padding-top:16px;opacity:0;pointer-events:none;transition:opacity .2s}
+#play-toolbar:hover~#travel-panel,#travel-panel:hover,#travel-panel:focus-within,.super-active #travel-panel{opacity:1;pointer-events:auto}
+#super-readout{display:none}.super-active #super-readout{display:block}
+@media(hover:none){#travel-panel{opacity:1;pointer-events:auto}}
+@media(max-height:760px){
+  #play-toolbar{top:62px;padding:3px}#play-toolbar button{padding:7px 10px;font-size:10px}
+  #travel-panel{top:92px}
+  .air-readout,.location p{display:none}.location h1{font-size:20px}.mach-meter{margin-top:6px}
+  footer p{display:none}
+}
+
+/* 0.19 crash overlay */
+#crash-overlay{position:fixed;left:50%;top:22%;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;gap:10px;z-index:30;text-align:center;pointer-events:none}
+body.crashed #crash-overlay{display:flex;animation:crash-in .9s ease-out both}
+#crash-overlay strong{font:200 64px/1 system-ui,sans-serif;letter-spacing:.14em;color:#fff;text-shadow:0 0 28px #ff5a2a,0 0 4px #ffb070}
+#crash-overlay span{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;text-transform:uppercase;color:#ffd0bd}
+#crash-overlay button{pointer-events:auto;margin-top:8px;padding:10px 18px;border-radius:999px;border:1px solid #ff9d7a88;background:#2a0f0acc;color:#fff;font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.1em;cursor:pointer}
+#crash-overlay button:hover{background:#5a1c10}
+@keyframes crash-in{0%{opacity:0;transform:translateX(-50%) scale(1.25)}60%{opacity:0}100%{opacity:1;transform:translateX(-50%) scale(1)}}
+body.crashed #crosshair,body.crashed #instruments,body.crashed #notice,body.crashed #mach-flash,body.crashed #combat-hud{opacity:0;transition:opacity .4s}
+#crash-overlay{top:30%}
+
+/* 0.20 controls pass: fewer, larger targets. One place to choose where to fly, one bar for cameras. */
+#planner-button{display:none}
+label.field:has(#camera){display:none}
+#play-toolbar{gap:8px;padding:8px;border-radius:16px}
+#play-toolbar button{min-height:48px;padding:12px 22px;font-size:14px;font-weight:600;letter-spacing:.02em;border-radius:11px}
+#play-toolbar button span{font-size:16px;margin-left:8px;opacity:.85}
+#help-button{font-size:13px;padding:10px 14px}
+.travel-row select,.travel-row button{min-height:40px;font-size:13px;padding:8px 14px;border-radius:9px}
+#combat-panel button{min-height:38px;padding:8px 13px;font-size:12px;border-radius:9px}
+#destination-grid .destination-card{min-height:92px;padding:14px 16px}
+#destination-grid .destination-card strong{font-size:17px}
+#destination-grid .destination-card small,#destination-grid .destination-card span{font-size:11px}
+#explore-coordinates{margin-top:14px;width:100%;min-height:46px;font-size:14px;border-radius:11px;border:1px dashed #8dc9c36e;background:#0b222ccc;color:#cfeee6;cursor:pointer}
+#explore-coordinates:hover{background:#12333f}
+#view-bar{position:fixed;right:22px;top:132px;z-index:6;display:flex;flex-direction:column;gap:5px;padding:7px;border-radius:13px;background:#07161fb8;border:1px solid #8dc9c32e;backdrop-filter:blur(10px)}
+#view-bar button{display:flex;align-items:center;gap:9px;width:118px;min-height:32px;padding:5px 9px;border-radius:8px;border:1px solid transparent;background:transparent;color:#cfe6e2;font:600 12px system-ui,sans-serif;letter-spacing:.02em;cursor:pointer;text-align:left}
+#view-bar button:hover{background:#ffffff14}
+#view-bar button.on{background:#bfffe0;color:#06202a;border-color:#bfffe0}
+#view-bar kbd{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:5px;background:#ffffff1c;font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;color:inherit}
+#view-bar button.on kbd{background:#06202a22}
+.clean #view-bar,body.crashed #view-bar{display:none}
+body:has(#desk:not(.collapsed)) .hud-right{visibility:hidden}
+body[data-view=wing] #crosshair,body[data-view=top] #crosshair,body[data-view=nose] #crosshair,body[data-view=flyby] #crosshair,body[data-view=planet] #crosshair{opacity:0}
+@media(max-height:640px){#view-bar button{min-height:26px}#view-bar{top:118px}}
+@media(max-width:750px){#view-bar{right:8px;top:190px;padding:5px}#view-bar button{width:auto;min-height:30px;padding:4px 6px}#view-bar button span{display:none}#play-toolbar button{min-height:42px;font-size:12px;padding:9px 10px}}
+
+/* 0.21 throttle readout */
+#throttle-bar{display:block;width:92px;height:4px;margin-top:6px;border-radius:2px;background:#ffffff26;overflow:hidden}
+#throttle-bar b{display:block;height:100%;width:40%;background:#bfffe0;transition:width .12s}
+
+/* 0.22 place names */
+#place-labels{position:fixed;inset:0;pointer-events:none;z-index:2}
+/* Living skies: aircraft sensor and catalog browser. */
+#traffic-radar{position:fixed;right:92px;top:145px;z-index:14;width:244px;border:1px solid #7fbca84d;border-radius:12px;background:#081923ed;box-shadow:0 12px 36px #0005;backdrop-filter:blur(14px);font:10px/1.5 monospace;color:#b1d7d6;overflow:hidden}
+#traffic-radar header{display:flex;align-items:center;gap:8px;padding:9px 11px;border-bottom:1px solid #aacccc21}#traffic-radar header strong{margin-right:auto;letter-spacing:.15em}#traffic-radar header span{color:#84ebc3}#traffic-radar button{padding:5px 7px;font-size:10px;min-height:26px}#traffic-radar canvas{display:block;width:220px;height:220px;margin:auto;cursor:crosshair}#traffic-radar footer{display:flex;justify-content:space-between;align-items:center;padding:4px 11px}#traffic-radar select{font:10px monospace;width:65px;padding:4px;background:#15323a;color:#d8f5ed;border:1px solid #96c8bd55;border-radius:4px}#radar-summary{padding:7px 11px;border-top:1px solid #ffffff12;color:#85afa9;font-size:9px;min-height:38px}.folded .radar-body,.folded footer,.folded #radar-summary{display:none!important}.clean #traffic-radar{display:none}
+#radar-dialog{width:min(980px,94vw);max-height:86vh;padding:26px;border:1px solid #8bcfc35a;border-radius:18px;background:#091a25;color:#d9e9e6;box-shadow:0 30px 100px #000b}#radar-dialog::backdrop{background:#020c16c9;backdrop-filter:blur(7px)}.radar-dialog-head{display:flex;justify-content:space-between;align-items:center}.radar-dialog-head small{font:10px monospace;letter-spacing:.15em;color:#7cc5b7}.radar-dialog-head h2{margin:7px 0 20px;font-size:32px;letter-spacing:-.04em}.radar-dialog-head button{font-size:25px}.radar-tools{display:flex;gap:10px}.radar-tools input{flex:1;min-width:100px}.radar-tools input,.radar-tools select{padding:12px;background:#112b37;color:#daeeeb;border:1px solid #7db8ae55;border-radius:7px;font-size:12px}#orbital-source{font:10px/1.6 monospace;color:#87abae}.radar-columns{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;min-height:300px}#radar-list{max-height:48vh;overflow:auto;display:flex;flex-direction:column;gap:5px}#radar-list button{text-align:left;padding:12px;background:#102834;border:1px solid #7cb4ac22;border-radius:7px}#radar-list button:hover{background:#1b3b46}#radar-list strong,#radar-list small{display:block}#radar-list strong{font:12px monospace}#radar-list small{margin-top:5px;font:10px/1.5 monospace;color:#92acb6}#radar-detail{padding:18px;border-radius:10px;background:#102631;font:12px/1.8 monospace}#radar-detail h3{font-size:17px}#radar-detail button{background:#a1e6cb;color:#0c2829;font-weight:700;padding:12px;border-radius:8px}#radar-close{min-width:42px}#orbital-label{position:fixed;z-index:11;pointer-events:none;font:11px monospace;color:#a9d2ff;text-shadow:0 2px 4px #000;transform:translate(-50%,-100%);text-align:center;white-space:pre;line-height:1.7}.clean #orbital-label{display:none}
+@media(max-height:850px){#traffic-radar canvas{width:160px;height:160px}#traffic-radar{width:215px;top:150px}}
+@media(max-width:750px){#traffic-radar{right:12px;top:134px;width:170px}#traffic-radar canvas{width:150px;height:150px}#traffic-radar header{gap:3px;padding:5px}#traffic-radar header strong{font-size:9px}#traffic-radar button{font-size:8px;padding:3px}#radar-summary{font-size:8px}.radar-tools{flex-wrap:wrap}.radar-tools input{flex-basis:100%}.radar-columns{grid-template-columns:1fr}#radar-list{max-height:25vh}#radar-dialog{padding:16px}#view-bar{top:455px!important}}
+#traffic-radar>header,#traffic-radar>footer{position:static;inset:auto;transform:none;width:auto;height:auto;margin:0;letter-spacing:normal;background:none}#traffic-radar{right:172px}#traffic-radar header strong{letter-spacing:.12em}
+@media(max-width:750px){#traffic-radar{right:12px}}
+#traffic-radar footer label{display:flex;align-items:center;gap:5px;white-space:nowrap;font:10px monospace}#radar-count{white-space:nowrap;font-size:9px}
+
+/* 0.25 missions */
+.mission-head{margin:18px 0 8px;font:600 13px system-ui,sans-serif;letter-spacing:.06em;color:#bfe9df}.mission-head small{font-weight:400;letter-spacing:0;color:#8fb0aa;margin-left:8px}
+#mission-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;max-height:34vh;overflow:auto;padding-right:4px}
+.mission-card{border-color:#9be7c470!important}.mission-card strong{font-size:15px!important}
+#mission-panel{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:8;padding:9px 16px;border-radius:999px;background:#06171fcc;border:1px solid #9be7c45a;color:#dff7ef;font:600 13px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.03em;white-space:nowrap;backdrop-filter:blur(8px)}
+#mission-panel[data-status=done]{border-color:#b9ffcf;color:#c9ffd9;box-shadow:0 0 30px #5bff9a44}#mission-panel[data-status=failed]{border-color:#ff8a7a;color:#ffd2ca}
+#bridge-flash{position:fixed;left:50%;top:30%;transform:translateX(-50%);z-index:8;font:300 30px system-ui,sans-serif;color:#fff;text-shadow:0 0 18px #4dffa0,0 2px 6px #000a;letter-spacing:.02em;pointer-events:none;white-space:nowrap}
+@media(max-width:750px){#mission-panel{font-size:10px;top:60px;max-width:94vw;overflow:hidden;text-overflow:ellipsis}#bridge-flash{font-size:18px}}
+
+/* 0.26 movable panels */
+.drag-handle{cursor:grab;user-select:none;touch-action:none}.dragging .drag-handle,.dragging{cursor:grabbing}.dragging{box-shadow:0 18px 60px #000a!important;opacity:.95}.panel-grip{font:9px monospace;letter-spacing:.18em;color:#7fb8ad;text-align:center;padding:2px 0 5px;border-bottom:1px solid #ffffff14;margin-bottom:2px}
+/* 0.26 radar warning receiver and radar controls */
+#rwr{position:fixed;left:42%;top:150px;transform:translateX(-50%);max-width:44vw;z-index:19;padding:9px 16px;border-radius:10px;background:#1b0d06d9;border:1px solid #ffb35c88;color:#ffe3c4;font:600 12px/1.7 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em;text-align:center;pointer-events:none;box-shadow:0 10px 40px #0008}
+#rwr b{padding:1px 6px;border-radius:4px;margin-right:6px}#rwr b.lock{background:#ffb35c;color:#2a1405}#rwr b.missile{background:#ff3b30;color:#fff}
+#rwr.inbound{border-color:#ff3b30;background:#2a0705e6;animation:rwr-pulse .45s ease-in-out infinite alternate}@keyframes rwr-pulse{to{box-shadow:0 0 34px #ff3b30aa}}
+.clean #rwr{display:none}
+.radar-zoom{display:flex;align-items:center;gap:6px;font:10px monospace}.radar-zoom button{min-width:26px}#radar-range{min-width:58px;text-align:center}
+#traffic-radar.large canvas{width:320px!important;height:320px!important}#traffic-radar.large{width:auto}
+.sound-toggle{display:inline-flex;align-items:center;gap:6px;margin-right:8px}.sound-toggle .sound-icon{font-size:15px;line-height:1}.sound-toggle:not(.on){opacity:.7}.sound-toggle:not(.on) .sound-label::after{content:" off"}
+@media(max-width:750px){.sound-toggle .sound-label{display:none}}
+#rwr[data-urgency="1"]{border-color:#ff9d5c}#rwr[data-urgency="2"]{animation-duration:.6s}#rwr[data-urgency="3"]{animation-duration:.25s}#rwr[data-urgency="4"]{animation-duration:.12s;background:#4a0806ee}
+#surface-traffic-status{position:fixed;z-index:14;left:50%;top:158px;transform:translateX(-50%);display:flex;gap:12px;align-items:center;padding:6px 10px;border:1px solid #87bfa533;border-radius:8px;background:#09212bce;color:#b9d2d0;font:10px monospace;backdrop-filter:blur(8px)}#surface-traffic-status button{font:10px monospace;padding:5px 8px;border:1px solid #71c8ca55;border-radius:5px;background:#163943;color:#a4e7ec;white-space:nowrap}#surface-traffic-status button[aria-pressed=true]{background:#86dce8;color:#10242f}.clean #surface-traffic-status{display:none}@media(max-width:750px){#surface-traffic-status{top:auto;bottom:35px;font-size:8px;max-width:calc(100vw - 22px);width:max-content;gap:5px}#surface-traffic-status button{font-size:8px}}
+
+/* 0.28 layout grid. hud-layout.ts moves the floating panels into three columns: readouts and views on the left,
+   status in the centre, sensors on the right. Widths under 1000px stack the centre above the two side columns.
+   A panel the pilot drags gets .floating and keeps its own fixed position. */
+body>header{top:16px;left:24px;right:24px;padding-right:214px}
+#desk{top:16px;right:24px;z-index:20;max-height:calc(100vh - 96px)}
+#hud{position:fixed;z-index:6;top:84px;left:24px;right:24px;bottom:78px;display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr) minmax(0,300px);grid-template-areas:"left center right";gap:16px;pointer-events:none}
+.hud-col{display:flex;flex-direction:column;gap:10px;min-width:0;min-height:0}
+.hud-left{grid-area:left;align-items:flex-start;padding-bottom:110px}
+.hud-center{grid-area:center;align-items:center}
+.hud-right{grid-area:right;align-items:flex-end}
+.hud-col>*{pointer-events:auto}
+#hud .hud-col>.location,#hud .hud-col>#notice,#hud .hud-col>#rwr{pointer-events:none}
+#hud .hud-col>:not(.floating){position:relative!important;inset:auto!important;transform:none!important;margin:0!important;max-width:100%}
+#hud .hud-col>.location{max-width:300px}
+.combat-active #hud .location{display:none}
+#notice{max-width:520px}
+#notice:empty{display:none}
+#mach-flash{top:28%}
+/* Camera views: a compact two-column card under the readouts. */
+#view-bar{display:grid;grid-template-columns:1fr 1fr;width:252px;gap:4px}
+#view-bar .panel-grip{grid-column:1/-1}
+#view-bar button{width:auto;min-height:30px}
+/* Credits sit in the footer instead of over the map. */
+body>footer{left:24px;right:24px;height:60px}
+footer .credits{margin-left:auto;flex:0 1 auto;overflow:hidden;display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0}
+footer .credits>a,footer .credits>div{position:static!important;font:8px monospace!important;color:#9bbac0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+footer .credits a{color:inherit;text-decoration:none}
+body>footer .credits>*{max-width:100%!important;width:auto!important;text-align:right!important}
+.telemetry{left:24px;bottom:78px}
+@media(max-width:1300px){body>footer p{display:none}}
+@media(max-height:850px){#flight-map canvas{height:140px}}
+@media(max-height:720px){#traffic-radar canvas{width:130px!important;height:130px!important}#flight-map canvas{height:110px}#view-bar button{min-height:24px}#hud{top:76px}}
+
+/* Narrow windows and tablets: centre stack on top, readouts left, sensors right. */
+@media(max-width:1000px){
+  #hud{top:76px;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"center center" "left right";grid-template-rows:auto 1fr;gap:10px 12px}
+  .hud-right{width:250px}
+  #flight-map{width:250px}
+  .telemetry{gap:18px}
+  .brand small{display:none}#help-button,.sound-toggle{white-space:nowrap}
+}
+
+/* Phones. */
+@media(max-width:750px){
+  body>header{top:10px;left:12px;right:12px;padding-right:136px}
+  .brand{gap:8px;font-size:14px;letter-spacing:3px}.brand small{display:none}.brand-icon{font-size:30px}
+  #help-button{font-size:0;padding:6px}#help-button span{font-size:13px;margin:0}
+  .sound-toggle{margin-right:0;padding:6px 8px}
+  #desk,#desk.collapsed{top:10px;right:12px;bottom:auto}
+  #desk .desk-head .eyebrow{font-size:8px;letter-spacing:1px}
+  #desk.collapsed{width:auto}#desk.collapsed .desk-head{padding:9px 12px;gap:8px}
+  #desk:not(.collapsed){left:12px;width:auto;max-height:calc(100vh - 80px)}
+  #hud{top:58px;left:10px;right:10px;bottom:178px}
+  .hud-left{padding-bottom:0}
+  .hud-center{align-items:stretch}
+  .hud-right{width:170px}
+  #flight-map{width:170px}
+  #play-toolbar{width:100%;gap:4px;padding:4px;justify-content:stretch}#play-toolbar button{flex:1 1 0;min-width:0;min-height:40px;padding:8px 4px;font-size:12px;overflow:hidden;text-overflow:ellipsis}#play-toolbar button span{display:none}
+  .travel-row{flex-wrap:wrap}.travel-row select,.travel-row button{min-height:34px;font-size:11px;padding:6px 8px}
+  #hud #surface-traffic-status{width:auto;max-width:100%;flex-wrap:wrap;justify-content:center}
+  #hud .hud-col>.location{max-width:100%}
+  /* Views become a swipeable strip above the readouts; keyboard numbers mean nothing on touch. */
+  #hud .hud-col>#view-bar:not(.floating){position:fixed!important;left:10px!important;right:10px!important;bottom:134px!important;top:auto!important;width:auto;display:flex;flex-direction:row;overflow-x:auto;scrollbar-width:none;padding:4px}
+  #view-bar .panel-grip,#view-bar kbd{display:none}
+  #view-bar button{flex:none;min-height:30px;padding:4px 10px}#view-bar button span{display:inline!important}
+  #touch-flight{bottom:178px}
+  .telemetry{left:12px;bottom:52px;gap:16px}
+  body>footer{left:12px;right:12px;height:44px;gap:10px}
+  body>footer>div:first-child{display:none}
+  footer .credits>a,footer .credits>div{font-size:6px!important;max-width:calc(100vw - 110px)}
+}
+/* Phones held sideways: the view needs the height more than the panels do. Three slim columns, readouts along
+   the bottom edge, touch stick bottom-right under the folded radar and a small map. */
+@media(max-width:1000px) and (max-height:500px){
+  body>header{top:6px;left:12px;right:12px;padding-right:150px}
+  .brand{font-size:13px;letter-spacing:3px;gap:8px}.brand small{display:none}.brand-icon{font-size:26px}
+  #desk,#desk.collapsed{top:6px;right:12px;bottom:auto}
+  #desk.collapsed .desk-head{padding:8px 12px}
+  #desk:not(.collapsed){max-height:calc(100vh - 20px)}
+  #hud{top:52px;left:12px;right:12px;bottom:46px;grid-template-columns:190px minmax(0,1fr) 180px;grid-template-areas:"left center right";grid-template-rows:1fr;gap:10px}
+  .hud-left{padding-bottom:0}.hud-center{align-items:center}.hud-right{width:180px}
+  #flight-map{width:180px}#flight-map canvas{height:80px}
+  #play-toolbar{padding:3px;gap:3px}#play-toolbar button{min-height:32px;padding:5px 10px;font-size:11px}#play-toolbar button span{display:none}
+  .travel-row select,.travel-row button{min-height:30px;font-size:10px;padding:4px 7px}
+  #surface-traffic-status,.air-readout,.location p,.mach-meter>span,.mach-track{display:none!important}
+  .location h1{font-size:18px;margin:0 0 4px}.mach-meter{margin-top:4px}
+  #view-bar{width:180px;padding:4px;gap:2px}#view-bar .panel-grip{display:none}
+  #view-bar button{min-height:22px;padding:2px 6px;font-size:11px}#view-bar kbd{width:16px;height:16px;font-size:9px}
+  .telemetry{display:flex;left:12px;bottom:44px;gap:14px}
+  .metric:nth-child(n+3){display:none}
+  .metric span{margin-bottom:3px}.metric.primary strong{font-size:22px}.metric strong{font-size:18px}
+  .metric .clearance-readout{font-size:9px;margin:2px 0 0}
+  body>footer{left:12px;right:12px;height:40px}
+  body>footer>div:first-child,body>footer p{display:none}
+  footer .credits>a,footer .credits>div{font-size:6px!important}
+}
+@media(max-width:1000px) and (max-height:500px) and (pointer:coarse){
+  #touch-flight{position:fixed;display:grid;grid-template-columns:repeat(4,38px);gap:4px;left:auto;right:12px;bottom:48px;z-index:17}
+  #touch-flight button{padding:7px 0;font:15px monospace;background:#09202cc9;touch-action:none}
+  #touch-flight button:first-child{grid-column:2}#touch-flight button:nth-child(2){grid-column:1}#touch-flight button:nth-child(5),#touch-flight button:nth-child(6){grid-column:span 2;font-size:9px}
+}
+/* Docked sensor stack: radar and map share one width and one edge. Enlarged panels may grow past it. */
+#hud .hud-right>:not(.floating):not(.large):not(.expanded){width:100%!important}
+#hud .hud-right>#traffic-radar canvas{margin:4px auto}
+
+/* 0.29 cockpit pass: readouts at the bottom, actions where the thumbs and the eyes already are. */
+#region,.metric .clearance-readout{display:none}
+.metric .clearance-readout.caution,.metric .clearance-readout.critical{display:block}
+.location{text-shadow:0 1px 8px #000a}
+body:not(.super-active) #travel-panel{display:none!important}
+.super-active #travel-panel{opacity:1!important;pointer-events:auto!important;max-height:none}
+.telemetry{align-items:flex-end}
+.telemetry button{pointer-events:auto}
+/* Speed: Mach state sits under the number it qualifies; Superspeed is the one loud button on the panel. */
+.speed-metric .mach-meter{width:150px;margin:8px 0 0}
+.speed-metric .mach-meter strong{font:700 10px Menlo,Consolas,monospace;letter-spacing:1px}
+.speed-metric .mach-track{margin:5px 0 0;height:3px}
+#super-toggle{display:inline-flex;align-items:center;gap:8px;margin-top:9px;padding:7px 12px;border-radius:999px;border:1px solid #ff8a5c;background:linear-gradient(135deg,#ff5f3d,#c4243a);color:#fff;font:800 11px system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;box-shadow:0 0 18px #ff5f3d66,inset 0 1px 0 #ffffff40;text-shadow:none;cursor:pointer;transition:transform .12s,box-shadow .2s}
+#super-toggle:hover{transform:translateY(-1px);box-shadow:0 0 26px #ff5f3daa,inset 0 1px 0 #ffffff50}
+#super-toggle.on{background:linear-gradient(135deg,#ffb03d,#ff4d2e);animation:super-glow 1s ease-in-out infinite alternate}
+#super-toggle kbd{margin:0;padding:1px 5px;border-color:#ffffff66;color:#fff;font-size:9px;background:#0000002a}
+@keyframes super-glow{to{box-shadow:0 0 34px #ff8a3dcc,inset 0 1px 0 #ffffff60}}
+/* Throttle: real steppers, not a hint. */
+.throttle-control{display:flex;align-items:center;gap:8px}
+.throttle-control button{width:40px;height:40px;padding:0;border-radius:10px;border:1px solid #a5ebc866;background:#0a1f29cc;color:var(--mint);font:700 22px/1 system-ui,sans-serif;text-shadow:none}
+.throttle-control button:hover{background:#a5ebc826}.throttle-control button:active{background:#a5ebc84d}
+.throttle-control strong{min-width:74px;text-align:center}
+#throttle-bar{width:170px;height:7px;margin-top:8px;border-radius:4px}
+/* Weapons: a bright bar bottom-centre, only while a fight is on. */
+#combat-actions{position:fixed;left:50%;bottom:190px;transform:translateX(-50%);z-index:19;display:flex;gap:10px;pointer-events:auto}
+body:not(.combat-active) #combat-actions,.clean #combat-actions,body.crashed #combat-actions{display:none}
+#combat-actions .weapon{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:96px;min-height:58px;padding:8px 14px;border-radius:14px;border:1px solid #ffffff55;color:#fff;font:800 13px system-ui,sans-serif;letter-spacing:.1em;cursor:pointer;touch-action:none;user-select:none;box-shadow:0 8px 24px #0008,inset 0 1px 0 #ffffff55;transition:transform .08s,filter .15s}
+#combat-actions .weapon kbd{margin:0;padding:1px 6px;font-size:10px;color:#fff;border-color:#ffffff70;background:#0003}
+#combat-actions .weapon:hover{filter:brightness(1.15)}
+#combat-actions .weapon:active{transform:scale(.94);filter:brightness(1.3)}
+#combat-actions .gun{background:linear-gradient(160deg,#ffb347,#e8590c)}
+#combat-actions .missile{background:linear-gradient(160deg,#ff5e62,#b3123a)}
+#combat-actions .lock{background:linear-gradient(160deg,#4fd1c5,#1e6f8f)}
+#combat-panel{width:240px}#combat-panel #practice-stop{position:absolute;top:8px;right:8px;min-height:0;padding:3px 9px}
+/* Footer: aircraft systems in the middle, credits folded behind ⓘ. */
+#quick-controls{display:flex;gap:6px;margin:0 auto}
+#quick-controls .quick{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:6px 12px;border-radius:9px;background:#0a1f29cc;border:1px solid #ffffff24;font:600 12px system-ui,sans-serif}
+#quick-controls .quick kbd{margin:0;font-size:9px;padding:1px 5px}
+#quick-controls .quick.on{background:#a5ebc8;color:#06202a;border-color:#a5ebc8}#quick-controls .quick.on kbd{color:#06202a;border-color:#06202a55}
+#credits-toggle{font-size:16px;padding:6px 9px;color:#9bbac0}
+body>footer .credits{display:none;position:absolute;right:0;bottom:62px;padding:8px 10px;border-radius:8px;background:#071923ee;border:1px solid #ffffff1f}
+body.credits-open>footer .credits{display:flex}
+/* Explore & Missions: the tools row reads like the destinations below it. */
+#explore-tools{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.tool-card{border-color:#a5ebc855!important;background:linear-gradient(135deg,#1f4a3f8a,#0b1d2e)!important}
+#play-toolbar #explore-world{white-space:nowrap}
+#traffic-radar header{justify-content:flex-end}
+
+@media(max-width:1000px){
+  #quick-controls .quick kbd{display:none}
+  .speed-metric .mach-meter{width:120px}
+}
+@media(max-width:750px){
+  /* Phone: weapons are big round thumb buttons on the right; the map makes way during a fight. */
+  #combat-actions{left:auto;right:10px;bottom:180px;transform:none;flex-direction:column;gap:8px}
+  #combat-actions .weapon{min-width:70px;min-height:70px;border-radius:50%;padding:0;font-size:10px}
+  body.combat-active #flight-map{display:none!important}
+  #quick-controls{gap:4px;flex:1;justify-content:center}#quick-controls .quick{padding:5px 7px;font-size:10px;min-height:30px}
+  .speed-metric .mach-meter{width:100px;margin-top:4px}.speed-metric .mach-meter strong{font-size:8px}
+  #super-toggle{padding:6px 10px;font-size:10px;margin-top:6px}
+  .throttle-control button{width:36px;height:36px}
+  .metric:nth-child(4){display:block}
+  .metric:nth-child(3),.metric:nth-child(5),.speed-metric .mach-track{display:none}
+  .telemetry{gap:12px}
+  #explore-tools{grid-template-columns:1fr}
+  body>footer .credits{bottom:48px;max-width:calc(100vw - 24px)}
+}
+@media(max-width:1000px) and (max-height:500px){
+  #combat-actions{left:auto;right:12px;bottom:auto;top:50%;transform:translateY(-50%);flex-direction:column}
+  #combat-actions .weapon{min-width:64px;min-height:50px}
+  #quick-controls .quick{padding:4px 7px;font-size:10px;min-height:26px}
+  .speed-metric .mach-meter{display:none}
+  .metric:nth-child(4){display:block}#super-toggle{margin-top:4px;padding:5px 9px}
+  .throttle-control button{width:32px;height:32px}#throttle-bar{display:none}
+}
+#run-goal{display:none!important}
+.telemetry{align-items:flex-start}
+.telemetry .metric>span:first-child{min-height:12px}
+/* combat-view.ts paints the hull bar 24px under the combat panel; leave it room. */
+#hud .hud-col>#combat-panel:not(.floating){margin-bottom:34px!important}
+#combat-actions{bottom:236px}
+@media(max-width:750px){#combat-actions{bottom:180px}}
+/* Phone bottom stack, from the edge up: footer 44 · readouts to ~150 · views strip · touch stick from 204. */
+@media(max-width:750px){
+  body>footer{gap:6px}
+  #quick-controls{min-width:0;flex:1 1 auto;overflow-x:auto;scrollbar-width:none;justify-content:flex-start}
+  #quick-controls .quick{flex:none;padding:5px 8px}
+  #clean{font-size:0;padding:6px}#clean kbd{display:none}#clean::after{content:'Hide';font-size:10px}
+  #credits-toggle{padding:4px 6px}
+  .telemetry{left:12px;right:12px;bottom:50px;gap:10px;justify-content:space-between}
+  .metric.primary{max-width:none}.metric.primary strong{font-size:24px}.metric strong{font-size:20px}
+  .speed-metric .mach-meter{display:none}
+  #super-toggle{margin-top:5px;padding:5px 9px;font-size:9px}
+  .throttle-control{gap:4px}.throttle-control strong{min-width:46px}.throttle-control button{width:34px;height:34px;font-size:18px}
+  #throttle-bar{width:100%}
+  #hud .hud-col>#view-bar:not(.floating){bottom:158px!important}
+  #touch-flight{bottom:204px}
+  #hud{bottom:204px}
+  #combat-actions{bottom:204px}
+  #combat-panel{width:auto;max-width:190px;padding:10px 30px 10px 10px}#combat-help{display:none!important}#combat-panel strong{font-size:11px}
+}
+/* 0.30 weapons always ready, parked low on the right above the footer so they stay out of the view. */
+body:not(.combat-active) #combat-actions{display:flex}
+#combat-actions{left:auto;right:24px;bottom:72px;transform:none;flex-direction:row;gap:6px;opacity:.85;transition:opacity .2s}
+#combat-actions:hover,.combat-active #combat-actions{opacity:1}
+#combat-actions .weapon{min-width:72px;min-height:44px;padding:5px 10px;border-radius:11px;font-size:11px;gap:2px}
+@media(max-width:750px){
+  #combat-actions{right:10px;bottom:204px;flex-direction:row;gap:6px}
+  #combat-actions .weapon{min-width:54px;min-height:54px;border-radius:50%;padding:0;font-size:9px}
+  body.combat-active #flight-map{display:block!important}
+}
+@media(max-width:1000px) and (max-height:500px){
+  #combat-actions{right:12px;top:auto;bottom:160px;transform:none;flex-direction:row}
+  #combat-actions .weapon{min-width:52px;min-height:40px;border-radius:10px}
+}
+.clean #combat-actions,body.crashed #combat-actions{display:none!important}
+
+/* 0.31 nuclear bomb: hazard-yellow release button and the impact / shockwave countdown. */
+#combat-actions .nuke{background:repeating-linear-gradient(135deg,#ffd60a 0 9px,#1b1b1b 9px 13px);color:#111;text-shadow:0 0 4px #ffd60a,0 0 2px #fff;border-color:#ffd60a}
+#combat-actions .nuke b{background:#ffd60a;padding:0 5px;border-radius:4px}
+#combat-actions .nuke kbd{color:#111;background:#ffd60acc;border-color:#111}
+#combat-actions .nuke.spent{filter:grayscale(1) brightness(.6)}
+#nuke-status{position:fixed;left:50%;top:22%;transform:translateX(-50%);z-index:21;padding:8px 16px;border-radius:10px;border:1px solid #ffd60a;background:#120d00cc;color:#ffd60a;font:800 15px ui-monospace,Menlo,monospace;letter-spacing:.08em;white-space:nowrap;pointer-events:none;box-shadow:0 0 24px #ffd60a44}
+#nuke-status.danger{color:#fff;background:#b3123acc;border-color:#ff5e62;animation:nuke-pulse .5s infinite alternate}
+@keyframes nuke-pulse{to{box-shadow:0 0 34px #ff5e62}}
+@media(max-width:750px){#nuke-status{top:17%;font-size:12px;padding:6px 10px}#combat-actions .weapon{min-width:50px;min-height:50px}}
+body.crashed #nuke-status{display:none}
+
+/* 0.32 fleets and the bomber raid: friend-or-foe tags over ships and the raid warning line. */
+.fleet-tag{position:fixed;z-index:3;transform:translate(-50%,-140%);padding:4px 9px;border-radius:6px;font:700 10px/1.3 ui-monospace,Menlo,monospace;letter-spacing:.06em;white-space:nowrap;pointer-events:none;background:#0b1217cc;border:1px solid}
+.fleet-tag.hostile{color:#ff8a8a;border-color:#ff5e62}.fleet-tag.friendly{color:#9fe8b4;border-color:#4fd18a}
+.fleet-tag[hidden]{display:none}
+#raid-status{position:fixed;left:50%;top:calc(22% + 44px);transform:translateX(-50%);z-index:21;padding:6px 14px;border-radius:9px;border:1px solid #ff5e62;background:#2a0508cc;color:#ffb3b3;font:800 12px ui-monospace,Menlo,monospace;letter-spacing:.07em;white-space:nowrap;pointer-events:none}
+#raid-status[hidden],body.crashed #raid-status{display:none}
+.ops-card{border-color:#ff5e6288!important;background:linear-gradient(160deg,#3a0d12,#151a22)!important}
+@media(max-width:750px){#raid-status{top:calc(17% + 34px);font-size:9px;padding:4px 8px;max-width:calc(100vw - 16px);white-space:normal;text-align:center}.fleet-tag{font-size:8px}}
+
+/* 0.33 quieter combat call-outs: small see-through tags, a short raid toast, and a mission line that dims after 8 s. */
+.fleet-tag{padding:1px 6px;border-radius:4px;font:600 9px/1.4 ui-monospace,Menlo,monospace;letter-spacing:.03em;background:#0b121766;border:0;border-left:2px solid;opacity:.6;transform:translate(-50%,-180%)}
+.fleet-tag.alert{opacity:1;background:#2a0508cc}
+#raid-status{top:auto;bottom:128px;padding:4px 12px;font:700 11px ui-monospace,Menlo,monospace;background:#2a0508aa;border-color:#ff5e6288;animation:raid-in .3s}
+@keyframes raid-in{from{opacity:0;transform:translate(-50%,6px)}}
+#mission-panel{transition:opacity .6s,font-size .3s,padding .3s}
+#mission-panel.quiet{opacity:.45;font-size:10px;padding:3px 10px;background:transparent;border-color:transparent;box-shadow:none}
+@media(max-width:750px){#raid-status{bottom:auto;top:calc(17% + 30px)}}

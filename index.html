@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#081218" />
+    <title>Earth Fly · Pathfinder</title>
+    <!-- Linked here, not imported from main.ts, so the page never shows unstyled while the script loads. -->
+    <link rel="stylesheet" href="/src/style.css" />
+    <style>html,body{margin:0;background:#04101a;color:#d8e8e6}</style>
+  </head>
+  <body>
+    <main id="world" aria-label="Earth flight simulation"></main>
+    <div id="loading">
+      <span class="loader"></span>
+      <h1>EARTH FLY</h1>
+      <p>Preparing your home planet…</p>
+    </div>
+    <header>
+      <a class="brand" href="./"
+        ><span class="brand-icon">◌</span
+        ><span>EARTH <b>FLY</b><small>PATHFINDER X1 / EARTH EXPLORER</small></span></a
+      >
+      <div class="topstatus">
+        <span class="dot"></span><span id="phase">ORBITAL FLIGHT</span
+        ><span class="divider">/</span><span id="clock">00:00:00</span>
+      </div>
+      <button id="planner-button" class="quiet">Anywhere on Earth ↗</button>
+      <button id="sound" class="quiet sound-toggle" aria-label="Sound on" title="Sound on/off: engine, effects and missile warnings"><span class="sound-icon">🔊</span><span class="sound-label">Sound</span></button>
+      <button id="help-button" class="quiet">
+        Flight guide <span>?</span>
+      </button>
+    </header>
+    <section class="location">
+      <span class="eyebrow">HOME, FROM A DIFFERENT PERSPECTIVE</span>
+      <h1 id="region">The blue planet.</h1>
+      <p id="coordinates">27.00° N · 15.00° E</p>
+      <div class="air-readout">
+        <strong id="air-layer">Troposphere</strong>
+        <span id="air-range">0–12 km · approximate</span>
+        <span id="space-boundary">100 km to the Kármán line</span>
+        <span id="landing-site" hidden></span>
+      </div>
+    </section>
+    <!-- HERO: the Mach meter resolves into a single supersonic crossing announcement. -->
+    <div id="mach-flash" aria-live="polite" hidden><small>SOUND BARRIER</small><strong>MACH 1</strong><span>SUPERSONIC</span></div>
+    <div id="mouse-stick" hidden><i></i></div>
+    <div id="crosshair"><i></i><span></span><i></i></div>
+    <div id="tour-status" hidden><strong id="tour-title"></strong><span id="tour-progress"></span><progress id="tour-meter" max="1" value="0"></progress><span id="tour-eta"></span><button id="tour-stop">Take control · 1×</button></div>
+    <nav id="play-toolbar" aria-label="Play controls"><button id="explore-world" title="Places, missions, traffic and summits">Explore &amp; Missions <span>⌖</span></button><button id="practice-start" title="Start a 90-second air combat sortie">Dogfight <span>◎</span></button></nav>
+    <section id="travel-panel" aria-label="Travel drive"><div class="travel-row"><select id="super-speed" aria-label="Supercruise speed"><option value="1200">Cruise · 1.2 km/s</option><option value="5000">Hyper · 5 km/s</option><option value="20000">Stellar · 20 km/s</option></select><button id="climb-orbit" title="Guided climb to 400 km">Orbit ↑</button><button id="descend-world" title="Guided descent to 2.5 km above terrain">Descend ↓</button></div><small id="super-readout"></small></section>
+    <div id="touch-flight" aria-label="Touch flight controls"><button data-flight-key="w" aria-label="Climb">↑</button><button data-flight-key="a" aria-label="Bank left">←</button><button data-flight-key="s" aria-label="Dive">↓</button><button data-flight-key="d" aria-label="Bank right">→</button><button data-flight-key="shift" aria-label="Boost">BOOST</button><button data-flight-key="control" aria-label="Airbrake">BRAKE</button></div>
+    <div id="crash-overlay" role="alert"><strong>CRASHED</strong><span id="crash-reason"></span><button id="crash-respawn">Fly again · Enter</button></div>
+    <nav id="view-bar" aria-label="Camera views"></nav>
+    <div id="mission-panel" hidden></div><div id="bridge-flash" hidden></div>
+    <section id="combat-panel" hidden><strong id="combat-score"></strong><span id="combat-help"></span><button id="practice-stop" aria-label="End sortie" title="End sortie">×</button></section>
+    <div id="combat-actions" aria-label="Weapons"><button id="fire-gun" class="weapon gun"><b>GUN</b><kbd>Z</kbd></button><button id="fire-missile" class="weapon missile"><b>MISSILE</b><kbd>X</kbd></button><button id="lock-target" class="weapon lock"><b>LOCK</b><kbd>C</kbd></button><button id="drop-nuke" class="weapon nuke" aria-label="Drop nuclear bomb"><b>NUKE</b><kbd>N</kbd></button></div>
+    <div id="nuke-status" role="status" hidden></div><div id="raid-status" role="status" hidden></div>
+    <dialog id="world-explorer"><div class="dialog-head"><div><span class="eyebrow">ONE PLANET. NO BORDERS.</span><h2>Where will you fly?</h2></div><button id="explore-close" aria-label="Close explorer">×</button></div><p>Glide over a coastline, chase mountain ridges, or begin above the atmosphere.</p><label class="field">START YOUR JOURNEY<select id="explore-mode"><option value="flight">Scenic flight</option><option value="orbit">Circular orbit · 400 km</option><option value="descent">Atmospheric descent · 120 km</option><option value="surface">Surface launch · terrain permitting</option></select></label><h3 class="mission-head">Missions <small>fly under the bridges · best times are kept on this device</small></h3><div id="mission-grid"></div><h3 class="mission-head">Flights &amp; tools</h3><div id="explore-tools"><button id="tour-button" class="destination-card tool-card"><small>Cruise lap</small><strong>Around Earth</strong><span>Great circle at Mach 3 ↗</span></button><button id="summits-button" class="destination-card tool-card"><small>Seven summits</small><strong>Summits &amp; Caucasus</strong><span>Real heights, summit approaches ↗</span></button></div><h3 class="mission-head">Destinations</h3><div id="destination-grid"></div><button id="explore-coordinates">Somewhere else · enter coordinates →</button><p class="credit">Satellite imagery refines while you fly. Polar terrain uses bundled NOAA relief.</p></dialog>
+    <div id="imagery-credit"><a href="https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer" target="_blank" rel="noreferrer">Imagery © Esri, Vantor, Earthstar Geographics &amp; GIS User Community</a> · NASA</div>
+    <div id="notice" role="status"></div>
+    <aside id="desk" class="collapsed">
+      <div class="desk-head">
+        <span class="eyebrow">FLIGHT CONTROLS</span
+        ><button id="collapse" class="quiet" aria-label="Show or hide flight controls">
+          −
+        </button>
+      </div>
+      <div class="desk-body">
+        <label class="field"
+          >START A FLIGHT<select id="scenario">
+            <option value="mach">Mach run · 11 km</option>
+            <option value="valley" selected>Lake Brienz · low flight</option>
+            <option value="alps">Swiss Alps · mountain flight</option>
+            <option value="slope">Alpine slope · landing approach</option>
+            <option value="orbit">Low Earth orbit · 400 km</option>
+            <option value="overview">Above Africa · 2,400 km</option>
+            <option value="entry">Atmospheric entry · 100 km</option>
+            <option value="coast">Mediterranean coast · 8 km</option>
+            <option value="surface">Sahara surface · ready to lift off</option>
+            <option value="departure">Leaving Earth · 80 km</option>
+            <option value="caspian">Caspian Sea · Absheron coast</option>
+            <option value="summit" disabled>Summit approach</option>
+          </select></label
+        >
+        <div class="row">
+          <button id="restart">Start / reset <span>↗</span></button>
+        </div>
+        <p id="summit-flight" class="summit-readout" hidden></p>
+        <p id="solar-readout" class="solar-readout"></p>
+        <label class="field" hidden>YOUR AIRCRAFT<select id="aircraft"><option value="pathfinder">Pathfinder · space / VTOL</option></select></label>
+        <p id="aircraft-readout" class="terrain-status"></p>
+        <label class="field throttle-label" hidden
+          >MAIN THROTTLE <b id="power">0%</b
+          ><input
+            id="throttle"
+            aria-label="Main throttle"
+            type="range"
+            min="0"
+            max="100"
+            value="0"
+        /></label>
+        <div class="row game-actions" hidden>
+          <button id="boost">Boost <small>HOLD SHIFT</small></button>
+          <button id="airbrake">Airbrake <small>HOLD CTRL</small></button>
+        </div>
+        <div class="row">
+          <label class="field">CONTROLS<select id="controls">
+            <option value="game">Game</option>
+            <option value="mouse">Mouse</option>
+            <option value="direct">Direct</option>
+          </select></label>
+          <button id="motion-effects" title="Toggle camera buffet, airflow streaks and cinematic vapor">Motion on</button>
+        </div>
+        <div class="row">
+          <label class="field"
+            >CAMERA<select id="camera">
+              <option value="chase">Chase</option>
+              <option value="cockpit">Pilot view</option>
+              <option value="planet">Planet view</option>
+            </select></label
+          ><label class="field"
+            >TIME<select id="warp">
+              <option value="1">1×</option>
+              <option value="5">5×</option>
+              <option value="20">20×</option>
+              <option value="60">60× · cruise hold</option>
+              <option value="120">120× · cruise hold</option>
+              <option value="240">240× · cruise hold</option>
+            </select></label
+          >
+        </div>
+        <p id="time-readout" class="terrain-status"></p>
+        <div class="row">
+          <button id="save">Save flight</button
+          ><button id="resume">Resume save</button>
+        </div>
+        <label class="field" style="margin-top: 15px"
+          >SUN / HOURS FROM START<input
+            id="solar-time"
+            aria-label="Sun time offset"
+            type="range"
+            min="-12"
+            max="12"
+            step=".25"
+            value="0"
+        /></label>
+        <p id="terrain-status" class="terrain-status">Loading elevation…</p>
+        <p id="scenery-status" class="terrain-status"></p>
+        <div class="deck-footer">
+          <span id="drive-label">MAIN DRIVE</span><span id="fps">— FPS</span>
+        </div>
+      </div>
+    </aside>
+    <section class="telemetry">
+      <div class="metric primary">
+        <span>ALTITUDE · MSL</span
+        ><strong id="altitude">2,400<small>km</small></strong>
+        <span id="clearance-readout" class="clearance-readout">MODEL CLEARANCE —</span>
+        <span id="altimetry-reference" class="altimetry-reference"></span>
+      </div>
+      <div class="metric speed-metric">
+        <span id="speed-label">VELOCITY</span
+        ><strong id="speed">6.74<small>km/s</small></strong>
+        <div class="mach-meter">
+          <strong id="mach-regime">SUBSONIC</strong>
+          <div class="mach-track"><i id="mach-fill"></i><b title="Mach 1"></b></div>
+          <span id="run-goal" hidden></span>
+        </div>
+        <button id="super-toggle" title="Superspeed: fictional fast-travel drive · Y">Superspeed <kbd>Y</kbd></button>
+      </div>
+      <div class="metric">
+        <span>VERTICAL SPEED</span
+        ><strong id="vertical">0<small>m/s</small></strong>
+      </div>
+      <div class="metric">
+        <span>THROTTLE · − / =</span>
+        <div class="throttle-control"><button id="throttle-down" aria-label="Less throttle">−</button><strong id="throttle-readout">40<small>%</small></strong><button id="throttle-up" aria-label="More throttle">+</button></div>
+        <i id="throttle-bar"><b></b></i>
+      </div>
+      <div class="metric">
+        <span>FUEL / HULL HEAT</span
+        ><strong id="systems">100<small>% / 0%</small></strong>
+      </div>
+    </section>
+    <footer>
+      <div>
+        <span class="dot"></span> EARTH EXPLORER
+        <span class="muted">/ FLIGHT LAB 0.27</span>
+      </div>
+      <div id="quick-controls" aria-label="Aircraft systems">
+        <button id="pause" class="quick">Pause <kbd>Space</kbd></button>
+        <button id="gear" class="quick">Gear <kbd>G</kbd></button>
+        <button id="torch" class="quick">Torch <kbd>M</kbd></button>
+        <button id="assist" class="quick">Land assist <kbd>V</kbd></button>
+      </div>
+      <button id="credits-toggle" class="quiet" aria-expanded="false" title="Imagery and map credits">ⓘ</button>
+      <button id="clean" class="quiet">Hide UI <kbd>H</kbd></button>
+    </footer>
+    <a
+      id="scenery-credit"
+      href="https://www.openstreetmap.org/copyright"
+      target="_blank"
+      rel="noopener"
+      >Scenery © OpenStreetMap contributors · ODbL · tiles © OpenMapTiles via OpenFreeMap</a
+    >
+    <dialog id="planner">
+      <button id="close-planner" class="close quiet">×</button
+      ><span class="eyebrow">FREE FLIGHT / ANY COORDINATE</span>
+      <h2>Choose your horizon.</h2>
+      <label class="field">SEVEN SUMMITS &amp; CAUCASUS<select id="summit-destination" aria-label="Summit destination"></select></label>
+      <p id="summit-reference" class="summit-readout"></p>
+      <p class="summit-readout"><a id="summit-height-source" target="_blank" rel="noopener noreferrer">Height source ↗</a> · <a id="summit-coordinate-source" target="_blank" rel="noopener noreferrer">Coordinate source ↗</a></p>
+      <button id="summit-fly" type="button">Fly summit approach ↗</button>
+      <button id="crest-fly" type="button">Fly modeled crest ↗</button>
+      <p class="summit-readout">Modeled crest follows the highest sampled terrain within 1 km of the reference. It is a flight target, not a surveyed summit coordinate.</p>
+      <p class="summit-readout">Real elevation and regional satellite imagery. Summit shapes and surroundings remain approximate; close-range photorealism is still in development.</p>
+      <p id="summit-error" role="status"></p>
+      <p>
+        Click the world map or enter coordinates. Height is above terrain.
+        Detailed elevation loads before the flight starts; the bundled global
+        relief remains available offline.
+      </p>
+      <form id="start-form">
+        <div class="guide-grid">
+          <label class="field"
+            >LATITUDE<input
+              id="start-lat"
+              type="number"
+              value="46.55"
+              min="-90"
+              max="90"
+              step="any"
+              required /></label
+          ><label class="field"
+            >LONGITUDE<input
+              id="start-lon"
+              type="number"
+              value="8"
+              min="-180"
+              max="180"
+              step="any"
+              required /></label
+          ><label class="field"
+            >HEIGHT ABOVE GROUND · M<input
+              id="start-alt"
+              type="number"
+              value="1500"
+              min="0"
+              max="10000000"
+              required /></label
+          ><label class="field"
+            >HEADING · DEGREES<input
+              id="start-heading"
+              type="number"
+              value="90"
+              min="0"
+              max="360"
+              required /></label
+          ><label class="field"
+            >AIRSPEED · M/S<input
+              id="start-speed"
+              type="number"
+              value="150"
+              min="0"
+              max="15000"
+              required /></label
+          ><label class="field"
+            >START TYPE<select id="start-mode">
+              <option value="flight">Atmospheric flight</option>
+              <option value="descent">Descent / entry</option>
+              <option value="surface">On the ground</option>
+              <option value="orbit">Circular orbit</option>
+            </select></label
+          >
+        </div>
+        <p id="planner-error" role="status"></p>
+        <button id="launch" type="submit">Begin flight ↗</button>
+      </form>
+      <p class="credit">
+        Terrain: Mapzen / AWS Open Data, global relief plus streamed detail.
+        Satellite imagery: NASA Blue Marble. Coordinates describe the flight
+        location; this game does not request your device location.
+      </p>
+    </dialog>
+    <dialog id="guide">
+      <button id="close-guide" class="close quiet">×</button
+      ><span class="eyebrow">WELCOME HOME, PILOT</span>
+      <h2>One planet.<br />No loading screens.</h2>
+      <p>
+        Fly a fictional Pathfinder spaceplane over real Earth imagery. The first
+        Earth now includes measured terrain, an Alpine reference flight, and a
+        global flight planner. Cities and buildings come later.
+      </p>
+      <p><b>Altitude and clearance:</b> MSL is the aircraft reference point above the simulator's sea-level datum. MODEL CLEARANCE is the signed radial gap at the modeled belly/gear probes, using collision terrain; it is not a surveyed radar measurement and does not include trees or wingtip contact. Nearby published summit heights are shown separately. For example, 10 m above Everest's 8,848.86 m reference reads 8,858.9 m MSL and +10.0 m above that reference, even if the terrain model is lower. Low clearance and known summit proximity trigger warnings; the terrain look-ahead samples a constant-velocity path for up to eight seconds, so turns and acceleration can invalidate it. Critical warnings remain visible in clean view. Caspian water uses a fixed −28 m historical reference, not a live level.</p>
+      <div class="guide-grid">
+        <p>
+          <b>W / S</b> Pitch up / down (Game)<br /><b>A / D</b> Bank left / right<br /><b
+            >Q / E</b
+          >
+          Yaw left / right<br /><b>Drag scene</b> Look around
+        </p>
+        <p>
+          <b>Shift / Ctrl</b> Boost / airbrake (Game)<br /><b>Z / X / C</b> Gun / missile / lock<br /><b>Shift + = / Shift + −</b> Full power / cut<br /><b>R / F</b> Hover jets up / down<br /><b>M</b> Toggle
+          powerful torch drive
+        </p>
+        <p>
+          <b>G</b> Landing gear<br /><b>V</b> Descent assist<br /><b>B</b>
+          Belly-first entry hold<br /><b>1–8</b> Camera views
+        </p>
+        <p>
+          <b>Space</b> Pause / resume<br /><b>H</b> Hide the interface<br /><b
+            >Esc</b
+          >
+          Close this guide<br /><b>Mouse wheel</b> Camera distance
+        </p>
+      </div>
+      <p><b>Game controls:</b> W climbs, S dives; A/D command a banked turn and
+        ease back toward wings level when released. Hold Shift for boost and Ctrl
+        for the airbrake. Shift + = and Shift + − still set full/cut base throttle; Z, X and C fire the gun, launch a missile and lock a target; N drops a nuclear bomb, so turn away and get at least 10 km clear before the blast wave arrives. Game mode limits
+        engine demand near the pressure ceiling, but cannot prevent every dive,
+        stall, terrain collision or torch overload. Direct mode retains S-up/W-down,
+        manual roll and Shift/Ctrl throttle adjustment. Mouse mode uses a
+        spring-centred stick: hold left mouse and drag to steer; release to centre.
+        Right-drag looks around. Gamepad triggers boost/brake in Game mode.</p>
+      <p><b>Navigation:</b> the compass tape shows true heading. The moving map follows the aircraft and records the latest 30 minutes of flight. Use +/− or the mouse wheel to zoom, drag to pan, Follow to recenter, and ↗ to enlarge. Double click a location to plan a flight. The Sun readout shows geometric azimuth/elevation at your coordinates and the simulation UTC; no atmospheric refraction or terrain shadow correction is included.</p>
+      <p><b>Power:</b> normal drive peaks at a fictional 0.65 g, boost at 1.5 g, and the orbital torch at 30 g. Engines spool gradually; the torch is reduced in dense airflow. Pitch rate decreases with airspeed. Releasing pitch trims angle of attack rather than freezing height, so a climb or descent continues until you change the flight path.</p>
+      <p><b>Feel the flight:</b> the centred, horizon-stable chase camera, wider speed-dependent
+        field of view, air-relative streaks and gentle transonic buffet provide
+        motion cues. Motion off disables the streaks, vapor and camera shake;
+        reduced-motion preferences start with those effects disabled.</p>
+      <p><b>Mach run:</b> choose Mach run · 11 km, click Start, then hold Shift.
+        Watch the meter cross Mach 1; a restrained wing vapor collar can appear in the modeled moist lower air.
+        The HUD announces the crossing. A short bipolar pressure-wave cue plays in
+        chase view if sound is enabled; cockpit view does not play your own boom. Hold Ctrl to brake. The cue fires once per crossing,
+        with hysteresis, and never for vacuum orbital speeds. It is game feedback:
+        real booms occur when a supersonic shock passes an observer, not just at
+        the instant the aircraft passes Mach 1. Condensation depends on humidity;
+        the game vapor is stylized, not live weather. <a href="https://www.nasa.gov/blogs/quesst/2026/08/10/nasa-x-59-explainer-science-of-sonic-booms/" target="_blank" rel="noopener">NASA sonic boom explanation</a>.</p>
+      <p>
+        <b>First takeoff:</b> choose Sahara surface, click Start, and hold R.
+        Pitch up with W (S in Direct mode) and add throttle to climb. Torch gives a fictional 30 g
+        drive; use it above the atmosphere.
+      </p>
+      <p>
+        <b>Landing:</b> try Alpine slope · landing approach, or press V below 2 km at low speed. It brakes drift, lowers the gear and aligns with gentle terrain near touchdown.
+        On ground steeper than 12°, it attempts to hold above the site instead of
+        descending. Choose another site before fuel runs out. Manual touchdown
+        needs gear, under 6 m/s normal speed, under 5 m/s surface drift, attitude
+        within 8° of the terrain normal, and slope at most 12°. The three pads
+        must fit within 0.75 m of simulated gear travel. These are fictional
+        vehicle limits, not real landing guidance. Ocean contact is a
+        splashdown, not a landing.
+      </p>
+      <p>
+        <b>Space and speed:</b> crossing the 100 km Kármán line needs altitude,
+        not one mandatory speed. A powered climb can cross it slowly. Staying in
+        orbit needs sideways velocity: about 7.67 km/s at 400 km, for a 92-minute
+        orbit. Escape speed is about 11.2 km/s near sea level, ignoring air.
+        Your fictional 30 g torch can reach both; use it in thin air or vacuum.
+        Turning the nose in vacuum does not turn the trajectory.
+      </p>
+      <p>
+        <b>A fast trip around Earth:</b> choose Low Earth orbit, cut thrust, then
+        select 100× time for roughly a minute per circuit. This speeds up the
+        simulation clock. A circuit is relative to inertial space; Earth rotates
+        beneath you. Low-altitude circuits require powered flight and continuous
+        terrain clearance. Orbital speeds in dense air exceed the airframe's
+        pressure and heating limits. There is no safe ground-skimming orbit.
+      </p>
+      <section class="speed-reference" aria-label="Speed reference at current altitude">
+        <h3>At your current altitude</h3>
+        <p id="reference-height"></p>
+        <dl>
+          <dt>Circular orbital speed</dt><dd id="reference-orbit"></dd>
+          <dt>Circular orbit period</dt><dd id="reference-period"></dd>
+          <dt>Local escape speed</dt><dd id="reference-escape"></dd>
+          <dt>180 kPa continuous airframe envelope</dt><dd id="reference-airlimit"></dd>
+        </dl>
+        <p id="reference-trajectory"></p>
+        <p>Orbital values use Earth-centred inertial velocity and assume no air,
+        terrain or thrust. The air-load limit uses airspeed and is a continuous structural
+        envelope. Excess dynamic pressure or aerodynamic load above 12 g accumulates damage; short excursions do not instantly destroy the aircraft. Heating and terrain still impose limits.</p>
+      </section>
+      <p>
+        <b>Atmosphere layers:</b> troposphere (0–12 km), stratosphere (12–50 km),
+        mesosphere (50–85 km), thermosphere (85–700 km), exosphere (700–10,000 km).
+        These are approximate boundaries, which vary with location and conditions.
+        Space begins by convention at 100 km, within the thermosphere: the air does
+        not abruptly stop there. Beyond the exosphere, Earth's outer gas envelope
+        still fades gradually. The ionosphere overlaps several layers.
+      </p>
+      <p>
+        <b>Colours as you climb:</b> low-altitude haze fades into deeper blue,
+        then a black overhead sky with a thin blue Earth limb. Sun angle changes
+        the haze at sunrise and sunset. The layers do not have separate coloured
+        shells. Ground colours follow geographic imagery, forest coverage and
+        terrain elevation; climbing changes their atmospheric appearance.
+      </p>
+      <p>
+        <b>Terrain during descent:</b> finer elevation loads ahead of low flight.
+        Incoming changes wait for the matching visual mesh, then the visible and
+        collision surfaces blend together. Updates remain held near the ground
+        to protect clearance. If the terrain readout says an update is held,
+        climb above 1.5 km clearance before descending again. The Alpine
+        reference flights include a finer offline elevation set. Surface imagery
+        remains coarser than elevation; small rocks and trees are not collision objects.
+      </p>
+      <p class="credit">Scientific references:
+        <a href="https://www.nasa.gov/image-article/earths-atmospheric-layers-3/" target="_blank" rel="noopener">NASA atmospheric layers</a>,
+        <a href="https://science.nasa.gov/earth/earth-atmosphere/earths-atmosphere-a-multi-layered-cake/" target="_blank" rel="noopener">NASA atmosphere and space boundary</a>,
+        <a href="https://pwg.gsfc.nasa.gov/stargaze/Skepl3rd.htm" target="_blank" rel="noopener">NASA orbital and escape speeds</a>.
+      </p>
+      <p class="credit">
+        Spaceplane adapted from your Pathfinder Mars project. NASA Blue Marble
+        imagery; cloud and water maps via Bjørn Sandvik’s WebGL Earth. This is a
+        flight sandbox with simplified atmosphere and fictional propulsion.
+      </p>
+    </dialog>
+    <dialog id="tour-planner"><form id="tour-form"><h2>Around Earth</h2><p>Fly a full great circle and return over the same coordinates. Starts airborne at cruise altitude with SR-71 performance and automatic virtual refuelling.</p><div class="row"><button type="button" id="tour-current">Use current position</button><button type="button" id="tour-everest">Everest → Everest</button></div><div class="row"><label class="field">LATITUDE<input id="tour-lat" type="number" min="-90" max="90" step="any" required></label><label class="field">LONGITUDE<input id="tour-lon" type="number" min="-180" max="180" step="any" required></label></div><div class="row"><label class="field">INITIAL TRUE HEADING<input id="tour-heading" type="number" min="0" max="360" value="90" step="any" required></label><label class="field">CRUISE MSL · METRES<input id="tour-alt" type="number" min="20000" max="25908" value="25000" step="100" required></label></div><div class="row"><label class="field">CRUISE MACH<input id="tour-mach" type="number" min="2.5" max="3.2" value="3.2" step=".1" required></label><label class="field">TIME ACCELERATION<select id="tour-rate"><option value="1">1×</option><option value="5">5×</option><option value="20">20×</option><option value="60">60×</option><option value="120" selected>120×</option><option value="240">240×</option></select></label></div><p id="tour-plan"></p><p>Constant-Mach cruise navigation is simplified. Free flight uses aerodynamic integration; steering exits cruise hold and returns to 1×. The real SR-71 could not complete this distance on one tank. No takeoff or landing is included in this lap.</p><p id="tour-error" role="status"></p><div class="row"><button type="button" id="tour-close">Cancel</button><button type="submit">Start cruise lap ↗</button></div></form></dialog>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

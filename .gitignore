@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+work/
+ISA.md
+PRODUCTION_PLAN.md
+.claude/
+*.log
+.env*

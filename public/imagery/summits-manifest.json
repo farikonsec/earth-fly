@@ -1,0 +1,386 @@
+{
+  "source": "NASA GIBS / Landsat WELD True Color Global Annual v3.1",
+  "date": "2000-12-01",
+  "nominalSourceResolutionMetres": 30,
+  "note": "Historic annual composite. Non-Antarctic coverage. Sampling, cloud/void and glacier changes limit realism.",
+  "files": [
+    {
+      "key": "everest/12/3036/1715.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1715/3036.jpeg",
+      "sha256": "0012cd92f3941ce4a5741b0be8c48d21d3d7d792578e98eac9f24986ff4f3820",
+      "bytes": 16421
+    },
+    {
+      "key": "everest/12/3037/1715.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1715/3037.jpeg",
+      "sha256": "d612a2ceb05d816eedd3d409d1e5cf1f7af6cd98f96b8e3dd13d3c5fdf64b4fd",
+      "bytes": 14842
+    },
+    {
+      "key": "everest/12/3038/1715.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1715/3038.jpeg",
+      "sha256": "e05b03c28a00cdcbdda3f0447c0c3aeccf8fa245a33d363909fec613c0196da5",
+      "bytes": 15304
+    },
+    {
+      "key": "everest/12/3036/1716.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1716/3036.jpeg",
+      "sha256": "499a996bce31be74b436a69c9605bd387f8d0bbad53fb66fa27b750bad20fb1f",
+      "bytes": 18446
+    },
+    {
+      "key": "everest/12/3037/1716.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1716/3037.jpeg",
+      "sha256": "e707e50627daaefb1aeccecd6e5eab6cc2edfbd1e84d6b14e44de2a09c27f010",
+      "bytes": 14971
+    },
+    {
+      "key": "everest/12/3038/1716.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1716/3038.jpeg",
+      "sha256": "d674894a0bc1b59ffe913da2a8c3de8ca4d4bf31f431500742b4046802065191",
+      "bytes": 15655
+    },
+    {
+      "key": "everest/12/3036/1717.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1717/3036.jpeg",
+      "sha256": "438fec6715b14c5766f4b07f97b252ebacea5d85775add9a31d6559790ff87ef",
+      "bytes": 19340
+    },
+    {
+      "key": "everest/12/3037/1717.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1717/3037.jpeg",
+      "sha256": "554059a6ec9dda2337908303217eb54fdaa2f1c18c1bd06dfc8a9609afd83991",
+      "bytes": 14980
+    },
+    {
+      "key": "everest/12/3038/1717.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1717/3038.jpeg",
+      "sha256": "449fe1565e6b07d19c9e2831bc0c34e8287a350a1e8694b84b366307ce156dba",
+      "bytes": 15737
+    },
+    {
+      "key": "aconcagua/12/1250/2440.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2440/1250.jpeg",
+      "sha256": "0cce75780029b71e0797b20e3e73b6da9f07fc61edf3f803d03cca9030e4c134",
+      "bytes": 17918
+    },
+    {
+      "key": "aconcagua/12/1251/2440.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2440/1251.jpeg",
+      "sha256": "b3abe54e6e69091a2c99c3b1e0ab691e4d26b60093d08d51b8dcd307db9453f0",
+      "bytes": 18107
+    },
+    {
+      "key": "aconcagua/12/1252/2440.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2440/1252.jpeg",
+      "sha256": "18a2f883d6002383d24dc426039ff341edf174aefaa6fd83932151e73924c60a",
+      "bytes": 15899
+    },
+    {
+      "key": "aconcagua/12/1250/2441.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2441/1250.jpeg",
+      "sha256": "e096066d2a30f227f4836fea78f155d5620b86d0e363b3250447bc20dbddbb69",
+      "bytes": 18036
+    },
+    {
+      "key": "aconcagua/12/1251/2441.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2441/1251.jpeg",
+      "sha256": "ede810327da8f3f780a1a587ab32455a44e556fcfb5e5115f35d02dc935142d4",
+      "bytes": 20561
+    },
+    {
+      "key": "aconcagua/12/1252/2441.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2441/1252.jpeg",
+      "sha256": "2a30c18e2f24e1b7d1ab038ce4045f47ebd42c74b815e78c1f0034f0e855e689",
+      "bytes": 14443
+    },
+    {
+      "key": "aconcagua/12/1250/2442.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2442/1250.jpeg",
+      "sha256": "b811753b8bea32dd6f998244852225e8a24658c83f6aafeda98f6979ccd1247a",
+      "bytes": 17967
+    },
+    {
+      "key": "aconcagua/12/1251/2442.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2442/1251.jpeg",
+      "sha256": "07fd078d9d678f473aa50ec0267c86ebcfd4637d2c9e3c68a3686dc2a0840068",
+      "bytes": 18403
+    },
+    {
+      "key": "aconcagua/12/1252/2442.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2442/1252.jpeg",
+      "sha256": "222242bbc17f71ee4f8f46474c412d05ec9a543b09283221d7aaf12d0c618317",
+      "bytes": 19502
+    },
+    {
+      "key": "denali/12/328/1115.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1115/328.jpeg",
+      "sha256": "7db649ef37858ee244083ea53b2bb23c57243670c1c896a78d299ad36f35668e",
+      "bytes": 10574
+    },
+    {
+      "key": "denali/12/329/1115.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1115/329.jpeg",
+      "sha256": "c09cf414911a64ce23c3b165655f689d6e7123923ec3a1f7ccba8c8f68af95cc",
+      "bytes": 7995
+    },
+    {
+      "key": "denali/12/330/1115.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1115/330.jpeg",
+      "sha256": "35627264f64911a0f5c2c073cbdd0d0f8892ccc3125a5a8be89c7223b5097277",
+      "bytes": 8908
+    },
+    {
+      "key": "denali/12/328/1116.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1116/328.jpeg",
+      "sha256": "f0fd3e920cecd574eec079758dc2d2c68b6559be85c49e91ed1e71536a6bc139",
+      "bytes": 7352
+    },
+    {
+      "key": "denali/12/329/1116.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1116/329.jpeg",
+      "sha256": "7bee109bac30441000005e24ef5605df5fcf544c88c51455b713e686386b26a5",
+      "bytes": 6118
+    },
+    {
+      "key": "denali/12/330/1116.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1116/330.jpeg",
+      "sha256": "58342bccbd1b52c092e19524af682cf03682ffb87af5de754d5ed2df300ec9b5",
+      "bytes": 5537
+    },
+    {
+      "key": "denali/12/328/1117.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1117/328.jpeg",
+      "sha256": "b0ae9abed152769be98ddfaf65c7261fc235ccb4838c008723ecdbc77b962818",
+      "bytes": 8592
+    },
+    {
+      "key": "denali/12/329/1117.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1117/329.jpeg",
+      "sha256": "76010dbe8d677366a5b953060d2673347221bac2a690dac19dbf7a7b565e1102",
+      "bytes": 7816
+    },
+    {
+      "key": "denali/12/330/1117.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1117/330.jpeg",
+      "sha256": "5c755e628bf36da08144374f70650b53e305b5ac07ad9a93f100a8c48ed36f92",
+      "bytes": 6429
+    },
+    {
+      "key": "kilimanjaro/12/2472/2082.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2082/2472.jpeg",
+      "sha256": "a76fe17993b21bf70a352d1a2bf13aa1eeda8fe51e67defac65692335b0773b2",
+      "bytes": 12387
+    },
+    {
+      "key": "kilimanjaro/12/2473/2082.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2082/2473.jpeg",
+      "sha256": "3a4460be6235f72433d897c3b4894ae96c3a71eed1624123622fd82e4f238d79",
+      "bytes": 12064
+    },
+    {
+      "key": "kilimanjaro/12/2474/2082.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2082/2474.jpeg",
+      "sha256": "739bf7a5dcda029d0f75052075916799c469946beac5475203ff6438ef43f16f",
+      "bytes": 12599
+    },
+    {
+      "key": "kilimanjaro/12/2472/2083.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2083/2472.jpeg",
+      "sha256": "4c8b510ea34798df5a799e21c7e60f4f8bdaf2e3cab6e24548876210875acf40",
+      "bytes": 13340
+    },
+    {
+      "key": "kilimanjaro/12/2473/2083.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2083/2473.jpeg",
+      "sha256": "854da2a7d3c74ffff48325a1f16087f9b7ed114a3a12df8b7da63bcaa1965807",
+      "bytes": 10930
+    },
+    {
+      "key": "kilimanjaro/12/2474/2083.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2083/2474.jpeg",
+      "sha256": "fdadeafb567903a4eb4ab72c64fc3f303489adcd0822d051103d0182e23978f6",
+      "bytes": 13731
+    },
+    {
+      "key": "kilimanjaro/12/2472/2084.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2084/2472.jpeg",
+      "sha256": "1ef21256d2063500d6115bcc2e8f6e5bcd49254cede2ebb3c6c7707546f6fa2e",
+      "bytes": 13462
+    },
+    {
+      "key": "kilimanjaro/12/2473/2084.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2084/2473.jpeg",
+      "sha256": "f0dc21e1c16a3a5fbec70c119acf035576934f138acc70c3876a6d6e057f0a6a",
+      "bytes": 12800
+    },
+    {
+      "key": "kilimanjaro/12/2474/2084.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2084/2474.jpeg",
+      "sha256": "349b306facca7dd155470802c384b3134e2809905279efc670973f5908c05007",
+      "bytes": 10241
+    },
+    {
+      "key": "elbrus/12/2529/1498.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1498/2529.jpeg",
+      "sha256": "d607c7cf7d9b6c56b090a14e19956a08e2eb74335fda535a29b50a0cf11c3c2a",
+      "bytes": 13220
+    },
+    {
+      "key": "elbrus/12/2530/1498.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1498/2530.jpeg",
+      "sha256": "546a690733cda72124e443fc19de935661eefec1efe59cc96ff931459e0a6c6b",
+      "bytes": 14812
+    },
+    {
+      "key": "elbrus/12/2531/1498.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1498/2531.jpeg",
+      "sha256": "c3dbdc877cd9a8dc71bd718b82c78a839c87527494a0dc5ad31db559d8f5a825",
+      "bytes": 13513
+    },
+    {
+      "key": "elbrus/12/2529/1499.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1499/2529.jpeg",
+      "sha256": "c9d1860d9ff77cd3a0af5eef6f73a05a5ecfe58d1b0fd3c20228412a1df80ee3",
+      "bytes": 14894
+    },
+    {
+      "key": "elbrus/12/2530/1499.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1499/2530.jpeg",
+      "sha256": "9eddc44203e3389d8c67ed73a45cb1f1d2195166961d5846bc6094511c1b98b8",
+      "bytes": 14411
+    },
+    {
+      "key": "elbrus/12/2531/1499.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1499/2531.jpeg",
+      "sha256": "edf7c7ab5a62bad6132a283af6c6f01114a1c7914c420ed79ce27ca6e6181df1",
+      "bytes": 12252
+    },
+    {
+      "key": "elbrus/12/2529/1500.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1500/2529.jpeg",
+      "sha256": "8f313d2f10e370d83a8a6f034b0179dc5296825e9ed42308ab711d020ea8a286",
+      "bytes": 14939
+    },
+    {
+      "key": "elbrus/12/2530/1500.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1500/2530.jpeg",
+      "sha256": "cb63db354899d679e200471bddcbe88b708cfd6734f46733e2b4740074976ad8",
+      "bytes": 12538
+    },
+    {
+      "key": "elbrus/12/2531/1500.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/1500/2531.jpeg",
+      "sha256": "cd586d75c119132c85438fc3a7589e53450db4d632886e842635da4b84e47e78",
+      "bytes": 13252
+    },
+    {
+      "key": "carstensz/12/3607/2093.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2093/3607.jpeg",
+      "sha256": "d1015016db142a5722894fe443b35a0c89df78b33fbb166a3201f8e70e31ded2",
+      "bytes": 18458
+    },
+    {
+      "key": "carstensz/12/3608/2093.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2093/3608.jpeg",
+      "sha256": "de2941180992eba533f6678e55fa603f63aec807a86d7cab3103a594d8c54d8e",
+      "bytes": 15939
+    },
+    {
+      "key": "carstensz/12/3609/2093.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2093/3609.jpeg",
+      "sha256": "0792d4f6c1e82e1b68de5dca7b8d6acb153e56fcd6a14b9e9b120cb5a561c146",
+      "bytes": 16337
+    },
+    {
+      "key": "carstensz/12/3607/2094.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2094/3607.jpeg",
+      "sha256": "b1655cf238d5b0a71a3c6004caa1ff3650705f1e73fb3c2cfbf2cb7e3cd4ff7d",
+      "bytes": 20618
+    },
+    {
+      "key": "carstensz/12/3608/2094.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2094/3608.jpeg",
+      "sha256": "f14ff4bde4c4f36fd8692eba1bb90e168a83c6043fcc03d109dce1e36cabc619",
+      "bytes": 19187
+    },
+    {
+      "key": "carstensz/12/3609/2094.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2094/3609.jpeg",
+      "sha256": "45850d14c31886628a2a0af36dc67fcbd118aafdeedaebf12ec2b30f3cd1aba8",
+      "bytes": 18258
+    },
+    {
+      "key": "carstensz/12/3607/2095.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2095/3607.jpeg",
+      "sha256": "d4bee079eb528b2c14487fa2922e55863a1a3eb82cc9b481159b8de64fe222a4",
+      "bytes": 17290
+    },
+    {
+      "key": "carstensz/12/3608/2095.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2095/3608.jpeg",
+      "sha256": "81f2ad2f6615b1808b542bffe7361a8289d111430e858b8707892443bf3e72bc",
+      "bytes": 17816
+    },
+    {
+      "key": "carstensz/12/3609/2095.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2095/3609.jpeg",
+      "sha256": "d0a448662023ddda0b7ef4e96a6de22fcb20a3f50104c1d2bc6447060aef8765",
+      "bytes": 17590
+    },
+    {
+      "key": "kosciuszko/12/3733/2492.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2492/3733.jpeg",
+      "sha256": "3e783b250800849f01a049fe0ac9390c94bd588838cf239eeddad095a523b66a",
+      "bytes": 10250
+    },
+    {
+      "key": "kosciuszko/12/3734/2492.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2492/3734.jpeg",
+      "sha256": "4eb9a445a2461243bdaa0e8f0e19be4e939a0cc508aea1289a4bb3d220632b4c",
+      "bytes": 11557
+    },
+    {
+      "key": "kosciuszko/12/3735/2492.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2492/3735.jpeg",
+      "sha256": "7dcfda0528532ffc62d778ef724b8d42345ace44a13028c203b5c9cda7ddad68",
+      "bytes": 13116
+    },
+    {
+      "key": "kosciuszko/12/3733/2493.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2493/3733.jpeg",
+      "sha256": "aec71228afc568a41b4825ae381956aa6afef5cd1ab5ed43feb8143f0a4efab0",
+      "bytes": 10118
+    },
+    {
+      "key": "kosciuszko/12/3734/2493.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2493/3734.jpeg",
+      "sha256": "f1762029061adcbe152fd5ade6a14b9727a3f0c49490f25aa4b3d5d87a209642",
+      "bytes": 11907
+    },
+    {
+      "key": "kosciuszko/12/3735/2493.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2493/3735.jpeg",
+      "sha256": "7d714ca618a07a4ddc9ed8b24045be8c5f173f90a9ca13cb5d494184bfaa228a",
+      "bytes": 13552
+    },
+    {
+      "key": "kosciuszko/12/3733/2494.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2494/3733.jpeg",
+      "sha256": "822e9909177a7587a5144a28dba957ccb6632446e03b40628803ee50d2d48dc7",
+      "bytes": 10062
+    },
+    {
+      "key": "kosciuszko/12/3734/2494.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2494/3734.jpeg",
+      "sha256": "3a120b024ad2f42647e23d1543e8eb85ad25f49f1314f341e503bb5694d921fe",
+      "bytes": 13003
+    },
+    {
+      "key": "kosciuszko/12/3735/2494.jpeg",
+      "url": "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/Landsat_WELD_CorrectedReflectance_TrueColor_Global_Annual/default/2000-12-01/GoogleMapsCompatible_Level12/12/2494/3735.jpeg",
+      "sha256": "4f945134d2fd83caf99d602a0d40e03d3fd664087bbf3e9bd2122d6c01ac0708",
+      "bytes": 12010
+    }
+  ]
+}

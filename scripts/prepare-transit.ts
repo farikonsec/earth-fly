@@ -1,0 +1,4 @@
+/** TfL line/station identities. Synthetic game timetables are deliberately not presented as live services. */
+const source='https://api.tfl.gov.uk',lines=await(await fetch(source+'/Line/Mode/tube,overground,elizabeth-line,dlr')).json(),out=[];
+for(const line of lines){const r=await fetch(`${source}/Line/${line.id}/Route/Sequence/inbound`);if(!r.ok){console.warn(line.id,r.status);continue;}const d=await r.json();out.push({id:line.id,name:line.name,mode:d.mode,stations:d.stations.map((s:any)=>({id:s.id,name:s.name,lat:s.lat,lon:s.lon})),sequences:d.stopPointSequences.map((s:any)=>s.stopPoint.map((p:any)=>p.id))});}
+await Bun.write('public/traffic/london-transit.json',JSON.stringify({source,retrieved:new Date().toISOString(),notice:'TfL line and station locations. Simulated service, not live tracking. Contains public sector information licensed under TfL Open Data terms.',lines:out}));console.log(out.map(l=>[l.name,l.mode,l.stations.length]));
