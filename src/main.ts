@@ -264,7 +264,7 @@ function feelNuke(worldDt:number,shipP:T.Vector3){
   el.hidden=!text||document.body.classList.contains('clean');if(el.textContent!==text)el.textContent=text;el.classList.toggle('danger',danger);
   $('drop-nuke').classList.toggle('spent',!nuke.armed);
 }
-(window as unknown as {earthNuke:unknown}).earthNuke={nuke,drop:dropNuke,get fleets(){return fleets;},get raid(){return raid;},get ops(){return ops;},get perf(){return perf;},get post(){return post;},get scenes(){return {scene,terrainScene,shipScene,waterScene};}};
+(window as unknown as {earthNuke:unknown}).earthNuke={nuke,drop:dropNuke,get fleets(){return fleets;},get raid(){return raid;},get ops(){return ops;},startOp:(id:string)=>startOps(OPS.find(o=>o.id===id)!),get perf(){return perf;},get post(){return post;},get scenes(){return {scene,terrainScene,shipScene,waterScene};}};
 /** Mach 1 crossing: vapour cone, shock disc, a double thump and a jolt. */
 function sonicBoom(){const air=new T.Vector3(...state.v).sub(new T.Vector3(...atmosphereVelocity(state.p)));if(air.lengthSq()<1e-10)return;boomFx.trigger(air.normalize());audio.sonicCue();setTimeout(()=>audio.sonicCue(),140);fx.shake=Math.max(fx.shake,1.1);fx.flash=Math.max(fx.flash,.12);}
 /** External camera variants; all of them keep cameraMode 'chase' so flight feedback behaves the same. */
@@ -445,9 +445,9 @@ async function beginAt(lat:number,lon:number,altitude:number,heading:number,spee
   throttle=.8;paused=false;renderer.domElement.focus({preventScroll:true});
 }
 const OPS=[
-  {id:'white-swans',small:'Intercept',title:'Stop the White Swans',detail:'Three Tu-160 bombers and six Su-27s are inbound to nuke London. Shoot the bombers down before they release.',start:async()=>{
+  {id:'white-swans',small:'Intercept',title:'Stop the White Swans',detail:'Three Tu-160s, three Tu-95s and six Su-27s are inbound to nuke London. Shoot every bomber down before they release.',start:async()=>{
     raid.launch(260);const p=offsetFrom(RAID.target.lat,RAID.target.lon,RAID.bearing,150);await beginAt(p.lat,p.lon,RAID.altitude*1000,RAID.bearing,520);const number=raid.number;
-    ops.check=()=>raid.number!==number?{now:'',failed:'the raid got through'}:!raid.alive?{now:'',done:'all three bombers down · London is safe'}:raid.released?{now:'',failed:'a bomber released over London'}:{now:`${raid.alive}/3 bombers · ${Math.max(0,raid.distance).toFixed(0)} km out · ${Math.floor(raid.eta/60)}:${String(Math.floor(raid.eta%60)).padStart(2,'0')}`};}},
+    ops.check=()=>raid.number!==number?{now:'',failed:'the raid got through'}:!raid.alive?{now:'',done:'all six bombers down · London is safe'}:raid.released?{now:'',failed:'a bomber released over London'}:{now:`${raid.alive}/${raid.bombers.length} bombers · ${Math.max(0,raid.distance).toFixed(0)} km out · ${Math.floor(raid.eta/60)}:${String(Math.floor(raid.eta%60)).padStart(2,'0')}`};}},
   {id:'red-fleet',small:'Strike',title:'Nuke the Red Fleet',detail:'Sink the hostile carrier in the Channel. Its escorts kill anything they can track: come in under 8 m, or faster than Mach 3.',start:async()=>{
     const g=fleets.groups.find(x=>x.spec.side==='hostile')!,p=offsetFrom(g.spec.lat,g.spec.lon,g.spec.heading+180,90);for(const s of g.ships){s.alive=true;s.sink=0;s.drone.hp=s.drone.maxHp!;}surface.decks=fleets.decks();
     await beginAt(p.lat,p.lon,9000,g.spec.heading,450);let sunkAt=-1;
@@ -463,6 +463,7 @@ raid.onRelease=(p,v)=>{if(nuke.armed)nuke.drop(p,v,p.clone().normalize().negate(
 function runWarfare(worldDt:number,shipP:T.Vector3,alt:number){
   const shipV=new T.Vector3(...state.v),flying=state.status==='flying';
   fleets.update(worldDt,state.t,shipP,shipV,alt,flying,combat);raid.update(worldDt,state.t,shipP,shipV,flying,combat);
+  {const near=(km:number)=>Math.max(0,1-km/7)**2,on=!paused&&worldDt>0;audio.bomberSound(on?near(raid.nearest.tu95):0,on?near(raid.nearest.tu160):0);}
   const clean=document.body.classList.contains('clean')||cameraMode==='planet',tag=(el:HTMLElement,p:T.Vector3,text:string)=>{
     const v=p.clone().sub(shipP).project(camera),front=p.clone().sub(shipP).sub(camera.position).dot(camera.getWorldDirection(new T.Vector3()))>0;
     el.hidden=clean||!front||Math.abs(v.x)>.95||Math.abs(v.y)>.9;if(el.hidden)return;el.style.left=`${(v.x*.5+.5)*innerWidth}px`;el.style.top=`${(-v.y*.5+.5)*innerHeight}px`;if(el.textContent!==text)el.textContent=text;};

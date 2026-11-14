@@ -71,7 +71,7 @@ Open **Explore & Missions** to jump anywhere. Built-in starts include London and
 ## Missions
 
 - **Bridges.** Fly under any of 35 bridges, or run ten Thames bridges in a row from Tower Bridge to Westminster against the clock.
-- **Stop the White Swans.** Three Tu-160 bombers with six Su-27 escorts are flying at Mach 2 to bomb London. Shoot them down before they release. A raid sets out every 15 minutes even outside the mission.
+- **Stop the White Swans.** Three Tu-160 and three Tu-95 bombers with six Su-27 escorts are flying to bomb London. Shoot every bomber down before they release. A raid sets out every 30 minutes even outside the mission.
 - **Nuke the Red Fleet.** Sink a hostile carrier in the Channel. Its escorts shoot down anything they can track inside 45 km. Come in below 8 m, or faster than Mach 3.
 - **Land on the carrier.** A friendly deck, 32 m above the sea.
 - **Dogfight.** Waves of fighters with guns, rockets and seekers.

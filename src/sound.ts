@@ -80,6 +80,29 @@ export class FlightSound {
     source.buffer=buffer;filter.type='lowpass';filter.frequency.value=180+Math.min(2200,strength*500);volume.gain.value=Math.min(3.2,.5+strength*.8);
     source.connect(filter).connect(volume).connect(this.gain);source.onended=()=>{source.disconnect();filter.disconnect();volume.disconnect();};source.start();return true;
   }
+  private bomber: { prop: GainNode; jet: GainNode } | null = null;
+  /**
+   * Bombers passing nearby. `prop` is the Tu-95 throb: two contra-rotating four-blade props near 50 Hz blade rate,
+   * slightly apart so they beat. `jet` is a low Tu-160 roar. Both are 0 to 1 and fade with distance in the caller.
+   */
+  bomberSound(prop: number, jet: number) {
+    const c = this.context; if (!c || !this.gain || c.state !== 'running') return;
+    if (!this.bomber) {
+      const propGain = c.createGain(), jetGain = c.createGain(), low = c.createBiquadFilter(), throb = c.createGain(), lfo = c.createOscillator(), depth = c.createGain();
+      propGain.gain.value = 0; jetGain.gain.value = 0; low.type = 'lowpass'; low.frequency.value = 420; throb.gain.value = .6;
+      for (const f of [49, 51.6, 98.4]) { const o = c.createOscillator(), g = c.createGain(); o.type = 'sawtooth'; o.frequency.value = f; g.gain.value = f > 90 ? .35 : 1; o.connect(g).connect(low); o.start(); }
+      lfo.frequency.value = 2.6; depth.gain.value = .4; lfo.connect(depth).connect(throb.gain); lfo.start();
+      low.connect(throb).connect(propGain).connect(this.gain);
+      const buffer = c.createBuffer(1, c.sampleRate * 2, c.sampleRate), d = buffer.getChannelData(0); let brown = 0;
+      for (let i = 0; i < d.length; i++) { brown += ((Math.random() * 2 - 1) - brown) * .03; d[i] = brown * 6; }
+      const noise = c.createBufferSource(), band = c.createBiquadFilter(); noise.buffer = buffer; noise.loop = true; band.type = 'lowpass'; band.frequency.value = 260;
+      noise.connect(band).connect(jetGain).connect(this.gain); noise.start();
+      this.bomber = { prop: propGain, jet: jetGain };
+    }
+    const t = c.currentTime, on = this.enabled ? 1 : 0;
+    this.bomber.prop.gain.setTargetAtTime(Math.min(1, prop) * .55 * on, t, .25);
+    this.bomber.jet.gain.setTargetAtTime(Math.min(1, jet) * .5 * on, t, .25);
+  }
   terrainCue(){
     const c=this.context;
     if(!c||!this.gain||!this.enabled||c.state!=='running'||c.currentTime-this.lastTerrainTime<7)return false;

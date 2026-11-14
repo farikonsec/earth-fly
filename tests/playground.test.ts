@@ -32,3 +32,14 @@ function underFire(turn:boolean,seconds=45,seed=0){const{p,aim,v}=duel(),c=new C
 test('drones shoot a passive player down, and the hull only drops on a hit',()=>{const{c,events,low}=underFire(false,90);expect(c.taken).toBeGreaterThan(0);expect(events).toBe(c.taken);expect(low).toBe(Math.max(0,low));expect(c.down).toBe(true);expect(c.completed).toBe(true);expect(c.incoming.length).toBe(0);});
 test('a hard-turning player takes fewer hits, and a quiet hull regenerates',()=>{/* hits are luck-dependent: compare the total over several engagements */const total=(turn:boolean)=>[0,1,2,3].reduce((n,seed)=>n+underFire(turn,30,seed).c.taken,0);expect(total(true)).toBeLessThan(total(false));
  const c=new Combat(),{p,aim,v}=duel();c.start(p,new T.Quaternion(),v);c.targets=[];c.health=40;c.quiet=0;c.targets.push({id:99,p:p.clone().addScaledVector(aim,40),v:v.clone(),hp:3,phase:0});for(let i=0;i<300;i++)c.advance(.02,p,new T.Quaternion(),v,aim);expect(c.health).toBeGreaterThan(48);expect(c.health).toBeLessThanOrEqual(100);});
+test('superspeed rolls a full 360 and pulls a full loop instead of stopping at a fixed bank or pitch',()=>{
+ const surface=new EarthSurface(),upOf=(s:EarthState)=>new T.Vector3(...s.p).normalize();
+ {const{s,q}=start(50,10,20000),drive=new Supercruise();drive.start(s,1200);drive.speed=1200;let inverted=false,minTop=1;
+  for(let i=0;i<150;i++){drive.advance(s,q,1/60,surface,{pitch:0,roll:1,yaw:0});const top=new T.Vector3(0,1,0).applyQuaternion(q).dot(upOf(s));minTop=Math.min(minTop,top);if(top<-.95)inverted=true;}
+  expect(inverted).toBe(true);expect(minTop).toBeLessThan(-.95);
+  const top=()=>new T.Vector3(0,1,0).applyQuaternion(q).dot(upOf(s));for(let i=0;i<300&&top()<.99;i++)drive.advance(s,q,1/60,surface,{pitch:0,roll:1,yaw:0});
+  expect(new T.Vector3(0,1,0).applyQuaternion(q).dot(upOf(s))).toBeGreaterThan(.9);}
+ {const{s,q}=start(50,10,30000),drive=new Supercruise();drive.start(s,600);drive.speed=600;let vertical=false,over=false;
+  for(let i=0;i<60*8;i++){drive.advance(s,q,1/60,surface,{pitch:1,roll:0,yaw:0});const nose=new T.Vector3(0,0,-1).applyQuaternion(q).dot(upOf(s)),top=new T.Vector3(0,1,0).applyQuaternion(q).dot(upOf(s));if(nose>.97)vertical=true;if(vertical&&top<-.9)over=true;}
+  expect(vertical).toBe(true);expect(over).toBe(true);expect(s.status).toBe('flying');expect(q.length()).toBeCloseTo(1,8);}
+});
