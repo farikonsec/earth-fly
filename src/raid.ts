@@ -3,6 +3,8 @@ import { bodyToInertial, latLonToDir } from "./geo";
 import { EARTH } from "./earth";
 import { airVelocity } from "./combat-ai";
 import { buildAircraft } from "./aircraft-models";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "three/examples/jsm/libs/meshopt_decoder.module.js";
 import type { RadarContact } from "./contacts";
 import type { Combat, Drone } from "./combat";
 import type { V } from "./vector";
@@ -62,13 +64,36 @@ function bear() {
     const pod = new T.Mesh(new T.CylinderGeometry(0.95, 0.75, length, 14), metal); pod.rotation.x = Math.PI / 2; pod.position.set(side * x, -0.55, lead - 3.2 + length / 2); g.add(pod);
     const spinner = new T.Mesh(new T.ConeGeometry(0.62, 2.2, 14), dark); spinner.rotation.x = -Math.PI / 2; spinner.position.set(side * x, -0.55, lead - 4.6); g.add(spinner);
     for (const [k, dz] of [[1, -4.1], [-1, -3.3]] as const) {
-      const hub = new T.Group(); hub.position.set(side * x, -0.55, lead + dz); hub.userData.spin = k;
+      const hub = new T.Group(); hub.position.set(side * x, -0.55, lead + dz); hub.userData.spin = k; hub.userData.keep = true;
       for (let i = 0; i < 4; i++) { const b = new T.Mesh(blade, dark); b.rotation.z = (i * Math.PI) / 2 + (k < 0 ? Math.PI / 4 : 0); b.rotation.y = 0.35 * k; hub.add(b); }
-      const blur = new T.Mesh(new T.CircleGeometry(2.85, 28), disc); hub.add(blur); g.add(hub); props.push(hub);
+      const blur = new T.Mesh(new T.CircleGeometry(2.85, 28), disc); blur.userData.blur = true; hub.add(blur); g.add(hub); props.push(hub);
     }
   }
   g.scale.setScalar(LIFE);
   return { model: g, props };
+}
+/**
+ * Detailed models, both CC BY 4.0 from Sketchfab (credited in the README): "Tupolev TU-160" by KOG_THORNS and
+ * "Tupolev Tu-95 Bear" by Chenzoss, compressed for the web. Both are authored nose toward +Z with Y up. The hand-built
+ * shapes above stay as a fallback and are swapped out once a file loads.
+ */
+const DETAILED: Record<BomberType, { url: string; length: number; centre: number }> = {
+  // Lengths are in the parent model's own units: 60.5 for the hand-built Tu-160, metres for the Tu-95.
+  tu160: { url: "models/tu160.glb", length: 60.5, centre: -2.75 },
+  tu95: { url: "models/tu95.glb", length: 46.2, centre: 0.3 },
+};
+let detailed: Promise<Partial<Record<BomberType, T.Object3D>>> | null = null;
+function loadDetailed() {
+  if (detailed) return detailed;
+  const loader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+  detailed = Promise.all((Object.keys(DETAILED) as BomberType[]).map(async (type) => {
+    try {
+      const spec = DETAILED[type], scene = (await loader.loadAsync(spec.url)).scene, box = new T.Box3().setFromObject(scene), size = box.getSize(new T.Vector3()), c = box.getCenter(new T.Vector3());
+      scene.position.sub(c); const wrap = new T.Group(); wrap.add(scene); wrap.rotation.y = Math.PI; wrap.scale.setScalar(spec.length / size.z); wrap.position.z = spec.centre;
+      return [type, wrap] as const;
+    } catch (error) { console.warn(`Bomber model ${type} not loaded, keeping the simple one`, error); return [type, null] as const; }
+  })).then((pairs) => Object.fromEntries(pairs.filter(([, m]) => m)) as Partial<Record<BomberType, T.Object3D>>);
+  return detailed;
 }
 interface Bomber { type: BomberType; props: T.Object3D[]; drone: Drone; model: T.Group; offset: [number, number, number]; alive: boolean; missile: number; gun: number; burst: number }
 interface Escort { model: T.Group; offset: [number, number, number]; drone: Drone | null; lost: boolean }
@@ -89,6 +114,20 @@ export class Raid {
     for (const [type, offset] of flight) { const built = type === "tu160" ? { model: swan(), props: [] } : bear(); this.group.add(built.model); this.bombers.push({ type, model: built.model, props: built.props, offset, alive: true, missile: 4, gun: 0, burst: 0, drone: this.make(type) }); }
     for (const offset of [[-4, 0.3, 1.2], [4, 0.3, 1.2], [-5, 0.1, -2.6], [5, 0.1, -2.6], [-1.2, 0.7, -4.4], [1.2, 0.7, -4.4]] as [number, number, number][]) { const model = buildAircraft("su27"); this.group.add(model); this.escorts.push({ model, offset, drone: null, lost: false }); }
     this.clock = RAID.period * 0.25;
+    if (typeof window !== "undefined") void loadDetailed().then((models) => {
+      for (const b of this.bombers) {
+        const real = models[b.type]; if (!real) continue;
+        for (const child of [...b.model.children]) if (!child.userData.keep) b.model.remove(child);
+        // The real Tu-95 propellers are fixed in the mesh, so only the spinning blur discs stay from the simple model.
+        for (const hub of b.props) {
+          for (const part of [...hub.children]) if (!part.userData.blur) hub.remove(part);
+          // Hub centres measured from the detailed mesh: inner pair 6 m out, outer pair 12 m out, rear disc 0.9 m behind the front.
+          const inner = Math.abs(hub.position.x) < 10, side = Math.sign(hub.position.x);
+          hub.position.set(side * (inner ? 6 : 12), inner ? -2.45 : -2.1, (inner ? -10.4 : -7.25) + (hub.userData.spin > 0 ? 0 : 0.9)); hub.scale.setScalar(2.6 / 2.85);
+        }
+        b.model.add(real.clone());
+      }
+    });
   }
   private make(type: BomberType): Drone {
     const drone: Drone = { id: ++this.serial, external: true, name: BOMBER[type].name, radius: BOMBER[type].radius, score: 2500, p: new T.Vector3(), v: new T.Vector3(), hp: RAID.hp, maxHp: RAID.hp, phase: 0 };
