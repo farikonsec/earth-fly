@@ -1,4 +1,5 @@
 import * as T from "three";
+import { sliceMs } from "./frame-budget";
 import { latLonToDir, bodyToInertial, inertialToBody, dirToLatLon } from "./geo";
 import { EARTH } from "./earth";
 import { readTile, type MvtLayer } from "./mvt";
@@ -335,7 +336,7 @@ export class WorldDetail {
     // Advance the current build by a few milliseconds a frame; drop it if its tile was unloaded meanwhile.
     if (this.job) {
       if (this.tiles.get(this.job.tile.key) !== this.job.tile) this.job = null;
-      else { this.budget.until = performance.now() + BUILD_BUDGET_MS; if (this.job.steps.next().done) this.job = null; }
+      else { this.budget.until = performance.now() + sliceMs(BUILD_BUDGET_MS); if (this.job.steps.next().done) this.job = null; }
     }
     for (const [key, t] of this.tiles) if (Math.abs(t.x - cx) > KEEP || Math.abs(t.y - cy) > KEEP) { if (t.state === "loading") continue; this.dispose(t); this.tiles.delete(key); this.revision++; }
     for (const t of this.tiles.values()) if (t.trees && t.centre) t.trees.visible = altitude < 2500 && t.centre.distanceTo(here) < 3.2;

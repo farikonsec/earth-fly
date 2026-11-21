@@ -134,19 +134,30 @@ export class City {
    * buildings in lumpy ground. Regrade the mapped area to a smooth street-level field (a low percentile of each
    * ~150 m cell), feathered into the surrounding terrain.
    */
-  private regrade() {
-    const { west, south, east, north } = this.bounds, w = west - MARGIN, s = south - MARGIN, dx = (east - west + 2 * MARGIN) / GRADE_X, dy = (north - south + 2 * MARGIN) / GRADE_Y, samples: number[] = [];
-    for (let y = 0; y <= GRADE_Y; y++) for (let x = 0; x <= GRADE_X; x++) {
-      samples.length = 0;
-      for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) samples.push(this.terrain.rawHeight(s + (y + j * 0.4) * dy, w + (x + i * 0.4) * dx));
-      samples.sort((a, b) => a - b); this.grade[y * (GRADE_X + 1) + x] = samples[5];
+  private regrade() { this.gradeRow = 0; while (this.gradeRow >= 0) this.gradeStep(); }
+  /** Rows of the street-level field still to sample after a terrain change; -1 when idle. */
+  private gradeRow = -1;
+  private gradeSamples: number[] = [];
+  /** Samples one row of the field; after the last row, smooths it and hands it to the terrain. */
+  private gradeStep() {
+    const { west, south, east, north } = this.bounds, w = west - MARGIN, s = south - MARGIN, dx = (east - west + 2 * MARGIN) / GRADE_X, dy = (north - south + 2 * MARGIN) / GRADE_Y, samples = this.gradeSamples, y = this.gradeRow;
+    if (y <= GRADE_Y) {
+      for (let x = 0; x <= GRADE_X; x++) {
+        samples.length = 0;
+        for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) samples.push(this.terrain.rawHeight(s + (y + j * 0.4) * dy, w + (x + i * 0.4) * dx));
+        samples.sort((a, b) => a - b); this.next[y * (GRADE_X + 1) + x] = samples[5];
+      }
+      this.gradeRow++; return;
     }
     // One smoothing pass removes the last cell-to-cell steps.
-    const copy = this.grade.slice(), at = (x: number, y: number) => copy[Math.min(GRADE_Y, Math.max(0, y)) * (GRADE_X + 1) + Math.min(GRADE_X, Math.max(0, x))];
+    const copy = this.next, at = (x: number, y: number) => copy[Math.min(GRADE_Y, Math.max(0, y)) * (GRADE_X + 1) + Math.min(GRADE_X, Math.max(0, x))];
     for (let y = 0; y <= GRADE_Y; y++) for (let x = 0; x <= GRADE_X; x++) this.grade[y * (GRADE_X + 1) + x] = (at(x, y) * 4 + at(x - 1, y) + at(x + 1, y) + at(x, y - 1) + at(x, y + 1)) / 8;
     this.terrain.grade = { west: w, south: s, dx, dy, nx: GRADE_X, ny: GRADE_Y, margin: MARGIN, data: this.grade.slice() };
     this.terrain.revision++; this.terrain.generation++; this.revision = this.terrain.revision;
+    this.gradeRow = -1;
   }
+  /** The field being sampled; the live one in `grade` only changes when a pass completes. */
+  private next = new Float32Array((GRADE_X + 1) * (GRADE_Y + 1));
   private groundAt(b: Building) { return this.terrain.height(b.lat, b.lon); }
   private extrude(b: Building) {
     const c = this.chunks[b.chunk], n = b.n, ground = this.groundAt(b), wallColour = WALLS[b.kind] ?? WALLS[0], glass = b.kind === 3 ? 1 : 0;
@@ -278,7 +289,9 @@ export class City {
       if (this.cursor >= this.buildings.length) { this.built = true; this.revision = -1; dirty = new Set(this.chunks.keys()); }
       if (this.built || this.cursor % 6 < 3) for (const k of dirty) if (this.built || this.chunks[k].mesh === null || this.cursor % 2000 < 400) this.finish(this.chunks[k]);
       this.seatEye();
-    } else if (this.revision !== this.terrain.revision && time > this.refreshAt && this.refreshCursor < 0) { this.regrade(); this.refreshCursor = 0; }
+    } else if (this.revision !== this.terrain.revision && time > this.refreshAt && this.refreshCursor < 0 && this.gradeRow < 0) this.gradeRow = 0;
+    // Regrading after terrain streams in is spread over frames (a row at a time); buildings are reseated once it lands.
+    if (this.gradeRow >= 0) { while (this.gradeRow >= 0 && performance.now() - started < budgetMs) this.gradeStep(); if (this.gradeRow < 0) this.refreshCursor = 0; }
     // Terrain tiles stream in after the city: reseat buildings on the new ground, a few chunks per frame.
     if (this.refreshCursor >= 0) {
       while (this.refreshCursor < this.chunks.length && performance.now() - started < budgetMs) {

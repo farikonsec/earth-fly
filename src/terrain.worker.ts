@@ -1,4 +1,4 @@
-import { Terrain, type Tile, type TerrainGrade, type LocalDem, type TerrainCut, type Crater } from './terrain';
+import { Terrain, TileMap, type Tile, type TerrainGrade, type LocalDem, type TerrainCut, type Crater } from './terrain';
 import { GeoIndex, type Feature } from './geodata';
 import { buildTerrainTransition, type MeshRequest } from './terrain-mesh';
 import type {TerrainSnapshot} from './terrain-reprojection';
@@ -23,7 +23,7 @@ self.onmessage=(event: MessageEvent<TerrainJob>)=>{
       surface.waterLevel=(lat,lon)=>index.at(lat,lon,'water')?.elevation ?? null;
     }
     for(const [id,tile] of job.added) tiles.set(id,tile);
-    const restore=(entries:[string,number][])=>new Map(entries.map(([key,id])=>[key,tiles.get(id)!]));
+    const restore=(entries:[string,number][])=>new TileMap(entries.map(([key,id])=>[key,tiles.get(id)!] as const));
     surface.tiles=restore(job.current);
     surface.previous=job.previous ? restore(job.previous):null;
     surface.blend=job.blend;

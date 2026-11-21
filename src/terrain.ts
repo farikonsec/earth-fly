@@ -46,6 +46,19 @@ function bilinear(
     at(ix + 1, iy + 1) * a * b
   );
 }
+/** Numeric key for a z/x/y tile (z up to 15, x and y up to 2^12 at the zooms sampled). */
+const tileNum = (z: number, x: number, y: number) => (z * 8192 + x) * 8192 + y;
+/**
+ * A tile map that also keeps a numeric index, so height sampling (thousands of calls a frame while scenery builds)
+ * looks tiles up without building "z/x/y" strings. Behaves as a plain Map<string, Tile> everywhere else.
+ */
+export class TileMap extends Map<string, Tile> {
+  byNum = new Map<number, Tile>();
+  constructor(entries?: Iterable<readonly [string, Tile]> | null) { super(); if (entries) for (const [k, v] of entries) this.set(k, v); }
+  override set(key: string, tile: Tile) { super.set(key, tile); const [z, x, y] = key.split("/").map(Number); this.byNum.set(tileNum(z, x, y), tile); return this; }
+  override delete(key: string) { const [z, x, y] = key.split("/").map(Number); this.byNum.delete(tileNum(z, x, y)); return super.delete(key); }
+  override clear() { this.byNum.clear(); super.clear(); }
+}
 export interface Tile {
   data: Float32Array;
   z: number;
@@ -100,7 +113,7 @@ export class Terrain {
   }
   global: Float32Array = new Float32Array(720 * 361);
   polarNorth:Float32Array|null=null;polarSouth:Float32Array|null=null;
-  tiles = new Map<string, Tile>();
+  tiles: Map<string, Tile> = new TileMap();
   pending = new Map<string, Promise<void>>();
   failures = new Map<string, number>();
   revision = 0;
@@ -168,7 +181,10 @@ export class Terrain {
   private cutHeight(lat: number, lon: number, raw: number) {
     const cuts = this.cuts; if (!cuts) return raw;
     for (const c of cuts) {
-      const k = Math.cos((c.lat * Math.PI) / 180), dx = (lon - c.lon) * 111320 * k, dy = (lat - c.lat) * 110540;
+      // Most points are nowhere near a bridge: reject on latitude alone before any trigonometry.
+      const dy = (lat - c.lat) * 110540, reach = c.half + c.width + 50;
+      if (dy > reach || dy < -reach) continue;
+      const k = Math.cos((c.lat * Math.PI) / 180), dx = (lon - c.lon) * 111320 * k;
       const along = dx * c.east + dy * c.north, across = -dx * c.north + dy * c.east, F = 50;
       if (Math.abs(along) > c.half + F || Math.abs(across) > c.width + F) continue;
       // The level beside the deck at this point along it, from both sides.
@@ -196,17 +212,19 @@ export class Terrain {
   private sample(lat: number, lon: number, source: Map<string, Tile>, maxZoom = 12): number {
     const base = this.coarse(lat, lon);
     if(Math.abs(lat)>=84)return Math.max(0,base);
+    const index = source instanceof TileMap ? source.byNum : null;
+    const find = (z: number, x: number, y: number) => index ? (y < 0 || y >= 2 ** z ? undefined : index.get(tileNum(z, x, y))) : source.get(`${z}/${x}/${y}`);
     for (let z = maxZoom; z >= 6; z--) {
       const m = mercator(lat, lon, z),
         x = Math.floor(m.x),
         y = Math.floor(m.y),
-        tile = source.get(`${z}/${x}/${y}`);
+        tile = find(z, x, y);
       if (!tile) continue;
       const px = (m.x - x) * 256,
         py = (m.y - y) * 256;
       const n = 2 ** z,
         has = (dx: number, dy: number) =>
-          source.has(`${z}/${(((x + dx) % n) + n) % n}/${y + dy}`);
+          find(z, (((x + dx) % n) + n) % n, y + dy) !== undefined;
       const edge = Math.min(
           has(-1, 0) ? 256 : px,
           has(0, -1) ? 256 : py,
@@ -221,7 +239,7 @@ export class Terrain {
       const at = (i: number, j: number) => {
         const dx = Math.floor(i / 256),
           dy = Math.floor(j / 256),
-          neighbor = source.get(`${z}/${(((x + dx) % n) + n) % n}/${y + dy}`);
+          neighbor = dx === 0 && dy === 0 ? tile : find(z, (((x + dx) % n) + n) % n, y + dy);
         return neighbor
           ? neighbor.data[
               (((j % 256) + 256) % 256) * 256 + (((i % 256) + 256) % 256)
@@ -249,7 +267,7 @@ export class Terrain {
       if (this.blend === 1) this.previous = null;
     }
     if (!this.staged.size || this.previous) return;
-    const candidate = new Map(this.tiles);
+    const candidate = new TileMap(this.tiles);
     for (const [key, tile] of this.staged) candidate.set(key, tile);
     const old = this.height(lat, lon),
       next = this.sample(lat, lon, candidate);
@@ -265,7 +283,7 @@ export class Terrain {
       this.revision++;
     }
     if (!this.staged.size) return;
-    this.previous = immediate ? null : new Map(this.tiles);
+    this.previous = immediate ? null : new TileMap(this.tiles);
     for (const [key, tile] of this.staged) this.tiles.set(key, tile);
     this.staged.clear();
     while (this.tiles.size > 96)
@@ -318,7 +336,7 @@ export class Terrain {
           colorSpaceConversion: "none",
         });
         const canvas = new OffscreenCanvas(256, 256),
-          ctx = canvas.getContext("2d")!;
+          ctx = canvas.getContext("2d", { willReadFrequently: true })!;
         ctx.drawImage(bitmap, 0, 0);
         bitmap.close();
         const rgba = ctx.getImageData(0, 0, 256, 256).data,

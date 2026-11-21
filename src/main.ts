@@ -1,4 +1,5 @@
 import {PostFX} from './post';
+import { noteFrame, sliceMs } from "./frame-budget";
 import {Trails} from './trails';
 import {createStars,createMilkyWay,loadNightLights,nightUniforms,nightGLSL} from './space';
 import {Supercruise} from './supercruise';
@@ -1035,7 +1036,7 @@ function draw(dt: number) {
   clouds.rotation.y = state.t * 0.000004;
   const alt = (shipP.length() - EARTH.radius) * 1000;
   scenery.update(state.p, state.t);
-  city.update(state.p, state.t);
+  city.update(state.p, state.t, sliceMs(7));
   const groundSpeed = state.status === 'flying' ? (state.tele?.airspeed ?? 0) : 0;
   detail.update(state.p, state.t, groundSpeed);
   if(patchReady&&detail.group.visible){const count=patchGeo.getAttribute('position')?.count??0;if(count)detail.correction.update(detail.anchorPoint,patchGeo,patchAnchor,Math.round(Math.sqrt(count))-1,terrainBlend.value,recenterBlend.value,surface.revision);}
@@ -1745,6 +1746,7 @@ Promise.all([
   });
 let last = performance.now();
 function frame(now: number) {
+  noteFrame(now - last);
   const dt = Math.max(0.001, Math.min(tour&&!tour.completed?.25:.05, (now - last) / 1000));
   last = now;
   if (ready) {
