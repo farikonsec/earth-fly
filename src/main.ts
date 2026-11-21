@@ -36,6 +36,8 @@ import { arrangeHud } from "./hud-layout";
 import { JetWash } from "./wash";
 import { SamSites, SAM } from "./sam";
 import { Rwr } from "./rwr";
+import { AlliedFlights } from "./allied";
+import { SubHunt, SUBS, TARGETS } from "./submarine";
 import { MISSIONS, MissionRun } from "./missions";
 import { groundFrame, settleOnSurface, surfaceAttitude, contactGaps, LANDING } from "./contact";
 import { airAppearance, environmentAt, trajectory, KARMAN_LINE } from "./environment";
@@ -428,6 +430,9 @@ const surfaceTraffic=new SurfaceTraffic(surface,detail,bridges);terrainScene.add
 // Surface-to-air batteries on land around the aircraft, and the warning receiver that hears them and enemy seekers.
 const sams=new SamSites((lat,lon)=>surface.height(lat,lon),(lat,lon)=>!scenery.index.at(lat,lon,'water')&&!isOceanAt(lat,lon)),rwr=new Rwr();terrainScene.add(sams.group);
 const fleets=new Fleets(),raid=new Raid();shipScene.add(fleets.group,raid.group);surface.decks=fleets.decks();
+// US formations (friendly) and the submarine hunt; boats and their effects sit in the terrain scene so the sea hides what is under it.
+const allied=new AlliedFlights(),hunt=new SubHunt();shipScene.add(allied.group);terrainScene.add(hunt.group);
+hunt.ground=(lat,lon)=>surface.height(lat,lon);hunt.sound=(k,l)=>{audio.navalCue(k,l);};
 const fleetLabels=document.createElement('div');fleetLabels.id='fleet-labels';document.body.append(fleetLabels);
 const fleetTags=fleets.groups.map(g=>{const el=document.createElement('div');el.className='fleet-tag '+g.spec.side;fleetLabels.append(el);return el;});
 const swanTag=document.createElement('div');swanTag.className='fleet-tag hostile';fleetLabels.append(swanTag);
@@ -452,17 +457,36 @@ const OPS=[
     const g=fleets.groups.find(x=>x.spec.side==='hostile')!,p=offsetFrom(g.spec.lat,g.spec.lon,g.spec.heading+180,90);for(const s of g.ships){s.alive=true;s.sink=0;s.drone.hp=s.drone.maxHp!;}surface.decks=fleets.decks();
     await beginAt(p.lat,p.lon,9000,g.spec.heading,450);let sunkAt=-1;
     ops.check=()=>{if(!g.ships[0].alive&&sunkAt<0)sunkAt=state.t;return sunkAt>=0&&state.t-sunkAt>40?{now:'',done:'carrier sunk and you got away'}:sunkAt>=0?{now:`carrier sunk · survive ${Math.ceil(40-(state.t-sunkAt))} s`}:{now:`carrier ${g.distance.toFixed(0)} km · ${g.ships.filter(s=>s.alive).length} afloat`};};}},
+  {id:'sub-hunt',small:'Anti-submarine',title:'Hunt the Yasen',detail:'A Yasen-M south of Beachy Head will fire two Kalibr cruise missiles at London. Catch them low over the Weald, then sink the boat with sonobuoys, torpedoes and depth charges. A Kilo nearby has a SAM; a Typhoon is on the surface.',start:async()=>{
+    hunt.start();await beginAt(50.8,0.22,1200,165,170);
+    ops.check=()=>{const y=hunt.subs.find(s=>s.kind==='yasen')!;if(hunt.impacts)return{now:'',failed:`a Kalibr hit London`};
+      if(y.mode==='sunk'&&hunt.launched>=2&&hunt.destroyedMissiles>=hunt.launched)return{now:'',done:'Yasen sunk · both Kalibr down · London is safe'};
+      return{now:`Yasen ${y.mode==='sunk'?'sunk':Math.round(y.hull*100)+'%'} · Kalibr ${hunt.destroyedMissiles}/${hunt.launched} down${hunt.launched<2?' · more launches expected':''} · buoys ${hunt.buoys.filter(b=>b.inWater).length}`};};}},
   {id:'deck-landing',small:'Recovery',title:'Land on the carrier',detail:'A friendly deck 450 m long, 32 m above the sea. Gear down, 70 m/s over the stern.',start:async()=>{
     const g=fleets.groups.find(x=>x.spec.side==='friendly')!,p=offsetFrom(g.spec.lat,g.spec.lon,g.spec.heading+180,7);await beginAt(p.lat,p.lon,320,g.spec.heading,95);
     ops.check=()=>state.status==='landed'&&surface.deckAt(...latLon())>0?{now:'',done:'on deck · welcome aboard'}:{now:`deck ${g.distance.toFixed(1)} km · heading ${Math.round((g.spec.heading+360)%360)}°`};}},
 ];
 function latLon():[number,number]{const l=dirToLatLon(inertialToBody(state.p,state.t,EARTH.rotation));return [l.lat,l.lon];}
-async function startOps(o:typeof OPS[number]){ops.id=o.id;ops.title=o.title;ops.status='idle';ops.line='';ops.restart=()=>void startOps(o);await o.start();ops.status='flying';opsSince=performance.now();worldPlace=o.title;}
+async function startOps(o:typeof OPS[number]){if(o.id!=='sub-hunt')hunt.stop();ops.id=o.id;ops.title=o.title;ops.status='idle';ops.line='';ops.restart=()=>void startOps(o);await o.start();ops.status='flying';opsSince=performance.now();worldPlace=o.title;}
 raid.onRelease=(p,v)=>{if(nuke.armed)nuke.drop(p,v,p.clone().normalize().negate(),state.t);};
 /** Ships, the raid and their on-screen tags, once per frame. */
+/** The sonar panel: stores, contacts with range, bearing and depth, the predicted effect of a drop, and the event log. */
+let sonarAt=0;
+function sonarPanel(shipP:T.Vector3){
+  const panel=$('sonar-panel') as HTMLElement,show=hunt.active||hunt.buoys.length>0;panel.hidden=!show;if(!show||performance.now()-sonarAt<250)return;sonarAt=performance.now();
+  $('sonar-stores').textContent=`Buoys ${hunt.stores.buoys} · Torp ${hunt.stores.torpedoes} · DC ${hunt.stores.charges} @ ${hunt.chargeDepth} m`;
+  const up=shipP.clone().normalize(),east=new T.Vector3(0,1,0).cross(up).normalize(),north=up.clone().cross(east),head=trueHeading(rotation,up),pred=hunt.prediction(),esc=(t:string)=>t.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]!));
+  const rows=hunt.contacts.map((c,i)=>{const p=new T.Vector3(...bodyToInertial(c.est.toArray() as V,state.t,EARTH.rotation)),rel=p.clone().sub(shipP),brg=((Math.atan2(rel.dot(east),rel.dot(north))*180/Math.PI)+360)%360;
+    return `<div class="sonar-row${i===hunt.selected%Math.max(1,hunt.contacts.length)?' on':''}">${esc(c.label)} · ${rel.length().toFixed(1)} km · ${String(Math.round(brg)).padStart(3,'0')}° · ${c.depth===null?'depth ?':c.depth.toFixed(0)+' m'} · ±${Math.round(c.err*1000)} m</div>`;}).join('')||'<div class="sonar-row">No contacts · drop buoys (O) near the last datum</div>';
+  const kal=hunt.missiles.filter(m=>m.alive&&m.phase!=='capsule').map(m=>`${Math.max(0,m.drone.p.distanceTo(shipP)).toFixed(0)} km from you`).join(' · ');
+  const predict=pred?`<div class="sonar-pred">${esc(pred.contact.label)}${pred.hull!==null?` · hull ${Math.round(pred.hull*100)}%`:''}<br>Torpedo now: hit chance ~${Math.round(pred.torpedo*100)}% → hull −${Math.round(pred.torpedoLoss*100)}%<br>Charge at ${hunt.chargeDepth} m: ~${Math.round(pred.charge*100)}% hull if dropped on the estimate</div>`:'';
+  $('sonar-body').innerHTML=`${rows}${predict}${kal?`<div class="sonar-kal">⚠ KALIBR · ${kal}</div>`:''}<div class="sonar-log">${hunt.log.slice(0,4).map(esc).join('<br>')}</div>`;void head;void SUBS;void TARGETS;
+}
 function runWarfare(worldDt:number,shipP:T.Vector3,alt:number){
   const shipV=new T.Vector3(...state.v),flying=state.status==='flying';
   fleets.update(worldDt,state.t,shipP,shipV,alt,flying,combat);raid.update(worldDt,state.t,shipP,shipV,flying,combat);
+  allied.update(state.t,shipP);hunt.update(worldDt,state.t,shipP,new T.Vector3(...inertialToBody(state.p,state.t,EARTH.rotation)),combat);void alt;
+  sonarPanel(shipP);
   {const near=(km:number)=>Math.max(0,1-km/7)**2,on=!paused&&worldDt>0;audio.bomberSound(on?near(raid.nearest.tu95):0,on?near(raid.nearest.tu160):0);}
   const clean=document.body.classList.contains('clean')||cameraMode==='planet',tag=(el:HTMLElement,p:T.Vector3,text:string)=>{
     const v=p.clone().sub(shipP).project(camera),front=p.clone().sub(shipP).sub(camera.position).dot(camera.getWorldDirection(new T.Vector3()))>0;
@@ -1258,14 +1282,14 @@ function draw(dt: number) {
   
   const trafficUTC=celestialDate.getTime();
   airTraffic.update(trafficUTC/1000,state.t,body=>body.distanceTo(new T.Vector3(...inertialToBody(state.p,state.t,EARTH.rotation)))<20?surface.radiusM(body.toArray() as V)/1000:body.length()-.004);
-  trafficView.draw(shipP);orbitTraffic.update(trafficUTC,state.t,shipP);combat.external=[...orbitTraffic.targets,...sams.targets,...surfaceTraffic.targets,...fleets.targets,...raid.targets];
+  trafficView.draw(shipP);orbitTraffic.update(trafficUTC,state.t,shipP);combat.external=[...orbitTraffic.targets,...sams.targets,...surfaceTraffic.targets,...fleets.targets,...raid.targets,...hunt.targets];
   runWarfare(paused?0:worldDt,shipP,alt);
   {const shipBody=new T.Vector3(...inertialToBody(state.p,state.t,EARTH.rotation));sams.update(paused?0:worldDt,state.t,shipP,shipBody,alt,state.tele?.agl??alt,state.status==='flying',combat);}
   if(!combat.active&&!combat.completed&&state.status!=='impact')combat.startPatrol(shipP,rotation,new T.Vector3(...state.v));
   combat.allowEngage=state.status==='flying'&&alt<50000;
   feelNuke(worldDt,shipP);
   if(!paused&&state.status!=='impact')combat.advance(worldDt,shipP,rotation,new T.Vector3(...state.v),weaponAim,state.status==='flying'&&(gunHeld||keys.has('z')),state.status==='flying'&&(missileHeld||keys.has('x')));
-  if(slowUi)radarContacts=[...surfaceTraffic.contacts,...fleets.contacts,...raid.contacts,...combat.targets.map(d=>({id:'enemy-'+d.id,name:d.model?AIRCRAFT[d.model].name:'HOSTILE',kind:'hostile' as const,p:d.p,v:d.v,detail:(d.model?LOADOUTS[d.model]?.name:'Patrol')+' · '+(d.ai?.mode??'patrol'),targetId:d.id})),...sams.targets.map(d=>({id:'sam-'+d.id,name:'SAM BATTERY',kind:'ground' as const,p:d.p,v:d.v,detail:`Surface-to-air · ${SAM.detect} km radar · ${SAM.ceiling} km ceiling`,targetId:d.id})),...airTraffic.flights.map(f=>({id:f.id,name:f.id+' · '+AIRLINERS[f.type].name,kind:'civil' as const,p:f.p,v:f.v,detail:f.route+' · '+f.phase+' · '+Math.round(f.speed*3600)+' km/h'})),...orbitTraffic.contacts];
+  if(slowUi)radarContacts=[...surfaceTraffic.contacts,...fleets.contacts,...raid.contacts,...allied.contacts,...hunt.radar(state.t),...combat.targets.map(d=>({id:'enemy-'+d.id,name:d.model?AIRCRAFT[d.model].name:'HOSTILE',kind:'hostile' as const,p:d.p,v:d.v,detail:(d.model?LOADOUTS[d.model]?.name:'Patrol')+' · '+(d.ai?.mode??'patrol'),targetId:d.id})),...sams.targets.map(d=>({id:'sam-'+d.id,name:'SAM BATTERY',kind:'ground' as const,p:d.p,v:d.v,detail:`Surface-to-air · ${SAM.detect} km radar · ${SAM.ceiling} km ceiling`,targetId:d.id})),...airTraffic.flights.map(f=>({id:f.id,name:f.id+' · '+AIRLINERS[f.type].name,kind:'civil' as const,p:f.p,v:f.v,detail:f.route+' · '+f.phase+' · '+Math.round(f.speed*3600)+' km/h'})),...orbitTraffic.contacts];
   const contacts=radarContacts;
   const threats=combat.threats();threats.locks.push(...sams.locks(),...fleets.locks());
   // The radar scope, moving map and numeric readouts repaint ten times a second; redrawing them every frame cost more than it showed.
@@ -1557,6 +1581,12 @@ window.addEventListener("keydown", (e) => {
   if (e.repeat) return;
   if(k==='c'&&combat.active)combat.select(new T.Vector3(...state.p),weaponAim);
   if(k==='n')dropNuke();
+  // Anti-submarine stores and sonar (loaded for the submarine hunt).
+  if(['o','u','t','p','[',']','.'].includes(k)){
+    const say=(t:string)=>{$('bridge-flash').textContent=t;bridgeFlash=2.6;};
+    if(!hunt.active)say('Sonobuoys, torpedoes and depth charges are loaded for the Hunt the Yasen mission');
+    else{const body=new T.Vector3(...inertialToBody(state.p,state.t,EARTH.rotation)),vel=new T.Vector3(...inertialToBody(add(state.v,mul(atmosphereVelocity(state.p),-1)),state.t,EARTH.rotation)).multiplyScalar(1000);
+      say(k==='o'?hunt.drop('buoy',body,vel):k==='u'?hunt.drop('torpedo',body,vel):k==='t'?hunt.drop('charge',body,vel):k==='p'?hunt.ping(state.t):k==='.'?hunt.cycle():hunt.depthStep(k===']'?5:-5));}}
   if(k==='`'||k==='f3'){perf.toggle();e.preventDefault();}
   if(ops.id&&(ops.status!=='flying'||state.status==='impact')&&(k==='enter'||k==='r')){ops.restart?.();return;}
   if(missions.active&&(missions.status!=='flying'||state.status==='impact')&&(k==='enter'||k==='r')){void startMission(missions.active);return;}
@@ -1802,7 +1832,7 @@ Object.defineProperty(window, "earthDebug", {
     },
     setUTC:(iso:string)=>{const date=Date.parse(iso);if(!Number.isFinite(date))throw Error('Invalid UTC');epoch=new Date(date-state.t*1000);solarOffset=0;},
     terrain: surface,
-    supercruise,combat,satellite,nearImagery,city,detail,groundOverlay,bridges,water,sams,missions,surfaceTraffic,startMission:(id:string)=>startMission(MISSIONS.find(m=>m.id===id)!),airTraffic,orbitTraffic,radar,
+    supercruise,combat,satellite,nearImagery,city,detail,groundOverlay,bridges,water,sams,allied,hunt,missions,surfaceTraffic,startMission:(id:string)=>startMission(MISSIONS.find(m=>m.id===id)!),airTraffic,orbitTraffic,radar,
     view: { post,postFrame,fx,wideImagery,scene, patch, camera, renderer, atmospherePass, globe, scenery, flightEffects, audio,imagery,flightMap },
     state,
     rotation,

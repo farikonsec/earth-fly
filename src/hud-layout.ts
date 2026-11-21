@@ -4,7 +4,7 @@
  * stack, right sensors) and CSS grid reflows the columns for phones. Panels a pilot has dragged keep their spot.
  */
 const COLUMNS: Record<string, string[]> = {
-  left: [".location", "#combat-panel", "#view-bar"],
+  left: [".location", "#combat-panel", "#sonar-panel", "#view-bar"],
   center: ["#play-toolbar", "#travel-panel", "#tour-status", "#mission-panel", "#rwr", "#surface-traffic-status", "#notice"],
   right: ["#traffic-radar", "#flight-map"],
 };

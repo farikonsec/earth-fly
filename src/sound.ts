@@ -56,6 +56,28 @@ export class FlightSound {
     }
     await this.context.resume();
   }
+  /**
+   * Naval cues, all synthesised: an active sonar ping (a 1.5 kHz tone with a long decay and one returning echo), a
+   * splash of white noise, a deep underwater blast felt more than heard, and the roar of a missile booster.
+   * `level` scales loudness with distance (1 close, 0.05 far).
+   */
+  navalCue(kind: 'ping' | 'splash' | 'blast' | 'launch', level = 1) {
+    const c = this.context; if (!c || !this.gain || !this.enabled || c.state !== 'running' || level < 0.02) return false;
+    const rate = c.sampleRate, seconds = kind === 'ping' ? 3.2 : kind === 'blast' ? 4 : kind === 'launch' ? 3 : 1.1, d = new Float32Array(Math.floor(rate * seconds));
+    let seed = 9137, low = 0, low2 = 0;
+    for (let i = 0; i < d.length; i++) {
+      const t = i / rate; seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0; const white = seed / 2147483648 - 1;
+      if (kind === 'ping') { const tone = (u: number) => u < 0 ? 0 : Math.sin(u * 2 * Math.PI * 1480) * Math.min(1, u * 60) * Math.exp(-u * 2.1); d[i] = tone(t) * 0.8 + tone(t - 1.35) * 0.22; }
+      else if (kind === 'splash') { low += (white - low) * 0.25; d[i] = (white * 0.5 + low * 0.8) * Math.exp(-t * 4.5) * Math.min(1, t * 200); }
+      else if (kind === 'blast') { low += (white - low) * 0.01; low2 += (low - low2) * 0.03; d[i] = (low2 * 30 * Math.exp(-t * 0.9) + Math.sin(t * 2 * Math.PI * 38) * Math.exp(-t * 2.4) * 0.8) * Math.min(1, t * 120); }
+      else { low += (white - low) * 0.08; d[i] = (low * 2.2 + white * 0.25) * Math.min(1, t * 6) * Math.exp(-Math.max(0, t - 1.2) * 1.6); }
+    }
+    const buffer = c.createBuffer(1, d.length, rate); buffer.copyToChannel(d, 0);
+    const source = c.createBufferSource(), volume = c.createGain(); source.buffer = buffer;
+    volume.gain.value = Math.min(1.6, (kind === 'blast' ? 1.4 : kind === 'ping' ? 0.32 : 0.7) * level);
+    source.connect(volume).connect(this.gain); source.onended = () => { source.disconnect(); volume.disconnect(); }; source.start();
+    return true;
+  }
   sonicCue() {
     const c = this.context;
     if (!c || !this.gain || !this.enabled || c.state !== 'running') return false;

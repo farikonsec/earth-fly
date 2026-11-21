@@ -90,6 +90,7 @@ Nothing here is live. Everything is a snapshot or a model.
 - Night lights: NASA Earth at Night 2012.
 - Satellites: a CelesTrak snapshot of active objects, propagated with SGP4.
 - Bomber models: ["Tupolev TU-160"](https://sketchfab.com/3d-models/tupolev-tu-160-d3af9e67f8024dcc9b23a3e91d492e40) by KOG_THORNS and ["Tupolev Tu-95 Bear"](https://sketchfab.com/3d-models/tupolev-tu-95-bear-ab58508d275d48adb84f4a0207a26c26) by Chenzoss, both [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Changed: simplified, compressed and rescaled for the game. Files: [public/models/CREDITS.md](public/models/CREDITS.md).
+- Submarine models: ["TYPHOON - DESIGN 941 SUBMARINE"](https://sketchfab.com/3d-models/typhoon-design-941-submarine-0f74bfc10a8f4d60bd304e61ddc63e73) by s_ebo_l, ["Kilo Class Submarine"](https://sketchfab.com/3d-models/kilo-class-submarine-b7b2b557ebfa422b961d44b546369b08) by ArtBlender and ["PROJECT-855 YASEN M SUBMARINE"](https://sketchfab.com/3d-models/project-855-yasen-m-submarine-54361f4311e14fadb80d84d756cfd5ba) by MirzaArrafiERV_45, all [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Changed: simplified, compressed and rescaled for the game.
 - Full credits and licences: [public/textures/CREDITS.md](public/textures/CREDITS.md), [public/terrain/ATTRIBUTION.md](public/terrain/ATTRIBUTION.md), [public/scenery/README.md](public/scenery/README.md).
 
 Aircraft, weapons, ships and the bomb are game models with made-up numbers. They are not simulations of real systems.
