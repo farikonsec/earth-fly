@@ -205,8 +205,16 @@ export class WaterSurface {
   }
   private reflectFrame = 0;
   /** Renders the mirror image of the given scenes across the water plane (Lengyel oblique clipping keeps the riverbed out). */
-  reflect(renderer: T.WebGLRenderer, camera: T.PerspectiveCamera, scenes: T.Scene[], scale = 0.5) {
+  private frustum = new T.Frustum(); private viewProjection = new T.Matrix4();
+  /**
+   * `hide` lists objects left out of the mirror image: small things (trees, road traffic) that ripples smear to
+   * nothing but that cost as much to draw in the reflection as in the main view.
+   */
+  reflect(renderer: T.WebGLRenderer, camera: T.PerspectiveCamera, scenes: T.Scene[], scale = 0.5, hide: T.Object3D[] = []) {
     if (!this.active) return;
+    // No water in view (looking up, or the surface behind the camera): skip the mirror pass entirely.
+    this.frustum.setFromProjectionMatrix(this.viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse));
+    if (!this.frustum.intersectsObject(this.mesh)) { this.reflectFrame = 0; return; } // redraw as soon as it is back in view
     const size = renderer.getDrawingBufferSize(new T.Vector2()), w = Math.max(1, Math.round(size.x * scale)), h = Math.max(1, Math.round(size.y * scale));
     if (this.target.width !== w || this.target.height !== h) this.target.setSize(w, h);
     this.uniforms.camLocal.value.copy(this.mesh.worldToLocal(camera.position.clone()));
@@ -231,7 +239,9 @@ export class WaterSurface {
     const previous = renderer.getRenderTarget(), clearColor = renderer.getClearColor(new T.Color()), clearAlpha = renderer.getClearAlpha();
     this.mesh.visible = false;
     renderer.setRenderTarget(this.target); renderer.setClearColor(0x000000, 0); renderer.clear(true, true, false);
+    const shown = hide.filter((o) => o.visible); for (const o of shown) o.visible = false;
     for (const s of scenes) renderer.render(s, m);
+    for (const o of shown) o.visible = true;
     renderer.setRenderTarget(previous); renderer.setClearColor(clearColor, clearAlpha);
     this.mesh.visible = true;
   }

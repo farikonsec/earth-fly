@@ -32,7 +32,7 @@ export class WorldDetail {
   enabled = true; status = "idle"; error = "";
   private template = ""; private requested = false; private tiles = new Map<string, Tile>(); private inflight = 0;
   private anchor = new T.Vector3(); private anchored = false; private ground: T.MeshStandardMaterial; private water: T.MeshStandardMaterial;
-  private treeGeometry = shared(treeGeometry()); private airliner = shared(airlinerGeometry().scale(0.001, 0.001, 0.001)); private fin = shared(finGeometry().scale(0.001, 0.001, 0.001));
+  private treeGeometry = shared(treeGeometry()); private treeGeometryFar = shared(treeGeometry(0)); private airliner = shared(airlinerGeometry().scale(0.001, 0.001, 0.001)); private fin = shared(finGeometry().scale(0.001, 0.001, 0.001));
   private airlinerMaterial = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, metalness: 0.15 }); private finMaterial = new T.MeshStandardMaterial({ roughness: 0.5, metalness: 0.1 }); private treeMaterial = new T.MeshStandardMaterial({ vertexColors: true, roughness: 0.9, metalness: 0 });
   labels = document.createElement("canvas"); private label = this.labels.getContext("2d")!;
   /** Shared with main, which feeds it the drawn terrain mesh. */
@@ -137,6 +137,8 @@ export class WorldDetail {
     } catch { tile.state = "failed"; }
     this.inflight--;
   }
+  /** Tree meshes currently shown, so the water reflection can leave them out. */
+  get treeMeshes() { const out: T.Object3D[] = []; for (const t of this.tiles.values()) if (t.trees?.visible) out.push(t.trees); return out; }
   private dispose(tile: Tile) { tile.trees?.dispose(); tile.trees = undefined; if (tile.group) { this.group.remove(tile.group); tile.group.traverse((o) => { if (o instanceof T.Mesh && !o.geometry.userData.shared) o.geometry.dispose(); }); tile.group = undefined; } tile.footprints = []; }
   /**
    * Builds one tile's buildings, trees and parked airliners as a resumable job: it yields whenever the frame's
@@ -339,7 +341,8 @@ export class WorldDetail {
       else { this.budget.until = performance.now() + sliceMs(BUILD_BUDGET_MS); if (this.job.steps.next().done) this.job = null; }
     }
     for (const [key, t] of this.tiles) if (Math.abs(t.x - cx) > KEEP || Math.abs(t.y - cy) > KEEP) { if (t.state === "loading") continue; this.dispose(t); this.tiles.delete(key); this.revision++; }
-    for (const t of this.tiles.values()) if (t.trees && t.centre) t.trees.visible = altitude < 2500 && t.centre.distanceTo(here) < 3.2;
+    // Full trees on the tiles around the aircraft, the light model further out (a tile is about 1.5 km across).
+    for (const t of this.tiles.values()) if (t.trees && t.centre) { const d = t.centre.distanceTo(here); t.trees.visible = altitude < 2500 && d < 3.2; t.trees.geometry = d < 1.6 && altitude < 900 ? this.treeGeometry : this.treeGeometryFar; }
     if (!this.group.visible) { this.clearLabels(); return; }
     this.group.rotation.y = (time / EARTH.rotation) * Math.PI * 2;
     this.group.position.set(...bodyToInertial(this.anchor.toArray() as V, time, EARTH.rotation)).sub(new T.Vector3(...position));
@@ -383,13 +386,14 @@ export class WorldDetail {
 /** One broadleaf crown on a trunk (unit height, base at the origin) plus a conifer variant chosen by scale only. */
 /** Marks geometry shared between tiles so tile disposal leaves it alone. */
 function shared<G extends T.BufferGeometry>(g: G) { g.userData.shared = true; return g; }
-function treeGeometry() {
+/** `detail` 1 for trees near the aircraft (250 triangles); 0 for distant ones (66), which cover a few pixels. */
+function treeGeometry(detail = 1) {
   // Three overlapping lumps make a broken, natural crown; vertex colour darkens the underside and the inner lumps.
   const lumps: T.BufferGeometry[] = [];
   for (const [x, y, z, r] of [[0, 0.66, 0, 0.36], [0.17, 0.55, 0.1, 0.27], [-0.15, 0.58, -0.12, 0.28]] as const) {
-    const g = new T.IcosahedronGeometry(r, 1).toNonIndexed(); g.translate(x, y, z); lumps.push(g);
+    const g = new T.IcosahedronGeometry(r, detail).toNonIndexed(); g.translate(x, y, z); lumps.push(g);
   }
-  const trunk = new T.CylinderGeometry(0.035, 0.06, 0.42, 5, 1, true).toNonIndexed(); trunk.translate(0, 0.21, 0);
+  const trunk = new T.CylinderGeometry(0.035, 0.06, 0.42, detail ? 5 : 3, 1, true).toNonIndexed(); trunk.translate(0, 0.21, 0);
   const parts = [...lumps, trunk], merged = new T.BufferGeometry(), positions: number[] = [], colours: number[] = [];
   parts.forEach((g, k) => { const p = g.getAttribute("position"); for (let i = 0; i < p.count; i++) {
     const x = p.getX(i), y = p.getY(i), z = p.getZ(i), wobble = 1 + 0.1 * Math.sin(x * 23 + z * 17) * Math.cos(y * 19);

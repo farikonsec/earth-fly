@@ -1255,7 +1255,7 @@ function draw(dt: number) {
   terrainSun.position.copy(lightDir).multiplyScalar(10000);
   // Local terrain owns its depth, including mapped surfaces below the globe's sea-level shell.
   // The river surface draws after the whole local scene against its depth, so only what stands above the water hides it.
-  if (patch.visible){water.reflect(renderer,camera,[terrainScene,shipScene],TIERS[tier].reflect);renderer.clearDepth();renderer.render(terrainScene, camera);if(water.active||wash.mesh.visible)renderer.render(waterScene,camera);}
+  if (patch.visible){water.reflect(renderer,camera,[terrainScene,shipScene],TIERS[tier].reflect,[...detail.treeMeshes,surfaceTraffic.group]);renderer.clearDepth();renderer.render(terrainScene, camera);if(water.active||wash.mesh.visible)renderer.render(waterScene,camera);}
   // The blast pass needs the terrain's depth to char the ground and hide the cloud behind hills, so keep it while a blast is in range.
   if(!postFrame.nuke)renderer.clearDepth();
   ship.quaternion.copy(rotation);
