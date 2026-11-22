@@ -52,9 +52,29 @@ body.shell #bridge-flash{font-size:15px!important;font-weight:600!important}
 body.shell #travel-panel{background:#0a0f15b3!important;border:1px solid var(--line)!important;border-radius:10px!important;font-family:var(--ui)!important}
 
 /* ---- radar and menu button ------------------------------------------------------------------------------------ */
-body.shell #menu-button{width:40px;height:40px;border-radius:11px;border:1px solid #ffffff33;background:#0a0f1566;backdrop-filter:blur(8px);color:var(--text);display:grid;place-items:center;cursor:pointer;padding:0}
-body.shell #menu-button svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none}
-body.shell #menu-button:hover{border-color:#ffffff66}
+/* ---- action bar (top left) ---------------------------------------------------------------------------------- */
+body.shell #anchor-actions{left:var(--edge);top:16px;flex-direction:row;flex-wrap:nowrap;gap:6px}
+@media (max-width:1100px){body.shell #anchor-actions .action kbd{display:none}body.shell #anchor-actions .action{padding:0 10px}}
+body.shell #anchor-actions .action{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 13px;border-radius:9px;border:1px solid #ffffff38;
+  background:#0a0f15a6;backdrop-filter:blur(8px);font:600 13px/1 var(--ui);color:var(--text);cursor:pointer;white-space:nowrap}
+body.shell #anchor-actions .action:hover{border-color:#ffffff80;background:#121a22cc}
+body.shell #anchor-actions .action.on{border-color:var(--accent);color:var(--accent)}
+body.shell #anchor-actions .action kbd{font:600 10px/1 var(--mono);color:var(--muted);border:1px solid #ffffff30;border-radius:4px;padding:2px 4px}
+body.shell #anchor-actions .action.icon{width:36px;padding:0;justify-content:center}
+body.shell #anchor-actions .action.icon svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none}
+body.shell #anchor-actions .action.danger{color:#ffb0b0;border-color:#ff5d5d66}
+body.shell #anchor-actions .action[hidden]{display:none}
+body.shell #anchor-objective{top:66px;max-width:min(340px,calc(50vw - 200px))}
+
+/* ---- map (bottom left; Map button enlarges it) ------------------------------------------------------------- */
+body.shell #anchor-map{left:var(--edge);bottom:24px}
+body.shell #flight-map{width:260px!important;border-radius:12px!important;border:1px solid #ffffff2e!important;background:#0a1a24e6!important}
+body.shell #flight-map canvas{height:170px!important}
+body.shell #flight-map.expanded{width:min(720px,calc(100vw - 40px))!important}
+body.shell #flight-map.expanded canvas{height:min(480px,62vh)!important}
+body.shell .flight-map-label{font:500 10px/1 var(--ui)!important;padding:7px 9px!important;min-height:0!important;color:var(--muted)!important}
+body.shell .map-controls button{font:600 11px/1 var(--ui)!important;border-radius:6px!important}
+body.shell.map-big #anchor-weapons{visibility:hidden}
 body.shell #traffic-radar{width:156px!important;height:156px;border-radius:50%!important;overflow:hidden!important;border:1px solid #dffbe955!important;background:#06120c99!important;box-shadow:inset 0 0 0 1px #0006!important;padding:0!important}
 body.shell #traffic-radar .radar-body,body.shell #traffic-radar canvas{width:100%!important;height:100%!important;display:block}
 body.shell #traffic-radar.folded .radar-body{display:block!important}
@@ -125,7 +145,15 @@ body.touch-ui #combat-actions #fire-missile{grid-column:1;grid-row:2}
 body.touch-ui #combat-actions #lock-target{grid-column:2;grid-row:1}
 body.touch-ui #combat-actions #drop-nuke{grid-column:1;grid-row:1;width:44px;height:44px}
 body.touch-ui #traffic-radar{width:96px!important;height:96px}
-body.touch-ui #anchor-objective{top:16px;max-width:46vw}
+body.touch-ui #anchor-actions{top:max(10px,env(safe-area-inset-top));gap:5px;flex-wrap:wrap;max-width:calc(100vw - 140px)}
+body.touch-ui #anchor-actions .action{height:32px;padding:0 10px;font-size:12px}
+body.touch-ui #anchor-actions .action kbd{display:none}
+body.touch-ui #anchor-actions .action.icon{width:32px}
+/* On a phone the stick owns the bottom left: the map opens from the Map button, centred. */
+body.touch-ui:not(.map-big) #anchor-map{display:none}
+body.touch-ui.map-big #anchor-map{left:50%;bottom:auto;top:54px;transform:translateX(-50%);z-index:30}
+body.touch-ui #flight-map.expanded canvas{height:min(300px,58vh)!important}
+body.touch-ui #anchor-objective{top:52px;max-width:46vw}
 body.touch-ui #anchor-alerts{top:64px}
 body.touch-ui #anchor-messages{bottom:auto;top:30%}
 @media (max-width:760px){
@@ -141,12 +169,16 @@ body.touch-ui #anchor-messages{bottom:auto;top:30%}
 }
 @media (orientation:portrait) and (pointer:coarse){
   body.touch-ui #touch-thrust{top:auto;height:170px}
+  body.touch-ui #anchor-objective{top:140px}
+  body.touch-ui.map-big #anchor-map{top:100px}
   body.touch-ui #touch-extras{top:auto;bottom:calc(max(26px,env(safe-area-inset-bottom)) + 180px)}
   body.touch-ui #anchor-weapons{bottom:220px;right:calc(max(14px,env(safe-area-inset-right)) + 60px)}
 }
 
 /* Nothing in-game shows over the loading screen. */
 body:has(#loading:not([hidden])) :is(.anchor,#touch-stick,#touch-thrust,#touch-extras,#combat-actions,#menu-button){display:none!important}
+body.clean.shell #anchor-actions{display:flex}
+body.clean.shell #anchor-actions .action:not(#menu-button){display:none}
 #menu .sound-icon{display:none}
 body.shell #anchor-credit .credits{display:flex;flex-direction:column;align-items:center;gap:1px}
 body.shell #anchor-credit .credits>*{position:static!important;inset:auto!important;transform:none!important;margin:0!important}

@@ -53,19 +53,47 @@ export class Shell {
       for (const sel of ids) { const el = document.querySelector(sel); if (el) box.append(el); }
       document.body.append(box); return box;
     };
+    this.actionBar();
     corner("anchor-objective", ["#mission-panel", "#combat-panel", "#tour-status", "#raid-status", "#nuke-status", "#sonar-panel"]);
     corner("anchor-alerts", ["#rwr", "#travel-panel"]);
     corner("anchor-messages", ["#notice", "#bridge-flash"]);
-    const right = corner("anchor-sensors", ["#traffic-radar"]);
-    this.button.id = "menu-button"; this.button.setAttribute("aria-label", "Menu (Esc)"); this.button.title = "Menu · Esc";
-    this.button.innerHTML = '<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14"/></svg>';
-    this.button.onclick = () => this.toggle();
-    right.prepend(this.button);
+    corner("anchor-sensors", ["#traffic-radar"]);
+    corner("anchor-map", ["#flight-map"]);
     corner("anchor-weapons", ["#combat-actions"]);
     const credit = document.querySelector(".credits"); if (credit) corner("anchor-credit", [".credits"]);
     // Hold-to-fire buttons read better with plain labels.
     const label = (id: string, text: string, key: string) => { const b = $(id); if (b) b.innerHTML = `<span>${text}</span><kbd>${key}</kbd>`; };
     label("fire-gun", "GUN", "Z"); label("fire-missile", "MSL", "X"); label("lock-target", "LOCK", "C"); label("drop-nuke", "NUKE", "N");
+  }
+
+  /** Top-left bar: the things a pilot reaches for in flight, one click each, with their keys. */
+  private actionBar() {
+    const bar = document.createElement("nav"); bar.id = "anchor-actions"; bar.className = "anchor"; bar.setAttribute("aria-label", "Flight actions");
+    const add = (id: string, label: string, key: string, action: () => void) => {
+      const b = document.createElement("button"); b.id = id; b.className = "action"; b.innerHTML = `<span>${label}</span>${key ? `<kbd>${key}</kbd>` : ""}`;
+      b.onclick = () => { action(); (document.querySelector("#world canvas") as HTMLElement | null)?.focus({ preventScroll: true }); }; bar.append(b); return b;
+    };
+    add("act-missions", "Missions", "", () => $("explore-world")?.click());
+    const map = add("act-map", "Map", "", () => { const m = $("flight-map"); if (!m) return; const big = !document.body.classList.contains("map-big"); document.body.classList.toggle("map-big", big); m.classList.toggle("expanded", big); });
+    const camera = add("act-camera", "Camera", "1–8", () => {
+      const views = Array.from(document.querySelectorAll<HTMLButtonElement>("#view-bar button"));
+      const i = views.findIndex((b) => b.dataset.view === document.body.dataset.view); views[(i + 1) % views.length]?.click();
+    });
+    const travel = add("act-super", "Superspeed", "Y", () => $("super-toggle")?.click());
+    const pause = add("act-pause", "Pause", "Space", () => $("pause")?.click());
+    this.button.id = "menu-button"; this.button.className = "action icon"; this.button.setAttribute("aria-label", "Settings (Esc)"); this.button.title = "Settings · Esc";
+    this.button.innerHTML = '<svg viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 9h14M2 13h14"/></svg>';
+    this.button.onclick = () => this.toggle(); bar.append(this.button);
+    const end = add("act-end", "End", "", () => this.api.endActivity()); end.classList.add("danger");
+    document.body.append(bar);
+    const name: Record<string, string> = { chase: "Chase", close: "Close", cockpit: "Cockpit", wing: "Wing", top: "Top", nose: "Nose", flyby: "Fly-by", planet: "Planet" };
+    setInterval(() => {
+      travel.classList.toggle("on", !!$("super-toggle")?.classList.contains("on"));
+      const paused = !!$("pause")?.classList.contains("on"); pause.classList.toggle("on", paused); pause.querySelector("span")!.textContent = paused ? "Resume" : "Pause";
+      camera.querySelector("span")!.textContent = name[document.body.dataset.view ?? ""] ?? "Camera";
+      map.classList.toggle("on", document.body.classList.contains("map-big"));
+      const activity = this.api.activity(); end.hidden = !activity || activity === "superspeed"; end.querySelector("span")!.textContent = `End ${activity ?? ""}`;
+    }, 200);
   }
 
   private buildMenu() {
@@ -76,25 +104,14 @@ export class Shell {
     const item = (label: string, action: () => void) => { const a = document.createElement("button"); a.className = "menu-item"; a.textContent = label; a.onclick = action; this.nav.append(a); return a; };
     item("Resume", () => this.toggle(false));
     const move = (body: HTMLElement, ...ids: string[]) => { for (const id of ids) { const el = $(id) ?? document.querySelector(id); if (el) body.append(el); } };
-    const card = (body: HTMLElement, kicker: string, title: string, text: string, action: () => void) => {
-      const b = document.createElement("button"); b.className = "menu-card"; b.innerHTML = `<small>${kicker}</small><strong>${title}</strong><span>${text}</span>`;
-      b.onclick = () => { this.toggle(false); action(); }; body.append(b); return b;
-    };
     this.sections = [
-      { id: "fly", label: "Fly", build: (b) => {
-        const grid = document.createElement("div"); grid.className = "menu-cards"; b.append(grid);
-        card(grid, "Missions", "Missions & places", "Operations, bridge runs, tours and every destination.", () => $("explore-world")?.click());
-        card(grid, "Combat", "Dogfight", "A 90-second sortie against fighters.", () => $("practice-start")?.click());
-        card(grid, "Anywhere", "Pick a start", "Choose any point on Earth, height and heading.", () => $("planner-button")?.click());
-        const presets = document.createElement("div"); presets.className = "menu-row"; b.append(presets);
-        move(presets, "#desk label.field:has(#scenario)", "restart");
-      } },
-      { id: "map", label: "Map", build: (b) => move(b, "flight-map") },
-      { id: "camera", label: "Camera", build: (b) => { move(b, "view-bar"); const hint = document.createElement("p"); hint.className = "menu-hint"; hint.textContent = "Keys 1–8 switch views in flight."; b.append(hint); } },
       { id: "aircraft", label: "Aircraft", build: (b) => {
         const row = document.createElement("div"); row.className = "menu-toggles"; b.append(row);
-        move(row, "pause", "gear", "torch", "assist", "super-toggle");
-        move(b, "travel-panel");
+        move(row, "gear", "torch", "assist");
+        const presets = document.createElement("div"); presets.className = "menu-row"; b.append(presets);
+        move(presets, "#desk label.field:has(#scenario)", "restart");
+        // Kept for their handlers and state; the action bar shows them.
+        const hidden = document.createElement("div"); hidden.hidden = true; b.append(hidden); move(hidden, "pause", "super-toggle", "view-bar");
       } },
       { id: "settings", label: "Settings", build: (b) => {
         const row = document.createElement("div"); row.className = "menu-toggles"; b.append(row);
@@ -124,7 +141,11 @@ export class Shell {
     document.body.append(this.menu);
     // Opening another dialog (explorer, guide, planner) from the menu leaves flight paused behind it.
     for (const id of ["explore-world", "practice-start", "planner-button", "help-button"]) $(id)?.addEventListener("click", () => { if (this.open) this.toggle(false); });
-    this.show("fly");
+    // Dogfight sits with the other flights in the Missions dialog.
+    const dogfight = document.createElement("button"); dogfight.className = "destination-card tool-card"; dogfight.innerHTML = "<small>Combat</small><strong>Dogfight</strong>";
+    dogfight.onclick = () => { $("explore-close")?.click(); $("practice-start")?.click(); };
+    $("explore-tools")?.prepend(dogfight);
+    this.show("aircraft");
   }
   private show(id: string) {
     for (const s of Array.from(this.body.querySelectorAll<HTMLElement>(".menu-section"))) s.hidden = s.dataset.section !== id;

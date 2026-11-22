@@ -66,7 +66,7 @@ export class Instruments {
     if (Math.abs(tele.alpha) > 0.28 && tele.dynamicPressure > 500) { c.fillStyle = WARN; c.font = font(12, 600); c.textAlign = "center"; c.fillText("STALL", mx, my + 30); c.fillStyle = HUD; }
 
     // ---- heading tape --------------------------------------------------------------------------------------------
-    const tapeW = compact ? 220 : 340, top = compact ? 62 : 30, perHdg = compact ? 3 : 3.4;
+    const tapeW = compact ? 220 : 340, top = compact ? (h > w ? 104 : 62) : 66, perHdg = compact ? 3 : 3.4;
     c.save(); c.beginPath(); c.rect(cx - tapeW / 2, top - 6, tapeW, 40); c.clip();
     c.strokeStyle = FAINT; c.beginPath(); c.moveTo(cx - tapeW / 2, top + 22); c.lineTo(cx + tapeW / 2, top + 22); c.stroke();
     c.strokeStyle = HUD; c.font = font(11); c.textAlign = "center";
@@ -81,28 +81,37 @@ export class Instruments {
     c.beginPath(); c.moveTo(cx - 4, top + 26); c.lineTo(cx, top + 31); c.lineTo(cx + 4, top + 26); c.stroke();
 
     // ---- speed and altitude ---------------------------------------------------------------------------------------
-    const alt = extra?.altitude ?? 0, speed = spaceSpeed ?? tele.airspeed, clearance = altimetry?.clearance ?? tele.agl;
+    // Speed reads in km/h (km/s in space), altitude in metres; each carries its name and unit so they never mix up.
+    const alt = extra?.altitude ?? 0, kmh = tele.airspeed * 3.6, clearance = altimetry?.clearance ?? tele.agl;
     const altColour = altimetry?.level === "critical" ? DANGER : altimetry?.level === "caution" ? WARN : HUD;
-    const speedText = spaceSpeed === undefined ? group(speed) : spaceSpeed.toFixed(2), speedSub = spaceSpeed === undefined ? `M ${tele.mach.toFixed(2)} · ${tele.gLoad.toFixed(1)} g` : "km/s";
-    const vs = `${tele.verticalSpeed >= 0 ? "+" : "−"}${group(Math.abs(tele.verticalSpeed))} m/s`, radio = clearance < 600 ? ` · R ${group(clearance)}` : "";
+    const speedText = spaceSpeed === undefined ? group(kmh) : spaceSpeed.toFixed(2), speedUnit = spaceSpeed === undefined ? "km/h" : "km/s";
+    const vs = `${tele.verticalSpeed >= 0 ? "▲" : "▼"} ${group(Math.abs(tele.verticalSpeed))} m/s`, radio = clearance < 600 ? `GROUND ${group(clearance)} m` : "";
+    const title = (text: string, x: number, y: number, align: CanvasTextAlign) => { c.font = font(9, 700); c.fillStyle = DIM; c.textAlign = align; c.fillText(text, x, y); };
     if (compact) {
-      c.textAlign = "right"; c.font = font(20, 600); c.fillText(speedText, cx - 118, cy); c.font = font(10, 600); c.fillStyle = DIM; c.fillText(spaceSpeed === undefined ? `M/S · M ${tele.mach.toFixed(2)}` : "KM/S", cx - 118, cy + 18);
-      c.textAlign = "left"; c.fillStyle = altColour; c.font = font(20, 600); c.fillText(group(alt), cx + 118, cy); c.font = font(10, 600); c.fillStyle = DIM; c.fillText(`M${radio}`, cx + 118, cy + 18);
+      const gap = Math.min(106, w / 2 - 98), sx = cx - gap - 88, ax = cx + gap;
+      plate(c, sx, cy - 22, 88, 44); plate(c, ax, cy - 22, 88, 44); c.textAlign = "left";
+      title(`SPEED  ${speedUnit.toUpperCase()}`, sx + 9, cy - 10, "left"); c.font = font(19, 600); c.fillStyle = HUD; c.fillText(speedText, sx + 9, cy + 9);
+      title("ALTITUDE  M", ax + 9, cy - 10, "left"); c.font = font(19, 600); c.fillStyle = altColour; c.fillText(group(alt), ax + 9, cy + 9);
+      if (radio) { c.font = font(10, 600); c.fillStyle = altColour === HUD ? DIM : altColour; c.fillText(radio, ax + 2, cy + 36); }
     } else {
       const span = 150, sx = cx - 250, ax = cx + 250;
-      // Speed tape: 10 m/s per 30 px, labels every 20.
-      if (spaceSpeed === undefined) tape(c, sx, cy, span, speed, 10, 30, 20, "left");
-      c.font = font(17, 600); c.textAlign = "right"; pointer(c, sx - 66, cy, 60, "right"); c.fillStyle = HUD; c.fillText(speedText, sx - 12, cy);
-      c.font = font(10); c.fillStyle = DIM; c.fillText(speedSub, sx, cy + span + 14);
+      // Speed tape: 25 km/h per 30 px, labels every 100. The readout box carries its name and unit on its top line.
+      if (spaceSpeed === undefined) tape(c, sx, cy, span, kmh, 25, 30, 100, "left");
+      pointer(c, sx - 98, cy, 92, "right", 22); c.textAlign = "left";
+      c.font = font(9, 700); c.fillStyle = DIM; c.fillText(`SPEED  ${speedUnit.toUpperCase()}`, sx - 90, cy - 11);
+      c.font = font(19, 600); c.fillStyle = HUD; c.fillText(speedText, sx - 90, cy + 8);
+      c.font = font(10); c.fillStyle = DIM; c.textAlign = "right"; c.fillText(spaceSpeed === undefined ? `Mach ${tele.mach.toFixed(2)} · ${tele.gLoad.toFixed(1)} g` : "", sx, cy + span + 14);
       // Altitude tape: 50 m per 30 px, labels every 100.
       tape(c, ax, cy, span, alt, 50, 30, 100, "right");
-      c.font = font(17, 600); c.textAlign = "left"; pointer(c, ax + 6, cy, 72, "left"); c.fillStyle = altColour; c.fillText(group(alt), ax + 14, cy);
-      c.font = font(10); c.fillStyle = altColour === HUD ? DIM : altColour; c.fillText(vs + radio, ax, cy + span + 14);
+      pointer(c, ax + 6, cy, 100, "left", 22); c.textAlign = "left";
+      c.font = font(9, 700); c.fillStyle = DIM; c.fillText("ALTITUDE  M", ax + 18, cy - 11);
+      c.font = font(19, 600); c.fillStyle = altColour; c.fillText(group(alt), ax + 18, cy + 8);
+      c.font = font(10); c.fillStyle = altColour === HUD ? DIM : altColour; c.fillText(radio ? `${vs} · ${radio}` : vs, ax, cy + span + 14);
     }
 
-    // ---- thrust (PC; on a phone the thrust slider shows it) --------------------------------------------------------
+    // ---- thrust (PC: beside the map; on a phone the thrust slider shows it) ------------------------------------------
     if (extra && !compact) {
-      const x = 28, bottom = h - 34, rail = 110, t = Math.max(0, Math.min(1, extra.throttle));
+      const x = 300, bottom = h - 34, rail = 110, t = Math.max(0, Math.min(1, extra.throttle));
       c.shadowBlur = 0; c.fillStyle = "rgba(255,255,255,.16)"; c.fillRect(x, bottom - rail, 4, rail);
       c.fillStyle = HUD; c.fillRect(x, bottom - rail * t, 4, rail * t);
       if (extra.boost) { c.fillStyle = WARN; c.fillRect(x, bottom - rail, 4, rail * 0.12); }
@@ -127,10 +136,10 @@ function plate(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: 
   c.save(); c.shadowBlur = 0; c.fillStyle = PLATE; c.strokeStyle = HUD; c.beginPath(); c.roundRect(x, y, w, h, 3); c.fill(); c.stroke(); c.restore();
 }
 /** Readout box with a point toward the tape. */
-function pointer(c: CanvasRenderingContext2D, x: number, y: number, w: number, side: "left" | "right") {
+function pointer(c: CanvasRenderingContext2D, x: number, y: number, w: number, side: "left" | "right", half = 11) {
   c.save(); c.shadowBlur = 0; c.fillStyle = PLATE; c.strokeStyle = HUD; c.beginPath();
-  if (side === "right") { c.moveTo(x, y - 11); c.lineTo(x + w - 8, y - 11); c.lineTo(x + w, y); c.lineTo(x + w - 8, y + 11); c.lineTo(x, y + 11); }
-  else { c.moveTo(x + 8, y - 11); c.lineTo(x + w, y - 11); c.lineTo(x + w, y + 11); c.lineTo(x + 8, y + 11); c.lineTo(x, y); }
+  if (side === "right") { c.moveTo(x, y - half); c.lineTo(x + w - 8, y - half); c.lineTo(x + w, y); c.lineTo(x + w - 8, y + half); c.lineTo(x, y + half); }
+  else { c.moveTo(x + 8, y - half); c.lineTo(x + w, y - half); c.lineTo(x + w, y + half); c.lineTo(x + 8, y + half); c.lineTo(x, y); }
   c.closePath(); c.fill(); c.stroke(); c.restore();
 }
 /** A vertical tape centred on `value`: ticks every `step`, `px` apart, labels every `label`. */
