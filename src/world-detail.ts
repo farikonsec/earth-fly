@@ -8,8 +8,10 @@ import { GroundCorrection, seatOnGround } from "./terrain-sample";
 import type { Terrain } from "./terrain";
 import type { City } from "./city";
 import type { V } from "./vector";
+import { LITE } from "./device";
 
-const ZOOM = 14, RADIUS = 2, KEEP = 3, SKIRT = 12, N = 2 ** ZOOM;
+// Lite devices keep a 3×3 block of building tiles instead of 5×5: each tile is tens of MB once built.
+const ZOOM = 14, RADIUS = LITE ? 1 : 2, KEEP = LITE ? 2 : 3, SKIRT = 12, N = 2 ** ZOOM;
 /** Milliseconds of tile building allowed per frame; a tile finishes over several frames instead of freezing one. */
 const BUILD_BUDGET_MS = 5;
 const WALLS: [number, number, number][] = [[196, 186, 166], [171, 146, 104], [150, 86, 66], [58, 78, 96], [150, 150, 146], [214, 206, 188]];

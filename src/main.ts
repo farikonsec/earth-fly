@@ -79,6 +79,7 @@ import {
   type FlightTelemetry,
 } from "./flight";
 import { createSpaceplane } from "./spaceplane";
+import { LITE } from "./device";
 import { atmosphere } from "./atmosphere";
 import { add, mul, len, type V } from "./vector";
 const $ = (id: string) => document.getElementById(id)!;
@@ -119,9 +120,10 @@ let throttle = 0,
 const supercruise=new Supercruise(),satellite=new SatelliteImagery(),wideImagery=new SatelliteImagery(),combat=new Combat(),combatView=new CombatView(combat);
 const airTraffic=new AirTraffic(),trafficView=new TrafficView(airTraffic),orbitTraffic=new OrbitalTraffic(),radar=new Radar(orbitTraffic);
 let lastTrafficTime=0;const orbitalLabel=document.createElement('div');orbitalLabel.id='orbital-label';document.body.append(orbitalLabel);
-wideImagery.fixedZoom=9;satellite.boost=1;
+wideImagery.fixedZoom=9;satellite.boost=LITE?0:1;
 /** Close-range imagery: a small sharp patch under the aircraft (about 0.4 m per pixel in the UK) for low flying and landing. */
-const nearImagery=new SatelliteImagery();nearImagery.boost=1;nearImagery.fixedZoom=17;
+// Boost doubles each imagery canvas side (4× the GPU memory); lite devices keep the base resolution.
+const nearImagery=new SatelliteImagery();nearImagery.boost=LITE?0:1;nearImagery.fixedZoom=17;
 let weaponAim=new T.Vector3(0,0,-1),gunHeld=false,missileHeld=false,aimPointer:{x:number;y:number}|null=null;
 const pilotInput = new PilotInput(), sonic = new SonicFeedback();
 const mouseAim = { active: false, x: 0, y: 0, originX: 0, originY: 0 };
@@ -1038,7 +1040,8 @@ function draw(dt: number) {
   clouds.rotation.y = state.t * 0.000004;
   const alt = (shipP.length() - EARTH.radius) * 1000;
   scenery.update(state.p, state.t);
-  city.update(state.p, state.t, sliceMs(7));
+  // The full London model holds every building at once (~0.8 GB in Safari); lite devices use the streamed building tiles instead.
+  if(!LITE)city.update(state.p, state.t, sliceMs(7));
   const groundSpeed = state.status === 'flying' ? (state.tele?.airspeed ?? 0) : 0;
   detail.update(state.p, state.t, groundSpeed);
   if(patchReady&&detail.group.visible){const count=patchGeo.getAttribute('position')?.count??0;if(count)detail.correction.update(detail.anchorPoint,patchGeo,patchAnchor,Math.round(Math.sqrt(count))-1,terrainBlend.value,recenterBlend.value,surface.revision);}
@@ -1243,7 +1246,8 @@ function draw(dt: number) {
   post.begin();
   const worldDt=paused?0:Math.max(0,state.t-lastTrafficTime);lastTrafficTime=state.t;
   uiClock+=dt;const slowUi=uiClock>=.1||paused;if(slowUi)uiClock=0;surfaceTraffic.view.labels=slowUi;
-  surfaceTraffic.update(worldDt,state.t,shipP,alt);
+  // Road and rail traffic alone costs over 1 GB in Safari; lite devices fly without it.
+  if(!LITE)surfaceTraffic.update(worldDt,state.t,shipP,alt);
   renderer.render(scene, camera);
   const u = atmospherePass.material.uniforms;
   u.eye.value.copy(cameraAbs);
@@ -1665,7 +1669,7 @@ window.addEventListener("resize", () => {
   renderer.setSize(innerWidth, innerHeight);post.resize();
 });
 // Phones get 2048-wide textures: the full set needs ~170 MB of GPU memory, enough for mobile browsers to kill and reload the tab.
-const TEX = TOUCH_UI.matches ? "-2k" : "";
+const TEX = LITE ? "-2k" : "";
 Promise.all([
   load(`textures/earth${TEX}.jpg`),
   load(`textures/clouds${TEX}.webp`),
@@ -1712,14 +1716,14 @@ Promise.all([
     const inland=await(await fetch('scenery/absheron.json')).json();
     makeCaspianMask(inland.features);
     scenery.features.push(...inland.features);
-    if(!TOUCH_UI.matches)void loadLondonDem();void bridges.load();
+    if(!LITE)void loadLondonDem();void bridges.load();
     const thames=await fetch('scenery/london-water.json').then(r=>r.ok?r.json():null).catch(()=>null);if(thames){makeLondonMask(thames.features);scenery.features.push(...thames.features);ships.load(thames.features);}
     scenery.index=new GeoIndex(scenery.features);
     surface.waterLevel=(lat,lon)=>scenery.index.at(lat,lon,'water')?.elevation??null;
     surface.meshSync = true;
     surface.live = true;
     ready = true;
-    void loadNightLights().then(texture=>{if(texture){nightUniforms.nightMap.value=texture;nightUniforms.nightReady.value=1;}}).catch(()=>{});
+    void loadNightLights(LITE?3:4).then(texture=>{if(texture){nightUniforms.nightMap.value=texture;nightUniforms.nightReady.value=1;}}).catch(()=>{});
     const requested=query.get("scenario");if(requested)reset(requested);
     // Default sortie: airborne over the Thames at Wandsworth, 450 m up, heading for Westminster and the City 4 km ahead.
     // The loading screen stays up until the aircraft is placed, so nothing else flashes first.

@@ -21,6 +21,8 @@ body.shell .anchor{position:fixed;z-index:20;display:flex;flex-direction:column;
 body.shell .anchor>*{position:static!important;inset:auto!important;transform:none!important;margin:0!important;pointer-events:auto}
 body.shell #anchor-objective{left:var(--edge);top:20px;max-width:min(380px,40vw);align-items:flex-start}
 body.shell #anchor-alerts{left:50%;top:76px;transform:translateX(-50%);align-items:center}
+/* Warnings are read, never tapped: taps pass through to the buttons underneath. */
+body.shell #anchor-alerts>#rwr{pointer-events:none}
 body.shell #anchor-messages{left:50%;bottom:28px;transform:translateX(-50%);align-items:center}
 body.shell #anchor-sensors{right:var(--edge);top:18px;flex-direction:row-reverse;align-items:flex-start}
 body.shell #anchor-weapons{right:var(--edge);bottom:24px;align-items:flex-end}
@@ -167,12 +169,22 @@ body.touch-ui #anchor-messages{bottom:auto;top:30%}
   #menu .menu-body{padding:14px 18px 24px}
   #menu #view-bar{grid-template-columns:repeat(2,1fr)}
 }
+/* Phone held sideways: a smaller weapon cluster stays below the speed and altitude boxes. */
+@media (orientation:landscape) and (pointer:coarse) and (max-height:500px){
+  body.touch-ui #combat-actions{gap:6px}
+  body.touch-ui #combat-actions .weapon{width:48px;height:48px;font-size:9px}
+  body.touch-ui #combat-actions #fire-gun{width:64px;height:64px}
+  body.touch-ui #combat-actions #drop-nuke{width:38px;height:38px}
+}
 @media (orientation:portrait) and (pointer:coarse){
   body.touch-ui #touch-thrust{top:auto;height:170px}
   body.touch-ui #anchor-objective{top:140px}
   body.touch-ui.map-big #anchor-map{top:100px}
+  /* The button bar wraps to two or three rows in portrait; alerts start below it. */
+  body.touch-ui #anchor-alerts{top:150px}
   body.touch-ui #touch-extras{top:auto;bottom:calc(max(26px,env(safe-area-inset-bottom)) + 180px)}
-  body.touch-ui #anchor-weapons{bottom:220px;right:calc(max(14px,env(safe-area-inset-right)) + 60px)}
+  /* Between the stick and the throttle, clear of the speed and altitude boxes. */
+  body.touch-ui #anchor-weapons{bottom:max(26px,env(safe-area-inset-bottom));right:calc(max(14px,env(safe-area-inset-right)) + 60px)}
 }
 
 /* Nothing in-game shows over the loading screen. */
@@ -180,6 +192,7 @@ body:has(#loading:not([hidden])) :is(.anchor,#touch-stick,#touch-thrust,#touch-e
 body.clean.shell #anchor-actions{display:flex}
 body.clean.shell #anchor-actions .action:not(#menu-button){display:none}
 #menu .sound-icon{display:none}
+#menu .sound-toggle .sound-label{display:inline}
 body.shell #anchor-credit .credits{display:flex;flex-direction:column;align-items:center;gap:1px}
 body.shell #anchor-credit .credits>*{position:static!important;inset:auto!important;transform:none!important;margin:0!important}
 body.touch-ui #anchor-credit{bottom:2px}
