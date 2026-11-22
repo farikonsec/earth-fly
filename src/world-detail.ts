@@ -211,6 +211,8 @@ export class WorldDetail {
       const g = new T.BufferGeometry();
       g.setAttribute("position", new T.Float32BufferAttribute(position, 3)); g.setAttribute("normal", new T.Float32BufferAttribute(normal, 3));
       g.setAttribute("tint", new T.BufferAttribute(new Uint8Array(tint), 4, true)); g.setAttribute("wall", new T.Float32BufferAttribute(wall, 3)); g.setIndex(index); g.computeBoundingSphere();
+      // Tiles are rebuilt, never edited, so the CPU copies go once the GPU has them.
+      for (const attr of [...Object.values(g.attributes), g.index!]) (attr as T.BufferAttribute).onUpload(release);
       group.add(new T.Mesh(g, this.buildingMaterial));
     }
     if (performance.now() > slice.until) yield;
@@ -403,3 +405,6 @@ function treeGeometry(detail = 1) {
   merged.setAttribute("position", new T.Float32BufferAttribute(positions, 3)); merged.setAttribute("color", new T.Float32BufferAttribute(colours, 3));
   merged.computeVertexNormals(); return merged;
 }
+
+/** three.js upload hook: drop the CPU copy once the GPU has the data. */
+function release(this: { array: unknown }) { this.array = null; }

@@ -230,6 +230,13 @@ export class City {
     g.setIndex(new T.BufferAttribute(c.index.subarray(0, c.i), 1));
     g.computeBoundingSphere();
     if (c.mesh) { c.mesh.geometry.dispose(); c.mesh.geometry = g; } else { c.mesh = new T.Mesh(g, this.material); this.group.add(c.mesh); }
+    // Once the city is complete only positions change (re-seating on new terrain), so the other buffers are dropped
+    // from memory as soon as the GPU has them: about two thirds of the city's footprint.
+    if (this.built) {
+      for (const name of ["normal", "tint", "wall"]) (g.getAttribute(name) as T.BufferAttribute).onUpload(release);
+      g.index!.onUpload(release);
+      c.normal = new Int8Array(0); c.tint = new Uint8Array(0); c.wall = new Float32Array(0); c.index = new Uint32Array(0);
+    }
   }
   /** The London Eye is not a building in the map, so it is modelled by hand at its surveyed position. */
   private londonEye() {
@@ -324,3 +331,5 @@ export class City {
     this.group.position.set(...bodyToInertial(this.anchor.toArray() as V, time, EARTH.rotation)).sub(new T.Vector3(...position));
   }
 }
+/** three.js upload hook: the GPU has the data, so the CPU copy can go (count and itemSize stay for drawing). */
+function release(this: { array: unknown }) { this.array = null; }
