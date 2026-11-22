@@ -1,0 +1,202 @@
+/*
+ * Earth Fly screen design (see docs/ui/mockup.html). Loaded after style.css and scoped to body.shell, so the new
+ * layout wins without touching the older rules. Four colours on the HUD: symbology, accent, amber, red.
+ */
+:root{
+  --hud:#dffbe9;--hud-dim:#dffbe98c;--accent:#62f0b5;--warn:#ffb547;--danger:#ff5d5d;
+  --ink:#05080b;--glass:#0a0f15cc;--line:#ffffff1f;--text:#eef3f7;--muted:#93a1ad;
+  --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text",Inter,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",ui-monospace,Menlo,monospace;
+  --hud-shadow:0 0 2px #000c,0 0 6px #0009;
+  --edge:max(18px,env(safe-area-inset-left));
+}
+
+/* ---- what goes: the old chrome ---------------------------------------------------------------------------- */
+body.shell>header,body.shell .location,body.shell>footer,body.shell .telemetry,body.shell #desk,body.shell #play-toolbar,
+body.shell #hud,body.shell #surface-traffic-status,body.shell #touch-flight,body.shell #traffic-radar>header,body.shell #traffic-radar>footer,
+body.shell .panel-grip{display:none!important}
+
+/* ---- anchors ------------------------------------------------------------------------------------------------ */
+body.shell .anchor{position:fixed;z-index:20;display:flex;flex-direction:column;gap:10px;pointer-events:none;font-family:var(--ui);font-variant-numeric:tabular-nums}
+body.shell .anchor>*{position:static!important;inset:auto!important;transform:none!important;margin:0!important;pointer-events:auto}
+body.shell #anchor-objective{left:var(--edge);top:20px;max-width:min(380px,40vw);align-items:flex-start}
+body.shell #anchor-alerts{left:50%;top:76px;transform:translateX(-50%);align-items:center}
+body.shell #anchor-messages{left:50%;bottom:28px;transform:translateX(-50%);align-items:center}
+body.shell #anchor-sensors{right:var(--edge);top:18px;flex-direction:row-reverse;align-items:flex-start}
+body.shell #anchor-weapons{right:var(--edge);bottom:24px;align-items:flex-end}
+body.shell #anchor-credit{left:50%;bottom:6px;transform:translateX(-50%);opacity:.55}
+body.shell #anchor-credit,body.shell #anchor-credit *{font:400 9px/1.3 var(--ui)!important;color:#dfe8ee!important;background:none!important;border:0!important;padding:0!important;white-space:nowrap}
+body.clean.shell .anchor:not(#anchor-alerts){display:none}
+
+/* ---- objective (mission, operation, dogfight, tour) --------------------------------------------------------- */
+body.shell #mission-panel,body.shell #combat-panel,body.shell #tour-status,body.shell #raid-status,body.shell #nuke-status{
+  background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;padding:0!important;width:auto!important;border-radius:0!important;
+  font:600 13px/1.35 var(--ui)!important;letter-spacing:.01em!important;color:var(--text)!important;text-shadow:var(--hud-shadow);white-space:normal!important;text-align:left}
+body.shell #combat-panel strong{display:block;font:600 10px/1 var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--hud-dim);margin-bottom:5px}
+body.shell #combat-panel span{display:block;font:400 12px/1.35 var(--ui);color:var(--hud-dim)}
+body.shell #practice-stop{display:none}
+body.shell #tour-status{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+body.shell #tour-status[hidden],body.shell #raid-status[hidden],body.shell #nuke-status[hidden],body.shell #mission-panel[hidden]{display:none!important}
+body.shell #tour-status progress{width:160px;height:2px;appearance:none;border:0;background:#ffffff26}
+body.shell #tour-status progress::-webkit-progress-bar{background:#ffffff26}body.shell #tour-status progress::-webkit-progress-value{background:var(--accent)}
+body.shell #tour-stop{font:600 11px var(--ui);padding:6px 10px;border-radius:7px;border:1px solid #ffffff3a;background:#0a0f1566;color:var(--text)}
+body.shell #sonar-panel{width:280px!important;border-radius:10px!important;border:1px solid var(--line)!important;background:#0a0f15b3!important;font-family:var(--ui)!important;color:var(--text)!important}
+
+/* ---- threat banner and messages ---------------------------------------------------------------------------- */
+body.shell #rwr{padding:7px 14px!important;border-radius:8px!important;background:#2a0b0bd9!important;border:1px solid var(--danger)!important;color:#ffe3e3!important;
+  font:600 13px/1.5 var(--ui)!important;letter-spacing:.02em!important;max-width:min(560px,92vw)!important}
+body.shell #rwr:not(.inbound){background:#2a1d08d9!important;border-color:var(--warn)!important;color:#ffefd6!important}
+body.shell #rwr b{letter-spacing:.14em;font-size:11px}
+body.shell #notice,body.shell #bridge-flash{font:500 13px/1.3 var(--ui)!important;color:var(--text)!important;text-shadow:var(--hud-shadow)!important;background:none!important;border:0!important;padding:0!important;letter-spacing:.01em!important;max-width:min(620px,90vw)!important;text-align:center;white-space:normal!important}
+body.shell #bridge-flash{font-size:15px!important;font-weight:600!important}
+body.shell #travel-panel{background:#0a0f15b3!important;border:1px solid var(--line)!important;border-radius:10px!important;font-family:var(--ui)!important}
+
+/* ---- radar and menu button ------------------------------------------------------------------------------------ */
+body.shell #menu-button{width:40px;height:40px;border-radius:11px;border:1px solid #ffffff33;background:#0a0f1566;backdrop-filter:blur(8px);color:var(--text);display:grid;place-items:center;cursor:pointer;padding:0}
+body.shell #menu-button svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none}
+body.shell #menu-button:hover{border-color:#ffffff66}
+body.shell #traffic-radar{width:156px!important;height:156px;border-radius:50%!important;overflow:hidden!important;border:1px solid #dffbe955!important;background:#06120c99!important;box-shadow:inset 0 0 0 1px #0006!important;padding:0!important}
+body.shell #traffic-radar .radar-body,body.shell #traffic-radar canvas{width:100%!important;height:100%!important;display:block}
+body.shell #traffic-radar.folded .radar-body{display:block!important}
+
+/* ---- weapons: always on screen ------------------------------------------------------------------------------ */
+body.shell #combat-actions{display:flex!important;flex-direction:row;gap:6px}
+body.shell #combat-actions .weapon{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;border:1px solid #ffffff3a;background:#0a0f1580;backdrop-filter:blur(6px);
+  font:600 11px/1 var(--ui);letter-spacing:.08em;color:var(--hud);cursor:pointer;user-select:none;touch-action:none}
+body.shell #combat-actions .weapon:hover{border-color:#ffffff70}
+body.shell #combat-actions .weapon:active,body.shell #combat-actions .weapon.on{border-color:var(--accent);color:var(--accent)}
+body.shell #combat-actions .weapon kbd{font:600 10px/1 var(--mono);color:var(--muted);border:1px solid #ffffff30;border-radius:4px;padding:2px 4px;background:none}
+body.shell #combat-actions .weapon.nuke{color:var(--warn);border-color:#ffb54766}
+body.shell #combat-actions .weapon[disabled]{opacity:.4}
+
+/* ---- menu -------------------------------------------------------------------------------------------------- */
+#menu{position:fixed;inset:0;z-index:60;display:grid;grid-template-columns:250px 1fr;background:linear-gradient(90deg,#05080bf5 0 34%,#05080bd0 70%,#05080b99);backdrop-filter:blur(4px);font-family:var(--ui);color:var(--text)}
+#menu[hidden]{display:none}
+#menu nav{display:flex;flex-direction:column;gap:2px;padding:34px 0 26px 36px;overflow:auto}
+#menu .menu-brand{font:600 12px/1 var(--ui);letter-spacing:.32em;color:var(--muted);margin-bottom:26px}
+#menu .menu-item{all:unset;cursor:pointer;font:500 21px/1.2 var(--ui);color:#ffffff80;padding:8px 0;position:relative}
+#menu .menu-item:hover{color:#ffffffcc}
+#menu .menu-item.on{color:#fff}
+#menu .menu-item.on::before{content:"";position:absolute;left:-22px;top:50%;width:12px;height:2px;background:var(--accent)}
+#menu .menu-item.danger{color:#ff9d9d;font-size:15px;margin-top:18px}
+#menu .menu-item[hidden]{display:none}
+#menu .menu-foot-note{margin-top:auto;font-size:12px;color:var(--muted);padding-top:20px}
+#menu .menu-body{padding:40px 40px 30px 8px;overflow:auto}
+#menu .menu-section h2{font:600 12px/1 var(--ui);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 18px}
+#menu .menu-section[hidden]{display:none}
+#menu .menu-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;max-width:780px;margin-bottom:22px}
+#menu .menu-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:7px;min-height:112px;padding:15px;border-radius:12px;border:1px solid var(--line);background:#0d141bcc}
+#menu .menu-card:hover{border-color:#ffffff45}
+#menu .menu-card small{font:600 10px/1 var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+#menu .menu-card strong{font:600 16px/1.25 var(--ui)}
+#menu .menu-card span{font:400 12px/1.4 var(--ui);color:var(--muted)}
+#menu .menu-row,#menu .menu-toggles,#menu .menu-fields,#menu .menu-foot{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:18px;max-width:780px}
+#menu .menu-hint{color:var(--muted);font-size:12px;margin:12px 0 0}
+#menu button:not(.menu-item):not(.menu-card):not(.weapon),#menu select{font:500 13px/1 var(--ui)!important;color:var(--text)!important;background:#0d141bcc!important;border:1px solid var(--line)!important;border-radius:9px!important;padding:10px 14px!important;letter-spacing:.01em!important;text-transform:none!important;box-shadow:none!important;min-height:0!important}
+#menu button:not(.menu-item):not(.menu-card):hover{border-color:#ffffff45!important}
+#menu button.on{border-color:var(--accent)!important;color:var(--accent)!important}
+#menu button kbd{font:600 10px/1 var(--mono);color:var(--muted);border:1px solid #ffffff30;border-radius:4px;padding:2px 4px;margin-left:6px;background:none}
+#menu label.field{display:flex;flex-direction:column;gap:7px;font:600 10px/1 var(--ui)!important;letter-spacing:.14em;color:var(--muted)!important;margin:0!important;min-width:200px}
+#menu input[type=range]{accent-color:var(--accent)}
+#menu #view-bar{position:static!important;display:grid!important;grid-template-columns:repeat(4,minmax(110px,1fr));gap:10px;max-width:620px;background:none!important;border:0!important;padding:0!important;box-shadow:none!important;transform:none!important}
+#menu #view-bar button{justify-content:flex-start;display:flex;gap:8px;align-items:center}
+#menu #view-bar button kbd{margin:0}
+#menu #flight-map{position:relative!important;inset:auto!important;transform:none!important;width:min(900px,100%)!important;height:min(62vh,560px)!important;border-radius:12px!important;margin:0!important}
+#menu #travel-panel{position:static!important;transform:none!important;margin-top:12px}
+#menu .keys{display:grid;grid-template-columns:max-content 1fr;gap:9px 22px;max-width:520px;margin:0 0 22px}
+#menu .keys dt{font:600 12px/1.4 var(--mono);color:var(--hud)}
+#menu .keys dd{margin:0;color:var(--muted);font-size:13px}
+body.menu-open #instruments,body.menu-open .anchor,body.menu-open #combat-hud{visibility:hidden}
+
+/* ---- phone: thumb stick, thrust slider, fire arc ------------------------------------------------------------- */
+body.touch-ui #touch-stick{position:fixed;left:max(22px,env(safe-area-inset-left));bottom:max(26px,env(safe-area-inset-bottom));z-index:21;width:128px;height:128px;border-radius:50%;border:1.5px solid #ffffff44;background:#ffffff0d;touch-action:none}
+body.touch-ui #touch-stick i{position:absolute;left:50%;top:50%;width:50px;height:50px;margin:-25px 0 0 -25px;border-radius:50%;background:#ffffff33;border:1px solid #ffffff70;transition:transform .08s}
+body.touch-ui #touch-thrust{position:fixed;right:max(14px,env(safe-area-inset-right));top:calc(36% + 92px);bottom:max(26px,env(safe-area-inset-bottom));z-index:21;width:46px;border-radius:23px;border:1.5px solid #ffffff38;background:#ffffff0d;touch-action:none}
+body.touch-ui #touch-thrust i{position:absolute;left:4px;right:4px;bottom:4px;max-height:calc(100% - 8px);border-radius:19px;background:linear-gradient(#dffbe966,#dffbe922)}
+body.touch-ui #touch-thrust b{position:absolute;left:-8px;right:-8px;top:-20px;text-align:center;font:600 11px/1 var(--ui);color:var(--hud);text-shadow:var(--hud-shadow)}
+body.touch-ui #touch-extras{position:fixed;right:max(14px,env(safe-area-inset-right));top:36%;z-index:21;display:flex;flex-direction:column;gap:6px;width:46px}
+body.touch-ui #touch-extras button{font:600 9px/1 var(--ui);letter-spacing:.06em;padding:9px 0;width:46px;border-radius:9px;border:1px solid #ffffff3a;background:#0a0f1566;color:var(--text);touch-action:none}
+body.touch-ui #anchor-weapons{right:calc(max(14px,env(safe-area-inset-right)) + 64px);bottom:max(24px,env(safe-area-inset-bottom))}
+body.touch-ui #combat-actions{display:grid!important;grid-template-columns:repeat(2,auto);gap:10px;align-items:end;justify-items:end}
+body.touch-ui #combat-actions .weapon{width:58px;height:58px;border-radius:50%;justify-content:center;flex-direction:column;gap:2px;padding:0;font-size:10px}
+body.touch-ui #combat-actions .weapon kbd{display:none}
+body.touch-ui #combat-actions #fire-gun{width:76px;height:76px;border-color:var(--text);grid-column:2;grid-row:2}
+body.touch-ui #combat-actions #fire-missile{grid-column:1;grid-row:2}
+body.touch-ui #combat-actions #lock-target{grid-column:2;grid-row:1}
+body.touch-ui #combat-actions #drop-nuke{grid-column:1;grid-row:1;width:44px;height:44px}
+body.touch-ui #traffic-radar{width:96px!important;height:96px}
+body.touch-ui #anchor-objective{top:16px;max-width:46vw}
+body.touch-ui #anchor-alerts{top:64px}
+body.touch-ui #anchor-messages{bottom:auto;top:30%}
+@media (max-width:760px){
+  #menu{grid-template-columns:1fr;grid-template-rows:auto 1fr;background:#05080bf2}
+  #menu nav{flex-direction:row;flex-wrap:wrap;gap:4px 16px;padding:18px 18px 8px}
+  #menu .menu-brand{width:100%;margin-bottom:8px}
+  #menu .menu-item{font-size:16px}
+  #menu .menu-item.on::before{left:0;top:auto;bottom:-2px;width:100%}
+  #menu .menu-item.danger{margin-top:0}
+  #menu .menu-foot-note{display:none}
+  #menu .menu-body{padding:14px 18px 24px}
+  #menu #view-bar{grid-template-columns:repeat(2,1fr)}
+}
+@media (orientation:portrait) and (pointer:coarse){
+  body.touch-ui #touch-thrust{top:auto;height:170px}
+  body.touch-ui #touch-extras{top:auto;bottom:calc(max(26px,env(safe-area-inset-bottom)) + 180px)}
+  body.touch-ui #anchor-weapons{bottom:220px;right:calc(max(14px,env(safe-area-inset-right)) + 60px)}
+}
+
+/* Nothing in-game shows over the loading screen. */
+body:has(#loading:not([hidden])) :is(.anchor,#touch-stick,#touch-thrust,#touch-extras,#combat-actions,#menu-button){display:none!important}
+#menu .sound-icon{display:none}
+body.shell #anchor-credit .credits{display:flex;flex-direction:column;align-items:center;gap:1px}
+body.shell #anchor-credit .credits>*{position:static!important;inset:auto!important;transform:none!important;margin:0!important}
+body.touch-ui #anchor-credit{bottom:2px}
+body.touch-ui #anchor-credit,body.touch-ui #anchor-credit *{font-size:7.5px!important}
+
+/* ---- dialogs: missions, planner, tour, controls, traffic ------------------------------------------------------ */
+body.shell dialog{background:#070b10f7!important;border:1px solid var(--line)!important;border-radius:16px!important;color:var(--text)!important;font-family:var(--ui)!important;
+  padding:26px 28px!important;width:min(940px,94vw)!important;max-width:94vw!important;max-height:88vh!important;overflow:auto!important;box-shadow:0 30px 80px #000b!important}
+body.shell dialog::backdrop{background:#05080bb8;backdrop-filter:blur(4px)}
+body.shell dialog .eyebrow,body.shell dialog .credit{display:none!important}
+body.shell dialog h2{font:600 22px/1.2 var(--ui)!important;letter-spacing:0!important;margin:0 0 18px!important;color:var(--text)!important;text-transform:none!important}
+body.shell dialog h3.mission-head{font:600 11px/1 var(--ui)!important;letter-spacing:.16em!important;text-transform:uppercase;color:var(--muted)!important;margin:22px 0 10px!important;border:0!important;padding:0!important}
+body.shell dialog .dialog-head,body.shell dialog .radar-dialog-head{display:flex;justify-content:space-between;align-items:flex-start;margin:0!important;padding:0!important;border:0!important}
+body.shell dialog :is(.close,#explore-close,#radar-close){position:absolute!important;top:16px!important;right:16px!important;width:34px!important;height:34px!important;border-radius:50%!important;padding:0!important;
+  display:grid!important;place-items:center;font:400 20px/1 var(--ui)!important;color:var(--muted)!important;background:#ffffff0d!important;border:1px solid var(--line)!important}
+body.shell dialog :is(.close,#explore-close,#radar-close):hover{color:var(--text)!important;border-color:#ffffff45!important}
+body.shell dialog :is(#mission-grid,#destination-grid,#explore-tools){display:grid!important;grid-template-columns:repeat(auto-fill,minmax(168px,1fr))!important;gap:10px!important}
+body.shell dialog .destination-card{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;min-height:82px;padding:13px;border-radius:12px;border:1px solid var(--line);background:#0d141bcc}
+body.shell dialog .destination-card:hover{border-color:#ffffff45;background:#111a22}
+body.shell dialog .destination-card small{font:600 10px/1 var(--ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+body.shell dialog .destination-card strong{font:600 15px/1.25 var(--ui);color:var(--text)}
+body.shell dialog .destination-card span{font:500 11px/1 var(--ui);color:var(--muted)}
+body.shell dialog .destination-card[disabled]{opacity:.45}
+body.shell dialog p{font:400 13px/1.45 var(--ui)!important;color:var(--muted)!important;margin:8px 0!important}
+body.shell dialog p:empty{display:none}
+body.shell dialog .summit-readout.source a{color:var(--muted)}
+body.shell dialog label.field{display:flex!important;flex-direction:column;gap:7px;font:600 10px/1 var(--ui)!important;letter-spacing:.14em!important;color:var(--muted)!important;margin:0!important}
+body.shell dialog :is(input,select){font:500 14px/1 var(--ui)!important;color:var(--text)!important;background:#0d141b!important;border:1px solid var(--line)!important;border-radius:9px!important;padding:10px 12px!important;min-height:0!important;box-shadow:none!important}
+body.shell dialog :is(input,select):focus{outline:none;border-color:var(--accent)!important}
+body.shell dialog button:not(.destination-card):not(.close):not(#explore-close):not(#radar-close){font:600 13px/1 var(--ui)!important;letter-spacing:.01em!important;text-transform:none!important;color:var(--text)!important;
+  background:#0d141bcc!important;border:1px solid var(--line)!important;border-radius:9px!important;padding:11px 16px!important;box-shadow:none!important;min-height:0!important}
+body.shell dialog button:is([type=submit],#launch){background:var(--accent)!important;color:#04140d!important;border-color:var(--accent)!important}
+body.shell dialog .guide-grid{display:grid!important;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))!important;gap:12px!important;margin:14px 0!important}
+body.shell dialog .row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+body.shell #guide{width:min(560px,94vw)!important}
+body.shell #planner,body.shell #tour-planner{width:min(640px,94vw)!important}
+body.shell dialog .keys{display:grid;grid-template-columns:max-content 1fr;gap:10px 24px;margin:0}
+body.shell dialog .keys dt{font:600 12px/1.4 var(--mono);color:var(--hud)}
+body.shell dialog .keys dd{margin:0;color:var(--muted);font-size:13px}
+body.shell #explore-coordinates{margin-top:16px}
+
+/* ---- crash screen ------------------------------------------------------------------------------------------- */
+body.shell #crash-overlay{font-family:var(--ui)!important;background:radial-gradient(circle,#05080bcc,#05080bf0)!important;gap:12px!important}
+body.shell #crash-overlay strong{font:600 30px/1 var(--ui)!important;letter-spacing:.2em!important;color:var(--danger)!important}
+body.shell #crash-overlay span{font:400 14px/1.4 var(--ui)!important;color:var(--muted)!important}
+body.shell #crash-respawn{font:600 14px/1 var(--ui)!important;color:#04140d!important;background:var(--accent)!important;border:0!important;border-radius:10px!important;padding:12px 20px!important}
+body.shell dialog :is(#mission-grid,#destination-grid,#explore-tools){max-height:none!important;overflow:visible!important;padding:0!important}
+body.shell dialog .destination-card:is(.ops-card,.tool-card,.mission-card){background:#0d141bcc!important;border-color:var(--line)!important;box-shadow:none!important}
+body.shell dialog .destination-card.ops-card small{color:var(--warn)}
+body.shell dialog .destination-card.chip-card{min-height:0;padding:10px 12px;justify-content:center}
+body.shell dialog .destination-card.chip-card small{display:none}
+body.shell dialog .destination-card.chip-card strong{font-size:13px;font-weight:500}

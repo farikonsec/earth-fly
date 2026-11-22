@@ -29,7 +29,7 @@ export function arrangeHud() {
   const contacts = document.getElementById("radar-contacts");
   if (contacts && tools) {
     contacts.className = "destination-card tool-card";
-    contacts.innerHTML = "<small>Living skies</small><strong>Traffic &amp; satellites</strong><span>Airliners, patrols, 16,000+ orbits ↗</span>";
+    contacts.innerHTML = "<small>Live</small><strong>Traffic &amp; satellites</strong>";
     tools.append(contacts);
   }
   // Phones (upright or sideways) start with the radar folded so the scope does not cover the view; the header button unfolds it.

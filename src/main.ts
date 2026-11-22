@@ -1,5 +1,7 @@
 import {PostFX} from './post';
 import { noteFrame, sliceMs } from "./frame-budget";
+import { Shell } from "./ui-shell";
+const TOUCH_UI = matchMedia("(pointer: coarse)");
 import {Trails} from './trails';
 import {createStars,createMilkyWay,loadNightLights,nightUniforms,nightGLSL} from './space';
 import {Supercruise} from './supercruise';
@@ -1308,7 +1310,7 @@ function draw(dt: number) {
   renderer.render(shipScene, camera);
   perf.mark('scene');
   finishFrame(dt,alt,up,cues);
-  instruments.draw(camera, rotation, state.tele, cameraMode, alt >= KARMAN_LINE ? len(state.v) : undefined,altimetry);
+  instruments.draw(camera, rotation, state.tele, cameraMode, alt >= KARMAN_LINE ? len(state.v) : undefined,altimetry,{altitude:alt,throttle:boostActive?deliveredThrottle:throttle,boost:boostActive,airbrake:airbrake>0.05,fuel:state.fuel,damage:(state.structuralDamage??0)*100,gear,touch:TOUCH_UI.matches});
   audio.update(
     deliveredThrottle,
     state.tele?.airspeed ?? 0,
@@ -1459,16 +1461,6 @@ function updateUI(alt: number) {
   $('aircraft-readout').textContent='PATHFINDER X1 · fusion / VTOL / orbital drive · SR-71 inspired cruise · reinforced hull';
   $('time-readout').textContent=`TIME ${paused?'PAUSED · ':''}${effectiveRate}× active / ${timeRate}× requested${!tour&&effectiveRate<timeRate?' · free flight limited; cruise hold enables 60–240×':''}`;
   if(tour){const summary=tour.summary(timeRate);$('tour-title').textContent=tour.completed?'FULL EARTH LAP COMPLETE':'SR-71 · GREAT-CIRCLE CRUISE';$('tour-progress').textContent=`${(summary.progress*100).toFixed(1)}% · ${(summary.distance/1000).toFixed(0)} / ${(tour.plan.distance/1000).toFixed(0)} km · virtual refuels ${summary.refuels}`;$('tour-meter').setAttribute('value',String(summary.progress));$('tour-eta').textContent=`${(summary.remaining/3600).toFixed(2)} h simulated · ${(summary.wallRemaining/60).toFixed(1)} min at ${timeRate}× · ${summary.completed?'returned to start':'heading follows great circle'}`;}
-  $("reference-height").textContent = `${(alt / 1000).toFixed(1)} km above mean sea level`;
-  $("reference-orbit").textContent = `${orbit.circularSpeed.toFixed(2)} km/s`;
-  $("reference-escape").textContent = `${orbit.escapeSpeed.toFixed(2)} km/s`;
-  $("reference-period").textContent = `${(orbit.circularPeriod / 60).toFixed(1)} min`;
-  const density = atmosphereAt(alt).density;
-  $("reference-airlimit").textContent = alt > 86000 ? "Negligible modeled air load"
-    : `${Math.sqrt(2 * VEHICLE.maxDynamicPressure / density).toFixed(0)} m/s airspeed`;
-  $("reference-trajectory").textContent = space
-    ? `${orbit.phase} · predicted perigee ${(orbit.perigee / 1000).toFixed(0)} km`
-    : "Powered atmospheric flight · terrain clearance required";
   let message = paused
     ? "SIMULATION PAUSED"
     : state.status === "impact"
@@ -1592,9 +1584,8 @@ window.addEventListener("keydown", (e) => {
   if(ops.id&&(ops.status!=='flying'||state.status==='impact')&&(k==='enter'||k==='r')){ops.restart?.();return;}
   if(missions.active&&(missions.status!=='flying'||state.status==='impact')&&(k==='enter'||k==='r')){void startMission(missions.active);return;}
   if(state.status==='impact'&&(k==='enter'||k==='r')){respawn();return;}
-  if(k==='escape'&&missions.active)missions.stop();
+  if(k==='escape'&&!radar.dialog.open){shell.toggle();return;}
   if(k==='y'){toggleSuper();}
-  if(k==='escape'&&!radar.dialog.open){combat.clear();stopSuper();}
 
   if (k === " ") paused = !paused;
   if (k === "=") throttle = Math.min(1, Math.round(throttle * 10 + 1) / 10);
@@ -2130,11 +2121,11 @@ async function startMission(m:typeof MISSIONS[number]){
  await ($('start-form') as HTMLFormElement).onsubmit?.(new SubmitEvent('submit',{cancelable:true}));
  throttle=.26;paused=false;bridgePrev=null;holdAgl=null;holdI=0;missions.start(m,state.t);worldPlace=m.title;renderer.domElement.focus({preventScroll:true});
 }
-for(const o of OPS){const b=document.createElement('button');b.className='destination-card mission-card ops-card';b.innerHTML='<small>'+o.small+'</small><strong>'+o.title+'</strong><span>'+o.detail+'</span>';b.onclick=()=>{worldDialog.close();void startOps(o);};$('mission-grid').append(b);}
+for(const o of OPS){const b=document.createElement('button');b.className='destination-card mission-card ops-card';b.innerHTML='<small>'+o.small+'</small><strong>'+o.title+'</strong>';b.title=o.detail;b.onclick=()=>{worldDialog.close();void startOps(o);};$('mission-grid').append(b);}
 for(const m of MISSIONS){const b=document.createElement('button');b.className='destination-card mission-card';const best=missions.bestFor(m.id);
- b.innerHTML='<small>'+(m.gates.length>1?m.gates.length+' bridges':'Fly under')+'</small><strong>'+m.title.replace(/^Fly under /,'')+'</strong><span>'+m.detail+(best?' · best '+Math.floor(best/60)+':'+(best%60).toFixed(1).padStart(4,'0'):'')+'</span>';
+ b.innerHTML='<small>'+(m.gates.length>1?m.gates.length+' bridges':'Bridge')+'</small><strong>'+m.title.replace(/^Fly under /,'')+'</strong>'+(best?'<span>Best '+Math.floor(best/60)+':'+(best%60).toFixed(1).padStart(4,'0')+'</span>':'');b.title=m.detail;if(m.gates.length===1)b.classList.add('chip-card');
  b.onclick=()=>{worldDialog.close();void startMission(m);};$('mission-grid').append(b);}
-for(const d of WORLD_DESTINATIONS){const b=document.createElement('button');b.className='destination-card';b.innerHTML='<small>'+d.region+'</small><strong>'+d.name+'</strong><span>'+Math.abs(d.lat).toFixed(1)+'° '+(d.lat>=0?'N':'S')+' · '+Math.abs(d.lon).toFixed(1)+'° '+(d.lon>=0?'E':'W')+' ↗</span>';b.onclick=async()=>{b.disabled=true;try{const mode=select('explore-mode').value;worldDialog.close();$('start-lat').setAttribute('value',String(d.lat));for(const [id,v]of [['start-lat',d.lat],['start-lon',d.lon],['start-alt',mode==='orbit'?400000:mode==='descent'?120000:mode==='surface'?0:d.alt],['start-heading',d.heading],['start-speed',mode==='descent'?1500:220]] as const)($(id)as HTMLInputElement).value=String(v);select('start-mode').value=mode;await ($('start-form') as HTMLFormElement).onsubmit?.(new SubmitEvent('submit',{cancelable:true}));worldPlace=d.name;renderer.domElement.focus({preventScroll:true});}finally{b.disabled=false;}};$('destination-grid').append(b);}
+for(const d of WORLD_DESTINATIONS){const b=document.createElement('button');b.className='destination-card';b.innerHTML='<small>'+d.region+'</small><strong>'+d.name+'</strong>';b.onclick=async()=>{b.disabled=true;try{const mode=select('explore-mode').value;worldDialog.close();$('start-lat').setAttribute('value',String(d.lat));for(const [id,v]of [['start-lat',d.lat],['start-lon',d.lon],['start-alt',mode==='orbit'?400000:mode==='descent'?120000:mode==='surface'?0:d.alt],['start-heading',d.heading],['start-speed',mode==='descent'?1500:220]] as const)($(id)as HTMLInputElement).value=String(v);select('start-mode').value=mode;await ($('start-form') as HTMLFormElement).onsubmit?.(new SubmitEvent('submit',{cancelable:true}));worldPlace=d.name;renderer.domElement.focus({preventScroll:true});}finally{b.disabled=false;}};$('destination-grid').append(b);}
 setInterval(()=>{if(worldPlace)$('region').textContent=worldPlace;const travel=supercruise.active;$('super-toggle').classList.toggle('on',travel);$('super-toggle').innerHTML=travel?'Superspeed on <kbd>Y</kbd>':'Superspeed <kbd>Y</kbd>';$('super-readout').textContent=travel?(supercruise.goal==='free'?'TERRAIN SHIELD':supercruise.goal==='orbit'?'CLIMBING TO 400 KM':'DESCENDING TO 2.5 KM AGL')+' · '+(supercruise.speed/1000).toFixed(2)+' km/s · fictional drive':'Y superspeed · W/S climb/dive · Ctrl brake';$('combat-panel').hidden=!combat.engaged;document.body.classList.toggle('combat-active',combat.engaged);$('combat-score').textContent=combat.completed?(combat.down?'SHOT DOWN · ':'SORTIE COMPLETE · ')+combat.score.toLocaleString()+' PTS':(combat.persistent?'PATROL':'WAVE '+combat.wave)+' · '+combat.score.toLocaleString()+' PTS'+(combat.persistent?'':' · '+Math.ceil(combat.remaining)+'s');$('combat-help').textContent=combat.completed?'Start another sortie to beat your score.':combat.lockTime>=.85?'TARGET LOCKED · X to launch':'C lock · Z / click gun · X missile · turn hard to dodge fire';},100);
 
 function stopSuper(){if(!supercruise.active)return;supercruise.stop();const alt=(len(state.p)-EARTH.radius)*1000;if(alt<90000){const safe=Math.min(1200,Math.sqrt(140000/Math.max(.00001,atmosphereDensity(alt))));const av=new T.Vector3(...atmosphereVelocity(state.p)),relative=new T.Vector3(...state.v).sub(av);if(relative.length()*1000>safe)state.v=relative.setLength(safe/1000).add(av).toArray() as V;}control.reset();clearPilot();throttle=.4;timeRate=1;select('warp').value='1';}
@@ -2152,3 +2143,9 @@ radar.onRendezvous=id=>{const instant=Date.now(),orbital=orbitTraffic.state(id,i
  state.p=pos.addScaledVector(forward,-1).toArray() as V;state.v=velocity.toArray() as V;rotation.setFromRotationMatrix(new T.Matrix4().makeBasis(right,top,forward.negate()));state.status='flying';state.body='';state.heat=0;state.structuralDamage=0;state.fuel=100;state.tele=undefined;
  throttle=0;torch=gear=assist=entry=false;timeRate=1;select('warp').value='1';cameraMode='chase';cameraSet=false;paused=false;lastTrafficTime=state.t;clearPilot();invalidatePatch();trails.reset();orbitTraffic.selected=id;radar.selected='sat-'+id;combat.startPatrol(new T.Vector3(...state.p),rotation,new T.Vector3(...state.v));combat.lock=1000000+id;sync();
 };
+// Screen layout and the one menu (Esc or ☰): moves the existing controls, so their wiring above stays as it is.
+const shell=new Shell({
+ paused:()=>paused,setPaused:v=>{paused=v;sync();},
+ activity:()=>missions.active?'mission':ops.id?'operation':tour&&!tour.completed?'tour':combat.active&&!combat.persistent?'dogfight':supercruise.active?'superspeed':null,
+ endActivity:()=>{if(missions.active)missions.stop();if(ops.id){ops.id='';ops.status='idle';hunt.stop();}stopTour();if(combat.active&&!combat.persistent)$('practice-stop').click();stopSuper();},
+});
