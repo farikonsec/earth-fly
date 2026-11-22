@@ -32,7 +32,6 @@ export class Shell {
     this.anchor();
     this.buildMenu();
     if (touch.matches) this.touchControls();
-    touch.addEventListener("change", () => location.reload());
   }
 
   get open() { return !this.menu.hidden; }

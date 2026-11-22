@@ -55,7 +55,7 @@ body.shell #travel-panel{background:#0a0f15b3!important;border:1px solid var(--l
 /* ---- action bar (top left) ---------------------------------------------------------------------------------- */
 body.shell #anchor-actions{left:var(--edge);top:16px;flex-direction:row;flex-wrap:nowrap;gap:6px}
 @media (max-width:1100px){body.shell #anchor-actions .action kbd{display:none}body.shell #anchor-actions .action{padding:0 10px}}
-body.shell #anchor-actions .action{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 13px;border-radius:9px;border:1px solid #ffffff38;
+body.shell #anchor-actions .action{all:unset;pointer-events:auto;box-sizing:border-box;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 13px;border-radius:9px;border:1px solid #ffffff38;
   background:#0a0f15a6;backdrop-filter:blur(8px);font:600 13px/1 var(--ui);color:var(--text);cursor:pointer;white-space:nowrap}
 body.shell #anchor-actions .action:hover{border-color:#ffffff80;background:#121a22cc}
 body.shell #anchor-actions .action.on{border-color:var(--accent);color:var(--accent)}
@@ -81,7 +81,7 @@ body.shell #traffic-radar.folded .radar-body{display:block!important}
 
 /* ---- weapons: always on screen ------------------------------------------------------------------------------ */
 body.shell #combat-actions{display:flex!important;flex-direction:row;gap:6px}
-body.shell #combat-actions .weapon{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;border:1px solid #ffffff3a;background:#0a0f1580;backdrop-filter:blur(6px);
+body.shell #combat-actions .weapon{all:unset;pointer-events:auto;box-sizing:border-box;display:inline-flex;align-items:center;gap:7px;padding:8px 10px;border-radius:8px;border:1px solid #ffffff3a;background:#0a0f1580;backdrop-filter:blur(6px);
   font:600 11px/1 var(--ui);letter-spacing:.08em;color:var(--hud);cursor:pointer;user-select:none;touch-action:none}
 body.shell #combat-actions .weapon:hover{border-color:#ffffff70}
 body.shell #combat-actions .weapon:active,body.shell #combat-actions .weapon.on{border-color:var(--accent);color:var(--accent)}

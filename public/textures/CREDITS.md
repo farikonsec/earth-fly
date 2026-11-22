@@ -33,3 +33,5 @@ The milestone 0.11 regional bundle extends existing NASA Blue Marble and Landsat
 ## Flight Lab 0.17 additions
 
 Night-side city lights: NASA GIBS `VIIRS_CityLights_2012` (Earth at Night 2012, NASA Earth Observatory / NOAA NGDC, Suomi NPP VIIRS), streamed at runtime at zoom 4 and not bundled. API: https://nasa-gibs.github.io/gibs-api-docs/ . Static 2012 composite. Volumetric clouds, stars and the Milky Way band are generated in code; cloud coverage reuses `clouds.png`.
+
+Phone variants (`*-2k.jpg`, `*-2k.webp`) are the same images resized to 2048×1024 for touch devices.

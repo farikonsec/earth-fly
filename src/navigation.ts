@@ -24,7 +24,7 @@ export class FlightMap {
  private mapPixels:ImageData|null=null;private polarCanvas=document.createElement("canvas");
  private last=-Infinity; private lastTime=-1; private dragging:{x:number;y:number;lat:number;lon:number}|null=null;
  constructor(private plan:(lat:number,lon:number)=>void){
-  this.element.id='flight-map';this.element.setAttribute('aria-label','Flight navigation map');this.image.src='textures/earth.jpg';this.image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=1440;canvas.height=720;const c=canvas.getContext('2d')!;c.drawImage(this.image,0,0,1440,720);this.mapPixels=c.getImageData(0,0,1440,720);};
+  this.element.id='flight-map';this.element.setAttribute('aria-label','Flight navigation map');this.image.src=matchMedia('(pointer: coarse)').matches?'textures/earth-2k.jpg':'textures/earth.jpg';this.image.onload=()=>{const canvas=document.createElement('canvas');canvas.width=1440;canvas.height=720;const c=canvas.getContext('2d')!;c.drawImage(this.image,0,0,1440,720);this.mapPixels=c.getImageData(0,0,1440,720);};
   this.canvas.setAttribute('aria-label','Drag to pan, wheel to zoom, double click to plan a flight');this.canvas.tabIndex=0;
   const controls=document.createElement('div');controls.className='map-controls';
   const button=(text:string,title:string,action:()=>void)=>{const b=document.createElement('button');b.textContent=text;b.title=title;b.setAttribute('aria-label',title);b.onclick=action;controls.append(b);return b;};

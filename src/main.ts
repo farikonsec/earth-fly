@@ -1664,10 +1664,12 @@ window.addEventListener("resize", () => {
   camera.updateProjectionMatrix();
   renderer.setSize(innerWidth, innerHeight);post.resize();
 });
+// Phones get 2048-wide textures: the full set needs ~170 MB of GPU memory, enough for mobile browsers to kill and reload the tab.
+const TEX = TOUCH_UI.matches ? "-2k" : "";
 Promise.all([
-  load("textures/earth.jpg"),
-  load("textures/clouds.webp"),
-  load("textures/water.webp"),
+  load(`textures/earth${TEX}.jpg`),
+  load(`textures/clouds${TEX}.webp`),
+  load(`textures/water${TEX}.webp`),
 ])
   .then(async ([earth, cloud, water]) => {
     oceanMask.value=water;water.wrapS=T.RepeatWrapping;
@@ -1710,7 +1712,7 @@ Promise.all([
     const inland=await(await fetch('scenery/absheron.json')).json();
     makeCaspianMask(inland.features);
     scenery.features.push(...inland.features);
-    void loadLondonDem();void bridges.load();
+    if(!TOUCH_UI.matches)void loadLondonDem();void bridges.load();
     const thames=await fetch('scenery/london-water.json').then(r=>r.ok?r.json():null).catch(()=>null);if(thames){makeLondonMask(thames.features);scenery.features.push(...thames.features);ships.load(thames.features);}
     scenery.index=new GeoIndex(scenery.features);
     surface.waterLevel=(lat,lon)=>scenery.index.at(lat,lon,'water')?.elevation??null;
@@ -2063,15 +2065,20 @@ $("resume").onclick = async () => {
     $("notice").textContent = String(e);
   }
 };
+let pausedBeforeLoss = false;
 renderer.domElement.addEventListener("webglcontextlost", (event) => {
   event.preventDefault();
+  pausedBeforeLoss = paused;
   paused = true;
   $("notice").textContent =
-    "Graphics context lost · reload to recover; your last save remains available";
+    "Restoring graphics…";
 });
-renderer.domElement.addEventListener("webglcontextrestored", () =>
-  location.reload(),
-);
+// Phones drop the GL context when the tab goes to the background; three.js re-uploads everything on the next frame.
+renderer.domElement.addEventListener("webglcontextrestored", () => {
+  $("notice").textContent = "";
+  paused = pausedBeforeLoss;
+  sync();
+});
 
 function applyAircraft(_profile:'blackbird'|'pathfinder'){setAircraftProfile('pathfinder');select('aircraft').value='pathfinder';for(const id of ['torch','assist'])($(id) as HTMLButtonElement).disabled=false;}
 select('aircraft').onchange=()=>{stopTour();applyAircraft(select('aircraft').value as 'pathfinder'|'blackbird');};
