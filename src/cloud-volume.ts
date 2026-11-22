@@ -92,7 +92,7 @@ float remap(float v,float a,float b){return clamp((v-a)/max(1e-4,b-a),0.,1.);}
 float density(vec3 p,vec3 q,bool fine,out float hf){
   float r=length(p);vec3 d=p/r;
   vec2 uv=vec2(.5+atan(-d.z,d.x)/6.28318530718,.5+asin(clamp(d.y,-1.,1.))/3.14159265359);
-  float cov=textureLod(weatherMap,uv,0.).a;
+  float cov=textureLod(weatherMap,uv,0.).r;
   float ground=max(0.,textureLod(elevationMap,vec2(uv.x,1.-uv.y),0.).r)*.001;
   float big=textureLod(noiseMap,q/48.+vec3(.37,.11,.73),0.).r;
   // Polar ice in the static map is not cloud; always leave gaps a pilot can fly through.

@@ -578,7 +578,7 @@ terrainMaterial.onBeforeCompile = (shader) => {
     float relief=clamp(max(0.,dot(normalize(normal+rough*.55),sunView))/max(.08,sunFacing),.45,1.7);
     outgoingLight*=tone*mix(1.,relief,step(0.,sunFacing));
     // Approximate cloud shadow: same coverage map as the sky, broken up at cumulus scale.
-    float cover=texture2D(weatherMap,vec2(.5+vGeography.x/360.,.5+vGeography.y/180.)).a*(1.-.7*smoothstep(55.,70.,abs(vGeography.y)));
+    float cover=texture2D(weatherMap,vec2(.5+vGeography.x/360.,.5+vGeography.y/180.)).r*(1.-.7*smoothstep(55.,70.,abs(vGeography.y)));
     cover=clamp(cover*1.7+(grain(vGroundP*.0011+vec3(0.,waterClock*.0009,0.))*.6+grain(vGroundP*.0043)*.4-.5)*1.5+.08,0.,1.);
     outgoingLight*=1.-.32*smoothstep(.64,.9,cover)*smoothstep(0.,.15,sunFacing);
     // From orbit a city is one glowing patch; from the air above it the glow resolves into dim lit streets.
@@ -1666,8 +1666,8 @@ window.addEventListener("resize", () => {
 });
 Promise.all([
   load("textures/earth.jpg"),
-  load("textures/clouds.png"),
-  load("textures/water.png"),
+  load("textures/clouds.webp"),
+  load("textures/water.webp"),
 ])
   .then(async ([earth, cloud, water]) => {
     oceanMask.value=water;water.wrapS=T.RepeatWrapping;
@@ -1678,9 +1678,10 @@ Promise.all([
     earthMaterial.needsUpdate = true;
     terrainMaterial.map = earth;
     terrainMaterial.needsUpdate = true;
-    cloud.colorSpace = T.SRGBColorSpace;
+    // Greyscale cloud cover, read as data: the sphere is white and this is its alpha.
+    cloud.colorSpace = T.NoColorSpace;
     cloud.wrapS=T.RepeatWrapping;weatherMap.value=cloud;
-    cloudMat.map = cloud;
+    cloudMat.alphaMap = cloud;
     cloudMat.needsUpdate = true;
     const c = document.createElement("canvas");
     imageW = c.width = water.image.width;

@@ -104,6 +104,7 @@ export class Raid {
   clock = 0; released = false; number = 1; distance = RAID.start; centre = new T.Vector3();
   /** Called once per raid when a surviving bomber reaches its release point. */
   onRelease: ((p: T.Vector3, v: T.Vector3) => void) | null = null;
+  private upgrade: (() => void) | null = null;
   private serial = 970000; private target = new T.Vector3(...latLonToDir(RAID.target.lat, RAID.target.lon)); private tangent: T.Vector3; private seed = 5081;
   private rand = () => { this.seed = (Math.imul(this.seed, 1664525) + 1013904223) >>> 0; return this.seed / 4294967296; };
   constructor() {
@@ -114,7 +115,8 @@ export class Raid {
     for (const [type, offset] of flight) { const built = type === "tu160" ? { model: swan(), props: [] } : bear(); this.group.add(built.model); this.bombers.push({ type, model: built.model, props: built.props, offset, alive: true, missile: 4, gun: 0, burst: 0, drone: this.make(type) }); }
     for (const offset of [[-4, 0.3, 1.2], [4, 0.3, 1.2], [-5, 0.1, -2.6], [5, 0.1, -2.6], [-1.2, 0.7, -4.4], [1.2, 0.7, -4.4]] as [number, number, number][]) { const model = buildAircraft("su27"); this.group.add(model); this.escorts.push({ model, offset, drone: null, lost: false }); }
     this.clock = RAID.period * 0.25;
-    if (typeof window !== "undefined") void loadDetailed().then((models) => {
+    // The detailed meshes (1.4 MB) download once flight starts and the raid is within 250 km, so they never hold the loading screen.
+    this.upgrade = () => void loadDetailed().then((models) => {
       for (const b of this.bombers) {
         const real = models[b.type]; if (!real) continue;
         for (const child of [...b.model.children]) if (!child.userData.keep) b.model.remove(child);
@@ -164,6 +166,7 @@ export class Raid {
     const at = (o: [number, number, number]) => lead.clone().addScaledVector(right, o[0]).addScaledVector(up, o[1]).addScaledVector(forward, o[2]);
     this.centre.copy(lead); this.shipAt.copy(ship); this.velocity.copy(airVelocity(lead)).addScaledVector(forward, RAID.speed);
     const range = lead.distanceTo(ship), shown = d > -140 && range < 200;
+    if (this.upgrade && range < 250 && typeof window !== "undefined") { this.upgrade(); this.upgrade = null; }
     for (const b of this.bombers) {
       const p = at(b.offset); b.drone.p.copy(p); b.drone.v.copy(airVelocity(p)).addScaledVector(forward, RAID.speed);
       b.model.visible = shown && b.alive; b.model.position.copy(p).sub(ship); b.model.quaternion.copy(attitude);
